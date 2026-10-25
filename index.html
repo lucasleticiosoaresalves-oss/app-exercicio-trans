@@ -242,6 +242,13 @@ textarea{min-height:66px;resize:vertical}
 .vframe{position:relative;width:100%;aspect-ratio:16/9;background:#000}
 .vframe iframe{position:absolute;inset:0;width:100%;height:100%;border:0;display:block}
 .vtit{padding:9px 11px;font-size:13px;font-weight:600;line-height:1.35}
+.movcard{display:block;width:100%;border:1px solid var(--line);border-radius:var(--r-s);overflow:hidden;
+  background:var(--surface);text-align:left;transition:.14s}
+.movcard:hover{border-color:var(--line-2)}
+.movthumb{display:block;position:relative;width:100%;aspect-ratio:16/9;background:var(--surface-3)}
+.movthumb img{width:100%;height:100%;object-fit:cover;display:block}
+.movnome{display:block;font-weight:600;font-size:13px;padding:8px 10px 0;line-height:1.3}
+.movmusc{display:block;font-size:11px;color:var(--ink-2);padding:2px 10px 9px;line-height:1.3}
 
 /* ---------- abas ---------- */
 .subtabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
@@ -302,16 +309,6 @@ nav.tabbar button.on::before{content:"";position:absolute;top:-6px;width:22px;he
   color:#fff;font-size:10px;font-family:var(--f-m);padding:14px 6px 5px;text-align:center}
 .fcell button.del{position:absolute;top:5px;right:5px;width:22px;height:22px;border-radius:50%;
   background:rgba(0,0,0,.55);color:#fff;display:grid;place-items:center;font-size:11px}
-/* ---------- demonstração animada do movimento ---------- */
-.demo{background:var(--surface-2);border-radius:var(--r-s);padding:8px;position:relative}
-.demo svg{width:100%;height:auto;display:block;max-width:240px;margin:0 auto}
-.demo .bd{stroke:var(--ink);stroke-width:3.4;stroke-linecap:round;stroke-linejoin:round;fill:none}
-.demo .hd{fill:var(--ink)}
-.demo .eq{stroke:var(--pink);stroke-width:3.6;stroke-linecap:round;fill:var(--pink)}
-.demo .gr{stroke:var(--line-2);stroke-width:2;stroke-dasharray:3 4}
-.demo .cap{position:absolute;left:8px;bottom:8px;font-size:10px;font-weight:700;color:var(--ink-3);
-  text-transform:uppercase;letter-spacing:.09em}
-.demo .gh{stroke:var(--line-2);stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round;fill:none;opacity:.5}
 .demo .ctl{position:absolute;right:8px;bottom:8px}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
@@ -385,16 +382,12 @@ nav.tabbar button.on::before{content:"";position:absolute;top:-6px;width:22px;he
    <div class="subtabs" id="treinoTabs">
     <button class="subtab on" data-st="hoje">Hoje</button>
     <button class="subtab" data-st="agenda">Calendário</button>
-    <button class="subtab" data-st="cargas">Cargas</button>
-    <button class="subtab" data-st="volume">Volume</button>
-    <button class="subtab" data-st="videos">Vídeos</button>
-    <button class="subtab" data-st="plano">Plano completo</button>
+    <button class="subtab" data-st="evolucao">Evolução</button>
+    <button class="subtab" data-st="plano">Plano e movimentos</button>
    </div>
    <div id="st-hoje" class="stack" style="gap:14px"></div>
    <div id="st-agenda" class="stack" style="gap:14px" hidden></div>
-   <div id="st-cargas" class="stack" style="gap:14px" hidden></div>
-   <div id="st-volume" class="stack" style="gap:14px" hidden></div>
-   <div id="st-videos" class="stack" style="gap:14px" hidden></div>
+   <div id="st-evolucao" class="stack" style="gap:14px" hidden></div>
    <div id="st-plano" class="stack" style="gap:14px" hidden></div>
   </div>
  </section>
@@ -402,16 +395,12 @@ nav.tabbar button.on::before{content:"";position:absolute;top:-6px;width:22px;he
  <section id="tab-nutri" hidden>
   <div class="stack" style="gap:14px">
    <div class="subtabs" id="nutriTabs">
-    <button class="subtab on" data-st="diario">Diário</button>
-    <button class="subtab" data-st="cardapio">Cardápio do dia</button>
-    <button class="subtab" data-st="despensa">Tenho em casa</button>
-    <button class="subtab" data-st="receitas">Receitas</button>
+    <button class="subtab on" data-st="diario">O que comi</button>
+    <button class="subtab" data-st="receitas">O que comer</button>
     <button class="subtab" data-st="agua">Água</button>
     <button class="subtab" data-st="compras">Compras</button>
    </div>
    <div id="st-diario" class="stack" style="gap:14px"></div>
-   <div id="st-cardapio" class="stack" style="gap:14px" hidden></div>
-   <div id="st-despensa" class="stack" style="gap:14px" hidden></div>
    <div id="st-receitas" class="stack" style="gap:14px" hidden></div>
    <div id="st-agua" class="stack" style="gap:14px" hidden></div>
    <div id="st-compras" class="stack" style="gap:14px" hidden></div>
@@ -2135,29 +2124,6 @@ function proxLembrete(){
   ...MEALS.map(m=>({h:m.h,t:m.n.toLowerCase()}))].sort((a,b)=>hm2min(a.h)-hm2min(b.h));
  return lista.find(x=>hm2min(x.h)>ag)||null;
 }
-function cardVozMini(){
- if(S.perfil.vozAlvo==='off')return '';
- const d=hoje(),v=vozDoDia(d),pr=progVoz(d),alvo=vozAlvo();
- return '<div class="card">'+chTtl('mic','Voz de hoje — '+v.bloco.t,
-   '<button class="btn gh xs" data-a="go-sub" data-tab="cuidados" data-st="voz">Abrir '+ic('right')+'</button>')+
-  '<div class="row" style="gap:13px">'+ring(pr.t?pr.f/pr.t:0,'var(--blue)',70,pr.f+'/'+pr.t,'feitos')+
-  '<div class="grow"><p class="tiny muted">'+esc(alvo.nome)+' · alvo de '+esc(alvo.conf)+' · '+v.min+' minutos hoje</p>'+
-  '<div class="row wrap" style="gap:4px;margin-top:7px">'+v.exs.map(e2=>
-   '<span class="tag '+((diaRO(d).voz.ex||{})[e2.id]?'o':'n')+'">'+esc(e2.n.split(' ')[0])+'</span>').join('')+
-  '</div></div></div></div>';
-}
-function cardPeleMini(){
- const x=dia(hoje());
- return '<div class="card">'+chTtl('sparkle','Pele',
-   '<button class="btn gh xs" data-a="go-sub" data-tab="cuidados" data-st="pele">Rotina '+ic('right')+'</button>')+
-  '<div class="g2">'+[['manha','Manhã','sun'],['noite','Noite','moon']].map(([k,t,i2])=>
-   '<button class="ex '+(x.pele[k]?'done':'')+'" data-a="pele" data-p="'+k+'" style="display:flex;align-items:center;gap:9px">'+
-   '<span class="chk '+(x.pele[k]?'on':'')+'">'+ic('check')+'</span>'+
-   ic(i2,'font-size:16px;color:var(--ink-3)')+
-   '<span class="grow"><span style="display:block;font-weight:600;font-size:13.5px">'+t+'</span>'+
-   '<span style="display:block;font-size:11px;color:var(--ink-2)">'+passosPele(k).length+' passos</span></span></button>').join('')+
-  '</div></div>';
-}
 function cardHabitos(){
  const x=dia(hoje()),n=HABITS.filter(h=>x.hab[h[0]]).length;
  return '<div class="card">'+chTtl('check','Hábitos de hoje','<span class="tag '+(n===HABITS.length?'o':'n')+'">'+n+'/'+HABITS.length+'</span>')+
@@ -2182,8 +2148,10 @@ function cardSemana(){
   barChart(pts,m.kcal)+'<p class="xtiny muted" style="margin-top:7px">Barras: calorias registradas por dia. Linha tracejada: sua meta de '+m.kcal+' kcal.</p></div>';
 }
 function renderInicio(){
+ /* A rotina do dia já lista voz e pele com marcação própria, então os
+    cartões separados dos dois saíram daqui: viravam repetição. */
  $('#inicioBox').innerHTML=(S.perfil.onboard?'':cardOnboard())+cardHero()+cardRotina()+cardMacros()+
-  cardAgua()+cardVozMini()+cardPeleMini()+cardHabitos()+cardSemana();
+  cardAgua()+cardHabitos()+cardSemana();
 }
 
 /* =====================================================================
@@ -2258,144 +2226,108 @@ function stHoje(){
    ===================================================================== */
 const MOV={
  agachamento:{n:'Agachamento',m:'Quadríceps, glúteo e core',
-  A:{p:[50,15,50,26,50,55,42,36,40,48,58,36,60,48,46,73,46,92,54,73,54,92]},
-  B:{p:[48,28,48,38,52,62,40,48,47,42,57,48,51,42,40,74,46,92,60,74,56,92]},
   passos:['Pés na largura do ombro, pontas levemente abertas para fora.',
    'Empurre o quadril para trás como se fosse sentar numa cadeira e desça em 3 segundos.',
    'Desça até a coxa ficar paralela ao chão, ou até onde conseguir manter a coluna reta.',
    'Suba empurrando o chão com o meio do pé e aperte o glúteo no topo.'],
   erros:['Joelho entrando para dentro na subida','Calcanhar saindo do chão','Arredondar a lombar no fundo do movimento']},
  afundo:{n:'Afundo e agachamento búlgaro',m:'Quadríceps, glúteo e equilíbrio',
-  A:{p:[50,15,50,26,50,55,42,36,40,48,58,36,60,48,46,73,46,92,54,73,54,92]},
-  B:{p:[50,22,50,32,50,60,43,42,42,56,57,42,58,56,64,74,64,92,38,78,30,92]},
   passos:['Um pé à frente, o outro bem atrás, tronco ereto.',
    'Desça na vertical até os dois joelhos formarem 90 graus.',
    'O joelho da frente nunca passa da ponta do pé.',
    'Suba empurrando com o calcanhar da perna da frente.'],
   erros:['Inclinar o tronco para a frente','Dar um passo curto demais','Deixar o joelho de trás bater no chão']},
  flexao:{n:'Flexão de braço',m:'Peito, tríceps e ombro',
-  A:{p:[24,54,32,58,58,68,32,74,32,90,35,74,35,90,74,76,88,89,77,76,90,89]},
-  B:{p:[24,68,32,72,58,77,22,82,32,90,25,82,35,90,74,82,88,89,77,82,90,89]},
   passos:['Mãos pouco mais abertas que o ombro, dedos apontando para a frente.',
    'Corpo em linha reta da cabeça ao calcanhar, glúteo contraído.',
    'Desça até o peito quase tocar o chão, cotovelos a 45 graus do corpo.',
    'Empurre o chão até estender os braços sem travar o cotovelo.'],
   erros:['Quadril caindo ou empinado','Cotovelo abrindo a 90 graus do corpo','Descer só metade do movimento']},
  supino:{n:'Supino e crucifixo',m:'Peito, ombro anterior e tríceps',
-  A:{p:[28,60,36,62,62,66,32,50,46,50,35,52,49,52,72,66,84,80,74,66,86,80],e:[['l',26,70,82,70],['l',34,50,58,50]]},
-  B:{p:[28,60,36,62,62,66,41,49,46,36,44,51,49,38,72,66,84,80,74,66,86,80],e:[['l',26,70,82,70],['l',34,36,58,36]]},
   passos:['Deite com os pés firmes no chão e as escápulas apertadas uma contra a outra.',
    'Pegada pouco mais aberta que o ombro; punho alinhado com o cotovelo.',
    'Desça a barra até a linha do mamilo em 2 segundos, encostando de leve.',
    'Empurre para cima e um pouco para trás, na direção dos olhos.'],
   erros:['Tirar o ombro do banco','Quicar a barra no peito','Punho dobrado para trás']},
  puxada:{n:'Puxada e barra fixa',m:'Dorsal, bíceps e parte alta das costas',
-  A:{p:[50,30,50,38,50,64,42,25,40,14,58,25,60,14,47,80,47,92,53,80,53,92],e:[['l',24,12,76,12]]},
-  B:{p:[50,20,50,29,50,56,37,23,40,14,63,23,60,14,47,72,47,86,53,72,53,86],e:[['l',24,12,76,12]]},
   passos:['Pegada mais aberta que o ombro — é a abertura que dá largura ao dorsal.',
    'Antes de dobrar o cotovelo, puxe os ombros para baixo e para trás.',
    'Puxe com os cotovelos em direção às costelas, peito aberto e subindo.',
    'Desça devagar em 3 segundos até estender quase por completo.'],
   erros:['Puxar com a mão e esquecer o cotovelo','Balançar o corpo para ganhar impulso','Soltar a descida de qualquer jeito']},
  remada:{n:'Remada',m:'Costas, posterior do ombro e bíceps',
-  A:{p:[28,38,36,42,62,48,38,60,38,74,41,60,41,74,64,70,62,92,67,70,65,92],e:[['l',28,74,50,74]]},
-  B:{p:[28,38,36,42,62,48,32,58,46,56,35,59,49,57,64,70,62,92,67,70,65,92],e:[['l',38,56,58,56]]},
   passos:['Tronco inclinado a 45 graus, coluna reta, joelhos levemente dobrados.',
    'Deixe os braços esticarem por completo embaixo, sentindo o alongamento.',
    'Puxe até o umbigo, apertando as escápulas no fim do movimento.',
    'Volte controlando, sem deixar o peso cair.'],
   erros:['Jogar o tronco para trás a cada repetição','Arredondar a lombar','Puxar até o peito em vez do umbigo']},
  desenvolvimento:{n:'Desenvolvimento de ombro',m:'Deltoide anterior e lateral, tríceps',
-  A:{p:[50,16,50,27,50,58,36,35,34,25,64,35,66,25,46,76,46,92,54,76,54,92],e:[['l',26,25,74,25]]},
-  B:{p:[50,16,50,27,50,58,38,22,38,8,62,22,62,8,46,76,46,92,54,76,54,92],e:[['l',30,8,70,8]]},
   passos:['Comece com as mãos na altura do queixo, cotovelos um pouco à frente do corpo.',
    'Contraia o abdômen para não jogar a lombar para trás.',
    'Empurre para cima até quase estender, levando a cabeça um pouco à frente no fim.',
    'Desça controlando até a altura do queixo.'],
   erros:['Arquear a lombar para empurrar','Travar o cotovelo com força lá em cima','Descer só até a testa']},
  elevacao:{n:'Elevação lateral',m:'Deltoide lateral — o que alarga o ombro',
-  A:{p:[50,16,50,27,50,58,42,39,41,53,58,39,59,53,46,76,46,92,54,76,54,92],e:[['r',36,51,10,5],['r',54,51,10,5]]},
-  B:{p:[50,16,50,27,50,58,34,27,20,28,66,27,80,28,46,76,46,92,54,76,54,92],e:[['r',14,25,11,5],['r',75,25,11,5]]},
   passos:['Peso leve. Cotovelo levemente dobrado e fixo assim o movimento inteiro.',
    'Suba pelos lados até a mão chegar na linha do ombro, não mais.',
    'Imagine que está derramando água de uma jarra: mindinho um pouco mais alto.',
    'Desça em 3 segundos, sem deixar o peso cair.'],
   erros:['Balançar o tronco para ajudar','Subir acima da linha do ombro','Usar peso que exige impulso']},
  rosca:{n:'Rosca de bíceps',m:'Bíceps e antebraço',
-  A:{p:[50,16,50,27,50,58,42,39,42,54,58,39,58,54,46,76,46,92,54,76,54,92],e:[['r',37,53,11,5],['r',53,53,11,5]]},
-  B:{p:[50,16,50,27,50,58,42,39,45,27,58,39,55,27,46,76,46,92,54,76,54,92],e:[['r',40,25,11,5],['r',50,25,11,5]]},
   passos:['Cotovelo colado ao lado do corpo e parado ali.',
    'Suba o peso girando só o antebraço, sem mexer o ombro.',
    'Aperte o bíceps no topo por 1 segundo.',
    'Desça em 3 segundos até esticar o braço por completo.'],
   erros:['Jogar o cotovelo para a frente','Balançar o tronco','Não esticar o braço embaixo']},
  triceps:{n:'Tríceps',m:'Tríceps',
-  A:{p:[50,16,50,27,50,58,47,42,47,56,51,42,51,56,47,76,47,92,53,76,53,92],e:[['l',38,56,60,56]]},
-  B:{p:[50,16,50,27,50,58,47,42,42,31,51,42,46,31,47,76,47,92,53,76,53,92],e:[['l',34,30,52,30]]},
   passos:['Cotovelo colado ao corpo, apontando para o chão, e parado.',
    'Estenda só o antebraço até o braço ficar reto.',
    'Aperte o tríceps por 1 segundo no fim.',
    'Volte controlando até formar 90 graus.'],
   erros:['Abrir o cotovelo para os lados','Usar o ombro para empurrar','Inclinar o tronco sobre o peso']},
  mergulho:{n:'Mergulho e paralelas',m:'Tríceps, peito inferior e ombro',
-  A:{p:[50,30,50,38,50,62,44,46,42,34,56,46,58,34,50,76,48,90,54,76,56,90],e:[['l',28,34,46,34],['l',54,34,72,34]]},
-  B:{p:[50,42,50,50,50,72,42,54,42,34,58,54,58,34,50,84,48,92,54,84,56,92],e:[['l',28,34,46,34],['l',54,34,72,34]]},
   passos:['Braços estendidos, ombros longe das orelhas, peito um pouco à frente.',
    'Desça até o cotovelo chegar a 90 graus — não mais que isso.',
    'Mantenha os cotovelos apontando para trás, não para os lados.',
    'Suba empurnando até estender, sem travar.'],
   erros:['Descer demais e forçar o ombro','Ombro subindo na direção da orelha','Balançar as pernas para ganhar impulso']},
  stiff:{n:'Stiff e levantamento terra',m:'Posterior de coxa, glúteo e lombar',
-  A:{p:[50,15,50,26,50,56,44,38,44,52,56,38,56,52,50,74,50,92,54,74,54,92],e:[['l',36,52,64,52]]},
-  B:{p:[26,44,34,47,60,54,34,61,34,75,37,61,37,75,56,72,54,92,63,72,57,92],e:[['l',24,75,48,75]]},
   passos:['Joelhos quase retos, só destravados.',
    'Empurre o quadril para trás e deixe o tronco descer junto, coluna reta.',
    'Desça até sentir o alongamento atrás da coxa, com o peso raspando a perna.',
    'Suba empurrando o quadril para a frente e aperte o glúteo.'],
   erros:['Dobrar o joelho e virar agachamento','Arredondar a lombar','Afastar o peso do corpo']},
  ponte:{n:'Elevação pélvica e ponte',m:'Glúteo e posterior de coxa',
-  A:{p:[22,72,30,75,54,86,32,84,44,90,32,87,45,92,72,72,84,89,74,72,86,89]},
-  B:{p:[22,72,30,74,54,66,32,84,44,90,32,87,45,92,72,68,84,89,74,68,86,89]},
   passos:['Deitado, pés perto do bumbum e apoiados no chão.',
    'Empurre o chão com os calcanhares e suba o quadril.',
    'Aperte o glúteo por 2 segundos no topo, sem forçar a lombar.',
    'Desça devagar até quase encostar.'],
   erros:['Subir empurrando com a lombar','Pés longe demais do corpo','Não pausar no topo']},
  panturrilha:{n:'Panturrilha',m:'Panturrilha',
-  A:{p:[50,18,50,28,50,58,43,40,43,54,57,40,57,54,47,76,47,92,53,76,53,92],e:[['l',40,92,60,92]]},
-  B:{p:[50,10,50,20,50,50,43,32,43,46,57,32,57,46,47,68,47,86,53,68,53,86],e:[['l',40,92,60,92]]},
   passos:['De preferência num degrau, com o calcanhar livre para descer.',
    'Deixe o calcanhar descer abaixo da linha do degrau e segure 1 segundo.',
    'Suba na ponta do pé o máximo que conseguir.',
    'Segure 1 segundo em cima antes de descer.'],
   erros:['Movimento curto e rápido demais','Dobrar o joelho para ajudar','Não usar amplitude completa']},
  prancha:{n:'Prancha',m:'Core, lombar e ombro',
-  A:{p:[24,62,32,66,58,72,24,76,24,90,27,76,27,90,74,78,88,89,77,78,90,89]},
-  B:{p:[24,64,32,68,58,76,24,78,24,90,27,78,27,90,74,80,88,89,77,80,90,89]},
   passos:['Cotovelo embaixo do ombro, antebraços no chão.',
    'Corpo em linha reta: nuca, costas e calcanhar na mesma linha.',
    'Contraia glúteo e abdômen como se fosse levar um soco na barriga.',
    'Respire normalmente durante todo o tempo.'],
   erros:['Quadril empinado para cima','Lombar afundando','Prender a respiração']},
  abdominal:{n:'Abdominal e core',m:'Reto abdominal e core',
-  A:{p:[22,72,30,74,54,82,30,66,24,60,33,66,27,60,70,64,82,88,72,64,84,88]},
-  B:{p:[36,58,42,64,54,82,40,52,34,46,43,52,37,46,70,64,82,88,72,64,84,88]},
   passos:['Lombar colada no chão do começo ao fim.',
    'Suba enrolando a coluna, tirando só as escápulas do chão.',
    'Expire na subida e segure 1 segundo contraído.',
    'Desça devagar sem relaxar por completo.'],
   erros:['Puxar o pescoço com as mãos','Subir com impulso','Descolar a lombar do chão']},
  cardio:{n:'Cardio',m:'Condicionamento e gasto calórico',
-  A:{p:[48,16,48,26,50,54,40,36,36,26,57,36,60,46,40,70,34,88,62,66,70,84]},
-  B:{p:[48,16,48,26,50,54,41,36,38,46,56,36,60,26,60,70,68,86,40,66,32,82]},
   passos:['Comece com 3 a 5 minutos em ritmo leve para aquecer.',
    'No bloco forte você não deve conseguir manter uma conversa.',
    'No bloco leve, respire e recupere de verdade antes do próximo.',
    'Termine com 3 minutos devagar em vez de parar de uma vez.'],
   erros:['Começar no ritmo forte sem aquecer','Encurtar o descanso entre os blocos','Tontura: pare e sente']},
  along:{n:'Alongamento e mobilidade',m:'Recuperação e amplitude',
-  A:{p:[50,16,50,26,50,56,44,36,42,22,56,36,58,22,47,74,47,92,53,74,53,92]},
-  B:{p:[30,44,38,47,58,53,36,60,34,74,39,60,37,74,58,72,56,92,61,72,59,92]},
   passos:['Entre na posição devagar, até sentir tensão — nunca dor.',
    'Segure parado por 30 segundos, sem balançar.',
    'Respire fundo: a cada expiração você ganha um pouco mais de amplitude.',
@@ -2484,63 +2416,17 @@ const EXVID={
   ['Alongamento e mobilidade em 10 minutos','2TMSxdzE0lU'],
   ['Alongamento pós-treino','w4LCsSxB-SQ']]
 };
-/* Velocidade do loop por movimento, em segundos */
-const MOV_DUR={cardio:1.1,panturrilha:1.5,abdominal:2.4,prancha:3.2,along:3.4,stiff:2.6,mergulho:2.4};
-function reduzMov(){try{return window.matchMedia('(prefers-reduced-motion: reduce)').matches}catch(e){return false}}
-/* interpola um atributo entre as duas poses, ida e volta, em loop contínuo */
-function anm(attr,a,b,dur,parado){
- if(parado||a===b)return '';
- return '<animate attributeName="'+attr+'" values="'+a+';'+b+';'+a+'" keyTimes="0;0.5;1" dur="'+dur+'" '+
-  'calcMode="spline" keySplines="0.42 0 0.58 1;0.42 0 0.58 1" repeatCount="indefinite"/>';
-}
-const SEGS=[[0,1],[1,2],[1,3],[3,4],[1,5],[5,6],[2,7],[7,8],[2,9],[9,10]];
-function figuraEstatica(pose,cls){
- const p=pose.p,P=i=>[p[i*2],p[i*2+1]];
- let s='<g class="'+(cls||'bd')+'">';
- SEGS.forEach(([i,j])=>{const a=P(i),b=P(j);
-  s+='<line x1="'+a[0]+'" y1="'+a[1]+'" x2="'+b[0]+'" y2="'+b[1]+'"/>'});
- return s+'</g>';
-}
-function figuraAnim(A,B,dur,parado){
- const pa=A.p,pb=B.p,Pa=i=>[pa[i*2],pa[i*2+1]],Pb=i=>[pb[i*2],pb[i*2+1]];
- let s='<g class="bd">';
- SEGS.forEach(([i,j])=>{
-  const a1=Pa(i),a2=Pa(j),b1=Pb(i),b2=Pb(j);
-  s+='<line x1="'+a1[0]+'" y1="'+a1[1]+'" x2="'+a2[0]+'" y2="'+a2[1]+'">'+
-   anm('x1',a1[0],b1[0],dur,parado)+anm('y1',a1[1],b1[1],dur,parado)+
-   anm('x2',a2[0],b2[0],dur,parado)+anm('y2',a2[1],b2[1],dur,parado)+'</line>';
- });
- s+='</g>';
- const ca=Pa(0),cb=Pb(0);
- s+='<circle class="hd" cx="'+ca[0]+'" cy="'+ca[1]+'" r="6">'+
-  anm('cx',ca[0],cb[0],dur,parado)+anm('cy',ca[1],cb[1],dur,parado)+'</circle>';
- const ea=A.e||[],eb=B.e||[];
- if(ea.length){
-  s+='<g class="eq">';
-  ea.forEach((sa,k)=>{const sb=eb[k]||sa;
-   if(sa[0]==='l')s+='<line x1="'+sa[1]+'" y1="'+sa[2]+'" x2="'+sa[3]+'" y2="'+sa[4]+'">'+
-    anm('x1',sa[1],sb[1],dur,parado)+anm('y1',sa[2],sb[2],dur,parado)+
-    anm('x2',sa[3],sb[3],dur,parado)+anm('y2',sa[4],sb[4],dur,parado)+'</line>';
-   else s+='<rect x="'+sa[1]+'" y="'+sa[2]+'" width="'+sa[3]+'" height="'+sa[4]+'" rx="2" stroke="none">'+
-    anm('x',sa[1],sb[1],dur,parado)+anm('y',sa[2],sb[2],dur,parado)+'</rect>';});
-  s+='</g>';
- }
- return s;
-}
-function demoSVG(mov,legenda,fantasma){
- if(!mov)return '';
- const parado=reduzMov(),dur=(MOV_DUR[mov.k]||2.2)+'s';
- return '<div class="demo">'+
-  '<svg viewBox="0 0 100 100" role="img" aria-label="Demonstração do movimento: '+esc(mov.n)+'">'+
-  '<line class="gr" x1="6" y1="94" x2="94" y2="94"/>'+
-  (fantasma?figuraEstatica(mov.B,'gh'):'')+
-  figuraAnim(mov.A,mov.B,dur,parado)+'</svg>'+
-  '<span class="cap">'+esc(legenda||mov.n)+'</span></div>';
+/* A demonstração de cada movimento é o vídeo de uma pessoa executando,
+   tocado dentro da própria página. */
+function demoPrincipal(mov){
+ const v=(EXVID[mov.k]||[])[0];
+ if(!v)return '<p class="tiny muted" style="margin-bottom:12px">Trabalha: '+esc(mov.m)+'</p>';
+ return cardVideo(v[0],v[1])+
+  '<p class="xtiny muted" style="text-align:center;margin:9px 0 15px">'+
+  'Toque para assistir · trabalha '+esc(mov.m)+'</p>';
 }
 function blocoTecnica(mov){
- return demoSVG(mov,null,true)+
-  '<p class="xtiny muted" style="text-align:center;margin:7px 0 13px">Trabalha: '+esc(mov.m)+
-   ' · o contorno claro atrás é a posição final do movimento</p>'+
+ return demoPrincipal(mov)+
   '<div class="lbl" style="margin-bottom:8px">Como executar</div>'+
   '<div class="stack" style="gap:9px;margin-bottom:14px">'+mov.passos.map((t,i)=>
    '<div class="row top" style="gap:10px"><div class="idx">'+(i+1)+'</div>'+
@@ -2549,13 +2435,14 @@ function blocoTecnica(mov){
   '<div class="stack" style="gap:6px">'+mov.erros.map(t=>
    '<div class="row top" style="gap:8px"><span class="tag a">'+ic('x')+'</span>'+
    '<span class="grow tiny" style="line-height:1.5">'+esc(t)+'</span></div>').join('')+'</div>'+
-  blocoVideos(mov.k);
+  blocoVideos(mov.k,1);
 }
-function blocoVideos(k){
- const v=EXVID[k]||[];
+/* os demais vídeos do movimento; `pular` omite os já mostrados acima */
+function blocoVideos(k,pular){
+ const v=(EXVID[k]||[]).slice(pular||0);
  if(!v.length)return '';
- return '<hr class="sep"><div class="lbl" style="margin-bottom:4px">Vídeos de execução</div>'+
-  '<p class="xtiny muted" style="margin-bottom:10px">Toque para assistir aqui mesmo, sem sair do app.</p>'+
+ return '<hr class="sep"><div class="lbl" style="margin-bottom:4px">Outros ângulos e explicações</div>'+
+  '<p class="xtiny muted" style="margin-bottom:10px">Tocam aqui mesmo, sem sair do app.</p>'+
   '<div class="stack" style="gap:10px">'+v.map(([t,id])=>cardVideo(t,id)).join('')+'</div>';
 }
 function cardVideo(t,id){
@@ -2639,7 +2526,7 @@ function stCargas(){
  const treinos=Object.values(S.dias).filter(x=>(x.treino||{}).feito).length;
  const porGrupo={};
  nomes.forEach(n=>{const g=grupoDe(n);(porGrupo[g]=porGrupo[g]||[]).push(n)});
- $('#st-cargas').innerHTML=
+ return ''+
   '<div class="card">'+chTtl('trophy','Seus números')+'<div class="g3">'+
    tile('Treinos',treinos,'concluídos')+tile('Exercícios',nomes.length,'com carga')+
    tile('Dia',Math.max(0,diaPlano()),'do plano')+'</div></div>'+
@@ -2668,7 +2555,7 @@ function stVolume(){
  });
  const ord=Object.keys(vol).sort((a,b)=>vol[b]-vol[a]);
  const totalSets=Object.values(vol).reduce((a,b)=>a+b,0);
- $('#st-volume').innerHTML=
+ return ''+
   '<div class="card">'+chTtl('chart','Volume por grupo muscular','<span class="tag n">28 dias</span>')+
   (ord.length?hBars(ord.map(g=>({x:g,y:vol[g]})),'var(--blue)'):
    vazio('chart','Marque as séries durante o treino para o volume aparecer aqui.'))+
@@ -2682,32 +2569,26 @@ function stVolume(){
     '<div class="sub num">'+v+' séries</div></div><span class="tag '+st[0]+'">'+st[1]+'</span></div>';}).join('')+
    '</div><p class="xtiny muted" style="margin-top:8px">Grupos "baixos" não são erro: nas fases 1 e 2 o volume é propositalmente menor.</p></div>':'');
 }
-function stVideos(){
- const se=sessaoDe(),exs=se.s?exercicios(se.key):[];
+function bibliotecaMovimentos(){
  const L=S.perfil.local;
- const pats=[];
- exs.forEach(ex=>{const m=movDe(ex.n);if(m&&!pats.some(p=>p.m===m))pats.push({m,ex:ex.n})});
  const bloco=(t,icone,arr)=>'<div class="card">'+chTtl(icone,t)+'<div class="stack" style="gap:8px">'+
   arr.map(v=>vidLink(v.t,v.q,v.d)).join('')+'</div></div>';
- $('#st-videos').innerHTML=
-  '<div class="card hero">'+chTtl('play','Demonstrações e vídeos')+
-   '<p class="tiny muted">Cada movimento tem duas coisas: a <b>demonstração animada</b>, com o passo a passo e os erros comuns, '+
-   'e os <b>vídeos de execução</b>, que tocam aqui mesmo para você ver uma pessoa real fazendo.</p></div>'+
-  (pats.length?'<div class="card">'+chTtl('dumb','Movimentos do treino de hoje','<span class="tag n">'+pats.length+'</span>')+
-   '<div class="g2">'+pats.map(p=>
-    '<button data-a="ex-info" data-n="'+esc(p.ex)+'" style="display:block">'+demoSVG(p.m)+
-    '<div style="font-weight:600;font-size:13px;margin-top:6px">'+esc(p.m.n)+'</div>'+
-    '<div class="xtiny muted">'+esc(p.m.m)+'</div></button>').join('')+'</div>'+
-   '<p class="xtiny muted" style="margin-top:10px">Toque em qualquer um para abrir o passo a passo e os erros comuns.</p></div>':'')+
-  '<div class="card">'+chTtl('book','Biblioteca de movimentos','<span class="tag n">'+Object.keys(MOV).length+'</span>')+
-   '<div class="g2">'+Object.keys(MOV).map(k=>
-    '<button data-a="mov-info" data-k="'+k+'" style="display:block">'+demoSVG(MOV[k])+
-    '<div style="font-weight:600;font-size:13px;margin-top:6px">'+esc(MOV[k].n)+'</div>'+
-    '<div class="xtiny muted">'+esc(MOV[k].m)+'</div></button>').join('')+'</div></div>'+
+ const mini=k=>{
+  const v=(EXVID[k]||[])[0];
+  return '<button class="movcard" data-a="mov-info" data-k="'+k+'">'+
+   (v?'<span class="movthumb"><img src="https://i.ytimg.com/vi/'+esc(v[1])+'/mqdefault.jpg" alt="" loading="lazy" '+
+     'onerror="this.style.visibility=\'hidden\'"><span class="vplay" style="width:36px;height:36px;font-size:16px">'+
+     ic('play')+'</span></span>':'')+
+   '<span class="movnome">'+esc(MOV[k].n)+'</span>'+
+   '<span class="movmusc">'+esc(MOV[k].m)+'</span></button>';
+ };
+ return '<div class="card">'+chTtl('book','Biblioteca de movimentos','<span class="tag n">'+Object.keys(MOV).length+'</span>')+
+  '<p class="tiny muted" style="margin-bottom:11px">Os 18 movimentos que formam o plano inteiro. '+
+  'Toque para ver o vídeo, o passo a passo e os erros comuns.</p>'+
+  '<div class="g2">'+Object.keys(MOV).map(mini).join('')+'</div></div>'+
   (L==='cal'?bloco('Calistenia','wave',VIDEOS.calistenia)+bloco('Musculação','dumb',VIDEOS.musculacao)
-   :L==='casa'?bloco('Treino em casa','home',VIDEOS.casa)+bloco('Calistenia','wave',VIDEOS.calistenia)+bloco('Musculação','dumb',VIDEOS.musculacao)
-   :bloco('Musculação','dumb',VIDEOS.musculacao)+bloco('Calistenia','wave',VIDEOS.calistenia))+
-  (L!=='casa'?bloco('Treino em casa','home',VIDEOS.casa):'');
+   :L==='casa'?bloco('Treino em casa','home',VIDEOS.casa)+bloco('Calistenia','wave',VIDEOS.calistenia)
+   :bloco('Musculação','dumb',VIDEOS.musculacao)+bloco('Calistenia','wave',VIDEOS.calistenia));
 }
 function stPlano(){
  const n=diaPlano();
@@ -2739,13 +2620,17 @@ function stPlano(){
      '<div class="sub">'+esc(s.foco)+' · voz: '+esc(VOZ_CICLO[i].t.toLowerCase())+'</div></div>'+
      '<span style="width:9px;height:9px;border-radius:50%;background:'+corTipo(s.tipo)+'"></span></button>';}).join('')+
    '</div></div>';
- }).join('');
+ }).join('')+bibliotecaMovimentos();
+}
+/* Cargas e volume são a mesma pergunta: estou evoluindo? Ficam juntos. */
+function stEvolucao(){
+ $('#st-evolucao').innerHTML=stCargas()+stVolume();
 }
 function renderTreino(){
  const s=S.ui.sub.treino;
  $$('#treinoTabs .subtab').forEach(b=>b.classList.toggle('on',b.dataset.st===s));
- ['hoje','agenda','cargas','volume','videos','plano'].forEach(k=>{const el=$('#st-'+k);if(el)el.hidden=(k!==s)});
- ({hoje:stHoje,agenda:stAgenda,cargas:stCargas,volume:stVolume,videos:stVideos,plano:stPlano}[s]||stHoje)();
+ ['hoje','agenda','evolucao','plano'].forEach(k=>{const el=$('#st-'+k);if(el)el.hidden=(k!==s)});
+ ({hoje:stHoje,agenda:stAgenda,evolucao:stEvolucao,plano:stPlano}[s]||stHoje)();
 }
 /* =====================================================================
    NUTRIÇÃO
@@ -2807,7 +2692,7 @@ function stCardapio(){
  let tot={kcal:0,p:0,c:0,g:0};
  MEALS.forEach(r=>{const rec=RECIPES.find(z=>z.id===c.itens[r.k]);
   if(rec){tot.kcal+=rec.kcal;tot.p+=rec.p;tot.c+=rec.c;tot.g+=rec.g}});
- $('#st-cardapio').innerHTML=
+ return ''+
   '<div class="card hero">'+chTtl('wand','Cardápio sugerido para hoje',
    '<button class="btn gh xs" data-a="novo-cardapio">'+ic('redo')+' outro</button>')+
    '<p class="tiny muted">Montado a partir das suas metas, das receitas favoritas e do que você marcou como disponível em casa.</p>'+
@@ -2839,7 +2724,7 @@ function stDespensa(){
  const prontas=ranked.filter(x=>x.s.falta===0);
  const quase=ranked.filter(x=>x.s.falta>0&&x.s.pct>=50).slice(0,10);
  const faltaTudo=[...new Set(quase.slice(0,5).flatMap(x=>x.s.faltantes))];
- $('#st-despensa').innerHTML=
+ return ''+
   '<div class="card">'+chTtl('pot','O que você tem em casa',
    des.length?'<button class="btn gh xs" data-a="desp-limpa">limpar</button>':'')+
    '<p class="tiny muted">Digite ou toque nos ingredientes. O app cruza com as '+RECIPES.length+' receitas e mostra o que dá para fazer agora.</p>'+
@@ -2882,7 +2767,7 @@ function stReceitas(){
  if(f==='favs')lista=lista.filter(r=>S.favs.includes(r.id));
  else if(f!=='todas')lista=lista.filter(r=>r.ref.includes(f));
  if(q)lista=lista.filter(r=>nrm(r.nome).includes(q)||r.ing.some(x=>nrm(x.n).includes(q)));
- $('#st-receitas').innerHTML=
+ $('#st-receitas').innerHTML=stCardapio()+stDespensa()+
   '<div class="card">'+chTtl('book','Receitas','<span class="tag n">'+RECIPES.length+'</span>')+
   '<p class="tiny muted">Todas com gramagem, modo de preparo e valores por porção. Toque para abrir e registrar no diário.</p>'+
   '<div class="srch" style="margin-top:11px">'+ic('search')+
@@ -3032,8 +2917,8 @@ function stCompras(){
 function renderNutri(){
  const s=S.ui.sub.nutri;
  $$('#nutriTabs .subtab').forEach(b=>b.classList.toggle('on',b.dataset.st===s));
- ['diario','cardapio','despensa','receitas','agua','compras'].forEach(k=>{const el=$('#st-'+k);if(el)el.hidden=(k!==s)});
- ({diario:stDiario,cardapio:stCardapio,despensa:stDespensa,receitas:stReceitas,agua:stAgua,compras:stCompras}[s]||stDiario)();
+ ['diario','receitas','agua','compras'].forEach(k=>{const el=$('#st-'+k);if(el)el.hidden=(k!==s)});
+ ({diario:stDiario,receitas:stReceitas,agua:stAgua,compras:stCompras}[s]||stDiario)();
 }
 
 
@@ -3501,7 +3386,10 @@ function renderProg(){
    ===================================================================== */
 function camposPerfil(pref){
  const p=S.perfil;
- return '<div class="g2">'+
+ /* três blocos curtos em vez de um paredão de quinze campos */
+ const grupo=(t,d)=>'</div><div class="lbl" style="margin:15px 0 7px">'+t+'</div>'+
+  (d?'<p class="xtiny muted" style="margin:-3px 0 8px">'+d+'</p>':'')+'<div class="g2">';
+ return '<div class="lbl" style="margin-bottom:7px">Sobre você</div><div class="g2">'+
   '<label class="fld" style="grid-column:1/-1">Como quer ser chamado<input type="text" id="'+pref+'nome" value="'+esc(p.nome)+'" placeholder="Seu nome"></label>'+
   '<label class="fld">Base do cálculo metabólico<select id="'+pref+'sexo">'+
    '<option value="f"'+(p.sexo==='f'?' selected':'')+'>Antes da T ou primeiro ano</option>'+
@@ -3510,6 +3398,7 @@ function camposPerfil(pref){
   '<label class="fld">Altura (cm)<input type="number" inputmode="numeric" id="'+pref+'altura" value="'+p.altura+'"></label>'+
   '<label class="fld">Peso atual (kg)<input type="number" step="0.1" inputmode="decimal" id="'+pref+'peso" value="'+n1(pesoAtual())+'"></label>'+
   '<label class="fld">Peso alvo (kg)<input type="number" step="0.1" inputmode="decimal" id="'+pref+'meta" value="'+p.meta+'"></label>'+
+  grupo('Objetivo e treino','Define suas metas de caloria e proteína e qual versão do plano aparece.')+
   '<label class="fld">Objetivo<select id="'+pref+'obj">'+
    [['perder','Perder gordura'],['manter','Manter e recompor'],['ganhar','Ganhar massa']].map(([v,n])=>
    '<option value="'+v+'"'+(p.obj===v?' selected':'')+'>'+n+'</option>').join('')+'</select></label>'+
@@ -3521,6 +3410,7 @@ function camposPerfil(pref){
   '<label class="fld">Como você treina<select id="'+pref+'local">'+
    LOCAIS.map(([v,t])=>'<option value="'+v+'"'+(p.local===v?' selected':'')+'>'+t+'</option>').join('')+
    '</select></label>'+
+  grupo('Voz, pele e horários','Os horários montam a rotina do dia na tela de Início.')+
   '<label class="fld">Objetivo da voz<select id="'+pref+'vozAlvo">'+
    [['fem','Feminilizar'],['masc','Masculinizar'],['neutro','Voz neutra'],['off','Não quero treinar voz']].map(([v,n])=>
    '<option value="'+v+'"'+(p.vozAlvo===v?' selected':'')+'>'+n+'</option>').join('')+'</select></label>'+
