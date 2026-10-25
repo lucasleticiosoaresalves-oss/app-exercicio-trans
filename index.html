@@ -11,7 +11,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <style>
-/* O mesmo reset mínimo que a plataforma do Claude aplica, escrito aqui na mão. */
+/* Reset mínimo. O resto do estilo está no bloco principal, dentro do corpo. */
 :root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 body{margin:0;font:14px system-ui,-apple-system,"Segoe UI",sans-serif}
 img{max-width:100%}
@@ -230,6 +230,18 @@ textarea{min-height:66px;resize:vertical}
 .vid:hover{border-color:var(--line-2);background:var(--surface-2)}
 .vid .pl{width:34px;height:34px;border-radius:9px;background:var(--pink-soft);color:var(--pink);
   display:grid;place-items:center;flex:none;font-size:16px}
+/* vídeo que toca na própria página */
+.vcard{border:1px solid var(--line);border-radius:var(--r-s);overflow:hidden;background:var(--surface)}
+.vthumb{display:block;position:relative;width:100%;aspect-ratio:16/9;background:var(--surface-3);padding:0;border:0;cursor:pointer}
+.vthumb img{width:100%;height:100%;object-fit:cover;display:block}
+.vthumb:hover .vplay{transform:scale(1.08)}
+.vplay{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:52px;height:52px;border-radius:50%;
+  background:rgba(12,22,30,.74);color:#fff;display:grid;place-items:center;font-size:21px;transition:transform .15s;
+  box-shadow:0 2px 14px rgba(0,0,0,.35)}
+.vplay .ic{margin-left:3px}
+.vframe{position:relative;width:100%;aspect-ratio:16/9;background:#000}
+.vframe iframe{position:absolute;inset:0;width:100%;height:100%;border:0;display:block}
+.vtit{padding:9px 11px;font-size:13px;font-weight:600;line-height:1.35}
 
 /* ---------- abas ---------- */
 .subtabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
@@ -1700,7 +1712,6 @@ const DEF={
    calMes:null,diaSel:null,tema:'auto',filtroRef:'todas',cardapio:null,skinTipo:null}
 };
 let S=JSON.parse(JSON.stringify(DEF));
-let DB=null,UID=null,BASE=null,ASSETS=null;
 
 /* ---------- datas ---------- */
 function ymd(d){const z=n=>String(n).padStart(2,'0');return d.getFullYear()+'-'+z(d.getMonth()+1)+'-'+z(d.getDate())}
@@ -1739,28 +1750,16 @@ function diaRO(d){return S.dias[d]||{ref:{},agua:0,treino:{feito:false,sets:{}},
 /* =====================================================================
    PERSISTÊNCIA
    ===================================================================== */
-const tmr={};
 function lsSave(){try{localStorage.setItem(LS,JSON.stringify(S))}catch(e){}}
 function lsLoad(){try{const r=localStorage.getItem(LS)||localStorage.getItem('rotaforte.v2');if(!r)return;
  const o=JSON.parse(r);
  S={...DEF,...o,perfil:{...DEF.perfil,...(o.perfil||{})},
   ui:{...DEF.ui,...(o.ui||{}),sub:{...DEF.ui.sub,...((o.ui||{}).sub||{})}}}}catch(e){}}
-function baseDoc(){return{perfil:S.perfil,pesos:S.pesos,medidas:S.medidas,cargas:S.cargas,despensa:S.despensa,
- fotos:S.fotos,compras:S.compras,recentes:S.recentes,favs:S.favs,vozLog:S.vozLog}}
-function save(what,d){
- lsSave();
- if(!DB||!BASE)return;
- const key=what==='dia'?'dia:'+d:'base';
- clearTimeout(tmr[key]);
- tmr[key]=setTimeout(async()=>{
-  try{
-   if(what==='dia')await BASE.collection('dias').doc(d).set(JSON.parse(JSON.stringify(dia(d))));
-   else await BASE.set(JSON.parse(JSON.stringify(baseDoc())));
-  }catch(e){}
- },900);
-}
-/* Ajusta os padrões para masculinização. Precisa rodar também DEPOIS da leitura
-   da nuvem: senão o perfil antigo guardado volta por cima e desfaz o ajuste. */
+/* Tudo é gravado no próprio navegador. Os parâmetros ficam por compatibilidade
+   com as chamadas espalhadas pelo app. */
+function save(){lsSave()}
+
+/* Ajusta os padrões para masculinização uma única vez. */
 function migrar(){
  const p=S.perfil;
  if(p.mig>=2)return false;
@@ -1768,26 +1767,35 @@ function migrar(){
  if(!p.onboard){p.vozAlvo='masc';p.obj='ganhar';p.pele='oleosa'}
  return true;
 }
-async function conectar(){
- try{
-  const u=await claude.use('user'),d=await claude.use('db');
-  if(!u||!d)return;
-  UID=await u.id(); if(!UID)return;
-  DB=d;BASE=d.doc('data/users/'+UID+'/estado');
-  try{ASSETS=await claude.use('assets')}catch(e){}
-  const snap=await BASE.get();
-  if(snap.exists){const v=snap.data()||{};
-   S.perfil={...S.perfil,...(v.perfil||{})};
-   ['pesos','medidas','fotos','compras','recentes','favs','vozLog'].forEach(k=>{
-    if(Array.isArray(v[k])&&v[k].length>=(S[k]||[]).length)S[k]=v[k]});
-   if(v.cargas)S.cargas={...v.cargas,...S.cargas};
-   if(Array.isArray(v.despensa)&&!S.despensa.length)S.despensa=v.despensa;
-  }else{await BASE.set(JSON.parse(JSON.stringify(baseDoc())))}
-  if(migrar())save('base');
-  const qs=await BASE.collection('dias').orderBy('d','desc').limit(300).get();
-  qs.docs.forEach(doc=>{const v=doc.data();if(v&&v.d&&!S.dias[v.d])S.dias[v.d]=v});
-  lsSave();render();
- }catch(e){}
+
+/* =====================================================================
+   FOTOS — ficam no IndexedDB deste navegador, que aguenta arquivos
+   grandes. O texto do app fica no localStorage; só a imagem vem daqui.
+   ===================================================================== */
+const FOTO_DB='rotatrans-fotos';
+function fotoStore(modo){
+ return new Promise((res,rej)=>{
+  if(!window.indexedDB)return rej(new Error('sem indexedDB'));
+  const req=indexedDB.open(FOTO_DB,1);
+  req.onupgradeneeded=()=>{const b=req.result;if(!b.objectStoreNames.contains('f'))b.createObjectStore('f')};
+  req.onsuccess=()=>{try{res(req.result.transaction('f',modo).objectStore('f'))}catch(e){rej(e)}};
+  req.onerror=()=>rej(req.error);
+ });
+}
+function fotoSalvar(id,blob){return fotoStore('readwrite').then(s=>new Promise((res,rej)=>{
+ const q=s.put(blob,id);q.onsuccess=()=>res();q.onerror=()=>rej(q.error)}))}
+function fotoLer(id){return fotoStore('readonly').then(s=>new Promise((res,rej)=>{
+ const q=s.get(id);q.onsuccess=()=>res(q.result);q.onerror=()=>rej(q.error)}))}
+function fotoApagar(id){return fotoStore('readwrite').then(s=>new Promise(res=>{
+ const q=s.delete(id);q.onsuccess=()=>res();q.onerror=()=>res()})).catch(()=>{})}
+/* troca os espaços reservados da galeria pelas imagens guardadas */
+function hidratarFotos(){
+ document.querySelectorAll('img[data-foto]').forEach(img=>{
+  if(img.dataset.pronto)return;
+  fotoLer(img.dataset.foto).then(b=>{
+   if(b){img.src=URL.createObjectURL(b);img.dataset.pronto='1'}
+  }).catch(()=>{});
+ });
 }
 
 /* =====================================================================
@@ -2421,9 +2429,7 @@ function movDe(nome){
  for(const[k,ks]of MOV_MAP)if(ks.some(x=>n.includes(nrm(x))))return k==='__none__'?null:MOV[k];
  return MOV.along;
 }
-/* Vídeos escolhidos por movimento. Abrem no YouTube numa aba nova:
-   a plataforma onde esta página roda bloqueia o player de outros sites. */
-function ytv(id){return 'https://www.youtube.com/watch?v='+id}
+/* Vídeos de execução por movimento, tocados dentro da própria página. */
 const EXVID={
  agachamento:[['Agachamento livre com barra: como fazer corretamente','rM6SDUdl9fs'],
   ['Agachamento livre: execução e adaptações para quem está começando','bxq2eVZl9nY'],
@@ -2478,13 +2484,6 @@ const EXVID={
   ['Alongamento e mobilidade em 10 minutos','2TMSxdzE0lU'],
   ['Alongamento pós-treino','w4LCsSxB-SQ']]
 };
-function vidURL(t,url,d){
- return '<a class="vid" href="'+esc(url)+'" target="_blank" rel="noopener">'+
-  '<span class="pl">'+ic('play')+'</span><span class="grow" style="min-width:0">'+
-  '<span style="display:block;font-weight:600;font-size:13.3px;color:var(--ink)">'+esc(t)+'</span>'+
-  (d?'<span style="display:block;font-size:11px;color:var(--ink-2);margin-top:1px">'+esc(d)+'</span>':'')+'</span>'+
-  ic('right','color:var(--ink-3)')+'</a>';
-}
 /* Velocidade do loop por movimento, em segundos */
 const MOV_DUR={cardio:1.1,panturrilha:1.5,abdominal:2.4,prancha:3.2,along:3.4,stiff:2.6,mergulho:2.4};
 function reduzMov(){try{return window.matchMedia('(prefers-reduced-motion: reduce)').matches}catch(e){return false}}
@@ -2555,16 +2554,24 @@ function blocoTecnica(mov){
 function blocoVideos(k){
  const v=EXVID[k]||[];
  if(!v.length)return '';
- return '<hr class="sep"><div class="lbl" style="margin-bottom:4px">Vídeos escolhidos</div>'+
-  '<p class="xtiny muted" style="margin-bottom:9px">Abrem no YouTube numa aba nova — o player de outro site não roda dentro desta página. '+
-  'A demonstração aqui em cima é a versão que funciona sem sair do app.</p>'+
-  '<div class="stack" style="gap:7px">'+v.map(([t,id])=>vidURL(t,ytv(id))).join('')+'</div>';
+ return '<hr class="sep"><div class="lbl" style="margin-bottom:4px">Vídeos de execução</div>'+
+  '<p class="xtiny muted" style="margin-bottom:10px">Toque para assistir aqui mesmo, sem sair do app.</p>'+
+  '<div class="stack" style="gap:10px">'+v.map(([t,id])=>cardVideo(t,id)).join('')+'</div>';
+}
+function cardVideo(t,id){
+ return '<div class="vcard">'+
+  '<button class="vthumb" data-a="play-video" data-id="'+esc(id)+'" data-t="'+esc(t)+'" '+
+   'aria-label="Reproduzir: '+esc(t)+'">'+
+   '<img src="https://i.ytimg.com/vi/'+esc(id)+'/hqdefault.jpg" alt="" loading="lazy" '+
+    'onerror="this.style.visibility=\'hidden\'">'+
+   '<span class="vplay">'+ic('play')+'</span></button>'+
+  '<div class="vtit">'+esc(t)+'</div></div>';
 }
 function sheetMov(k){
  const mov=MOV[k];if(!mov)return;
  sheet(mov.n,blocoTecnica(mov)+
   '<hr class="sep"><a class="btn gh bl sm" href="'+esc(yt(mov.n+' execução correta técnica'))+'" target="_blank" rel="noopener">'+
-  ic('play')+' Quero ver alguém fazendo (abre o YouTube)</a>','Demonstração e técnica');
+  ic('play')+' Buscar mais vídeos deste exercício</a>','Demonstração e técnica');
 }
 
 function sheetEx(nome){
@@ -2590,7 +2597,7 @@ function sheetEx(nome){
    '<div class="sub">'+fmtData(r.d)+(r.reps?' · '+r.reps+' reps':'')+'</div></div>'+
    '<span class="tag n">1RM '+e1rm(r.kg,r.reps||10)+'</span></div>').join('')+'</div>':'')+
   '<hr class="sep"><a class="btn gh bl sm" href="'+esc(yt(exQuery(nome)))+'" target="_blank" rel="noopener">'+
-   ic('play')+' Quero ver alguém fazendo (abre o YouTube)</a>',
+   ic('play')+' Buscar mais vídeos deste exercício</a>',
   'Execução, histórico e progressão');
 }
 function stAgenda(){
@@ -2684,10 +2691,8 @@ function stVideos(){
   arr.map(v=>vidLink(v.t,v.q,v.d)).join('')+'</div></div>';
  $('#st-videos').innerHTML=
   '<div class="card hero">'+chTtl('play','Demonstrações e vídeos')+
-   '<p class="tiny muted">Cada movimento tem duas coisas: a <b>demonstração animada</b>, que roda aqui dentro com o passo a passo e os erros comuns, '+
-   'e uma lista de <b>vídeos escolhidos</b> no YouTube, com nome e tudo, para ver uma pessoa real fazendo.</p>'+
-   '<p class="xtiny muted" style="margin-top:9px">Os vídeos abrem numa aba nova porque a plataforma em que esta página roda bloqueia o player de outros sites. '+
-   'Não dá para embutir o YouTube aqui — foi por isso que desenhei a demonstração animada.</p></div>'+
+   '<p class="tiny muted">Cada movimento tem duas coisas: a <b>demonstração animada</b>, com o passo a passo e os erros comuns, '+
+   'e os <b>vídeos de execução</b>, que tocam aqui mesmo para você ver uma pessoa real fazendo.</p></div>'+
   (pats.length?'<div class="card">'+chTtl('dumb','Movimentos do treino de hoje','<span class="tag n">'+pats.length+'</span>')+
    '<div class="g2">'+pats.map(p=>
     '<button data-a="ex-info" data-n="'+esc(p.ex)+'" style="display:block">'+demoSVG(p.m)+
@@ -3363,29 +3368,30 @@ function stFotos(){
  $('#st-fotos').innerHTML=
   '<div class="card">'+chTtl('cam','Fotos de evolução','<span class="tag n">'+f.length+'</span>')+
   '<p class="tiny muted">A balança mente em semanas de recomposição; a foto não. Tire sempre no mesmo lugar, com a mesma luz e na mesma posição — de frente, de lado e de costas.</p>'+
-  (ASSETS?'<label class="btn gh bl sm" style="margin-top:11px;cursor:pointer">'+ic('plus')+' Adicionar foto'+
-    '<input type="file" accept="image/*" id="fotoIn" style="display:none"></label>'
-   :'<p class="tiny" style="margin-top:10px;color:var(--warn)">Esta versão do app não guarda fotos: o envio de arquivo depende da sua conta Claude. '+
-     'Todo o resto funciona normalmente. Se quiser a galeria, use o app pelo link do Claude e mantenha as fotos por lá.</p>')+
+  '<label class="btn gh bl sm" style="margin-top:11px;cursor:pointer">'+ic('plus')+' Adicionar foto'+
+   '<input type="file" accept="image/*" id="fotoIn" style="display:none"></label>'+
+  '<p class="xtiny muted" style="margin-top:9px">As fotos ficam guardadas neste aparelho e não saem dele.</p>'+
   '</div>'+
   (f.length?
    (f.length>1?'<div class="card">'+chTtl('redo','Antes e agora')+'<div class="g2">'+
     [[f[0],'Primeira'],[f[f.length-1],'Mais recente']].map(([x,t])=>
-    '<div class="fcell"><img src="'+esc(x.url)+'" alt="'+t+'" loading="lazy"><div class="cap">'+t+' · '+fmtCurto(x.d)+'</div></div>').join('')+
+    '<div class="fcell"><img data-foto="'+esc(x.id)+'" alt="'+t+'"><div class="cap">'+t+' · '+fmtCurto(x.d)+'</div></div>').join('')+
     '</div><p class="xtiny muted" style="margin-top:9px">'+diffDias(f[0].d,f[f.length-1].d)+' dias entre as duas.</p></div>':'')+
    '<div class="card">'+chTtl('cam','Galeria')+'<div class="fgrid">'+f.slice().reverse().map(x=>
-    '<div class="fcell"><img src="'+esc(x.url)+'" alt="Foto de '+fmtCurto(x.d)+'" loading="lazy">'+
+    '<div class="fcell"><img data-foto="'+esc(x.id)+'" alt="Foto de '+fmtCurto(x.d)+'">'+
     '<button class="del" data-a="foto-del" data-id="'+esc(x.id)+'" aria-label="Remover">'+ic('x')+'</button>'+
     '<div class="cap">'+fmtCurto(x.d)+'</div></div>').join('')+'</div></div>'
    :'<div class="card">'+vazio('cam','Nenhuma foto ainda. A primeira é a mais importante: é a referência de tudo que vem depois.')+'</div>');
+ hidratarFotos();
  const inp=$('#fotoIn');
- if(inp)inp.addEventListener('change',async ev=>{
+ if(inp)inp.addEventListener('change',ev=>{
   const file=ev.target.files&&ev.target.files[0];if(!file)return;
-  if(file.size>19*1024*1024)return toast('Foto muito grande (máximo 19 MB)');
-  toast('Enviando foto…');
-  try{const r=await ASSETS.upload(file);
-   S.fotos.push({d:hoje(),id:r.id,url:r.url});save('base');render();toast('Foto adicionada');
-  }catch(e){toast('Não foi possível enviar a foto')}
+  if(!/^image\//.test(file.type))return toast('Escolha um arquivo de imagem');
+  if(file.size>25*1024*1024)return toast('Foto muito grande (máximo 25 MB)');
+  const id='f'+Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+  fotoSalvar(id,file).then(()=>{
+   S.fotos.push({d:hoje(),id});save();render();toast('Foto adicionada');
+  }).catch(()=>toast('Não consegui guardar a foto neste navegador'));
  });
 }
 function stResumo(){
@@ -3539,7 +3545,7 @@ function renderPerfil(){
  const p=S.perfil,m=metas();
  $('#perfilBox').innerHTML=
   '<div class="card hero">'+chTtl('user','Seus dados',
-   UID?'<span class="tag o">salvo na conta</span>':'<span class="tag w">só neste aparelho</span>')+
+   '<span class="tag n">guardado neste aparelho</span>')+
    camposPerfil('pf_')+
    '<button class="btn acc bl" style="margin-top:13px" data-a="salvar-perfil" data-pref="pf_">Salvar e recalcular tudo</button></div>'+
 
@@ -3589,10 +3595,10 @@ function renderPerfil(){
    '<p class="xtiny muted" style="margin-top:8px">As cores do app são as da bandeira trans: azul, rosa e branco.</p></div>'+
 
   '<div class="card">'+chTtl('info','Seus dados')+
-   '<p class="tiny muted">'+(UID?'Seus registros ficam salvos na sua conta e voltam em qualquer aparelho onde você abrir esta página.':
-    'Seus registros ficam salvos neste navegador, neste aparelho. Eles não somem ao fechar a aba, mas não viajam sozinhos '+
-    'para outro celular ou computador: para isso, use <b>Copiar meus dados</b> aqui e <b>Importar dados</b> do outro lado. '+
-    'Limpar os dados do site no navegador apaga tudo.')+'</p>'+
+   '<p class="tiny muted">Seus registros ficam neste navegador, neste aparelho, e não são enviados para lugar nenhum. '+
+    'Eles não somem ao fechar a aba, mas também não viajam sozinhos para outro celular: para isso use '+
+    '<b>Copiar meus dados</b> aqui e <b>Importar dados</b> do outro lado. Limpar os dados do site no navegador apaga tudo, '+
+    'então vale exportar de vez em quando.</p>'+
    '<div class="row wrap" style="gap:7px;margin-top:11px">'+
     '<button class="btn gh sm" data-a="exportar">Copiar meus dados</button>'+
     '<button class="btn gh sm" data-a="importar">Importar dados</button>'+
@@ -3746,6 +3752,13 @@ document.addEventListener('click',ev=>{
    save('dia',dd);closeSheet();render();break}
   case 'ex-info':sheetEx(d.n);break;
   case 'mov-info':sheetMov(d.k);break;
+  case 'play-video':{const c=el.closest('.vcard'),th=c&&c.querySelector('.vthumb');
+   if(!th)return;
+   const w=document.createElement('div');w.className='vframe';
+   w.innerHTML='<iframe src="https://www.youtube-nocookie.com/embed/'+encodeURIComponent(d.id)+
+    '?autoplay=1&rel=0&modestbranding=1&playsinline=1" title="'+esc(d.t||'')+'" '+
+    'allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>';
+   th.replaceWith(w);break}
   case 'open-dia':S.ui.diaSel=(d.d===hoje()?null:d.d);S.ui.sub.treino='hoje';S.ui.tab='treino';
    window.scrollTo(0,0);render();break;
   case 'dia-hoje':S.ui.diaSel=null;render();break;
@@ -3855,7 +3868,7 @@ document.addEventListener('click',ev=>{
    S.medidas=S.medidas.filter(z=>z.d!==hj);S.medidas.push(m2);S.medidas.sort((a2,b2)=>a2.d<b2.d?-1:1);
    save('base');render();toast('Medição salva');break}
   case 'rm-medida':S.medidas=S.medidas.filter(z=>z.d!==d.d);save('base');render();break;
-  case 'foto-del':{S.fotos=S.fotos.filter(f=>f.id!==d.id);save('base');render();toast('Foto removida');break}
+  case 'foto-del':{S.fotos=S.fotos.filter(f=>f.id!==d.id);fotoApagar(d.id);save();render();toast('Foto removida');break}
   case 'copiar-resumo':copiar(($('#leituraTxt')||{}).textContent||'','Resumo copiado');break;
 
   /* dados */
@@ -3924,7 +3937,6 @@ if(!S.perfil.inicio)S.perfil.inicio=hoje();
 migrar();
 aplicaTema();
 render();
-conectar();
 setInterval(()=>{if(S.ui.tab==='inicio'&&!$('#sheetBox'))renderInicio()},60000);
 </script>
 </body>
