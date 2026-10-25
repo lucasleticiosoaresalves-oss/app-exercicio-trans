@@ -419,15 +419,11 @@ nav.tabbar button.on::before{content:"";position:absolute;top:-6px;width:22px;he
    <div class="subtabs" id="cuidTabs">
     <button class="subtab on" data-st="corpo">Corpo</button>
     <button class="subtab" data-st="voz">Voz</button>
-    <button class="subtab" data-st="pele">Pele</button>
-    <button class="subtab" data-st="produtos">Produtos</button>
-    <button class="subtab" data-st="vozvideos">Vídeos de voz</button>
+    <button class="subtab" data-st="pele">Pele e produtos</button>
    </div>
    <div id="st-corpo" class="stack" style="gap:14px"></div>
    <div id="st-voz" class="stack" style="gap:14px" hidden></div>
    <div id="st-pele" class="stack" style="gap:14px" hidden></div>
-   <div id="st-produtos" class="stack" style="gap:14px" hidden></div>
-   <div id="st-vozvideos" class="stack" style="gap:14px" hidden></div>
   </div>
  </section>
 
@@ -435,16 +431,12 @@ nav.tabbar button.on::before{content:"";position:absolute;top:-6px;width:22px;he
   <div class="stack" style="gap:14px">
    <div class="subtabs" id="progTabs">
     <button class="subtab on" data-st="peso">Peso</button>
-    <button class="subtab" data-st="medidas">Medidas</button>
-    <button class="subtab" data-st="fotos">Fotos</button>
+    <button class="subtab" data-st="medidas">Medidas e fotos</button>
     <button class="subtab" data-st="resumo">Resumo</button>
-    <button class="subtab" data-st="conquistas">Conquistas</button>
    </div>
    <div id="st-peso" class="stack" style="gap:14px"></div>
    <div id="st-medidas" class="stack" style="gap:14px" hidden></div>
-   <div id="st-fotos" class="stack" style="gap:14px" hidden></div>
    <div id="st-resumo" class="stack" style="gap:14px" hidden></div>
-   <div id="st-conquistas" class="stack" style="gap:14px" hidden></div>
   </div>
  </section>
 
@@ -1793,6 +1785,9 @@ function dia(d){d=d||hoje();
  x.pele=x.pele||{manha:false,noite:false};
  return x}
 function diaRO(d){return S.dias[d]||{ref:{},agua:0,treino:{feito:false,sets:{}},voz:{feito:false,ex:{}},pele:{},hab:{}}}
+/* O diário de comida pode estar mostrando um dia passado; tudo que for
+   registrar ou apagar refeição usa este dia, não necessariamente hoje. */
+function diaFoco(){return S.ui.diaDiario||hoje()}
 
 /* =====================================================================
    PERSISTÊNCIA
@@ -2854,9 +2849,19 @@ const DICAS=[
 function dicaDoDia(){return DICAS[Math.abs(diaPlano())%DICAS.length]}
 
 function stDiario(){
- const d=hoje(),m=metas(),t=totalDia(d),x=dia(d);
+ const d=diaFoco(),m=metas(d),t=totalDia(d),x=dia(d);
  const restante=Math.round(m.kcal-t.kcal);
+ const ehHoje=(d===hoje());
  $('#st-diario').innerHTML=
+  '<div class="card" style="padding:9px 11px"><div class="row spread">'+
+   '<button class="btn gh xs" data-a="dia-diario" data-v="-1" aria-label="Dia anterior">'+ic('left')+'</button>'+
+   '<div style="text-align:center"><div style="font-weight:700;font-size:13.5px">'+
+    (ehHoje?'Hoje':fmtData(d))+'</div>'+
+    '<div class="xtiny muted">'+(ehHoje?fmtData(d):'toque em hoje para voltar')+'</div></div>'+
+   (ehHoje?'<button class="btn gh xs" disabled aria-hidden="true">'+ic('right')+'</button>'
+    :'<button class="btn gh xs" data-a="dia-diario" data-v="1" aria-label="Dia seguinte">'+ic('right')+'</button>')+
+   '</div>'+(ehHoje?'':'<button class="btn gh bl xs" style="margin-top:7px" data-a="dia-diario" data-v="0">voltar para hoje</button>')+
+  '</div>'+
   '<div class="card hero">'+chTtl('book',fmtLonga(d).split(',')[0],
    '<span class="tag '+(t.kcal>m.kcal*1.07?'a':t.kcal>m.kcal*.85?'o':'n')+'">'+Math.round(t.kcal)+' / '+m.kcal+' kcal</span>')+
    '<div class="gauto">'+
@@ -2877,8 +2882,9 @@ function stDiario(){
      '<div class="xtiny muted num">'+r.h+' · meta '+alvo+' kcal · '+Math.round(m.prot*r.pct)+' g de proteína</div></div>'+
      '<span class="tag '+(tt.kcal?'o':'n')+'">'+Math.round(tt.kcal)+' kcal</span></div>'+
     (it.length?'<div class="stack" style="gap:0">'+it.map((z,i)=>
-      '<div class="li"><div class="grow"><div class="ttl">'+esc(z.n)+'</div>'+
-      '<div class="sub num">'+esc(z.q)+' · '+Math.round(z.kcal)+' kcal · P '+n1(z.p)+' C '+n1(z.c)+' G '+n1(z.g)+'</div></div>'+
+      '<div class="li"><button class="grow" data-a="editar-item" data-m="'+r.k+'" data-i="'+i+'" style="min-width:0">'+
+      '<div class="ttl">'+esc(z.n)+'</div>'+
+      '<div class="sub num">'+esc(z.q)+' · '+Math.round(z.kcal)+' kcal · P '+n1(z.p)+' C '+n1(z.c)+' G '+n1(z.g)+'</div></button>'+
       '<button class="chip rm" data-a="rm-item" data-m="'+r.k+'" data-i="'+i+'">'+ic('trash')+'</button></div>').join('')+'</div>'
      :'<p class="tiny muted" style="margin:2px 0 9px">'+esc(r.dica)+'</p>')+
     '<div class="row" style="gap:6px;margin-top:9px">'+
@@ -3207,8 +3213,26 @@ function sheetSemana(){
 /* =====================================================================
    REFEIÇÕES SALVAS
    ===================================================================== */
+/* Corrigir a quantidade de algo já registrado, sem ter que apagar e refazer. */
+function sheetEditarItem(meal,idx){
+ const d=diaFoco(),it=(dia(d).ref[meal]||[])[idx];
+ if(!it)return;
+ const ref=MEALS.find(m=>m.k===meal)||{};
+ sheet('Editar item',
+  '<div class="stack" style="gap:10px">'+
+  '<label class="fld">Nome<input type="text" id="edNome" value="'+esc(it.n)+'"></label>'+
+  '<label class="fld">Quantidade<input type="text" id="edQtd" value="'+esc(it.q||'')+'"></label>'+
+  '<div class="g2">'+
+   '<label class="fld">Calorias<input type="number" id="edK" value="'+Math.round(it.kcal||0)+'"></label>'+
+   '<label class="fld">Proteína (g)<input type="number" step="0.1" id="edP" value="'+n1(it.p||0)+'"></label>'+
+   '<label class="fld">Carboidrato (g)<input type="number" step="0.1" id="edC" value="'+n1(it.c||0)+'"></label>'+
+   '<label class="fld">Gordura (g)<input type="number" step="0.1" id="edG" value="'+n1(it.g||0)+'"></label></div>'+
+  '<button class="btn acc bl" data-a="editar-ok" data-m="'+meal+'" data-i="'+idx+'">Salvar</button>'+
+  '<button class="btn gh bl sm" data-a="rm-item" data-m="'+meal+'" data-i="'+idx+'">'+ic('trash')+' Remover do diário</button>'+
+  '</div>',(ref.n||'')+(d===hoje()?'':' · '+fmtData(d)));
+}
 function sheetSalvarRef(meal){
- const itens=(dia(hoje()).ref[meal]||[]);
+ const itens=(dia(diaFoco()).ref[meal]||[]);
  if(!itens.length)return toast('Registre algo nesta refeição primeiro');
  const nome=(MEALS.find(m=>m.k===meal)||{}).n||'Refeição';
  sheet('Salvar como modelo',
@@ -3350,7 +3374,8 @@ function stVoz(){
    '<p class="tiny muted" style="line-height:1.65">Voz treinada nunca dói. Se aparecer dor, ardência, rouquidão que não passa '+
    'ou cansaço ao falar, pare por alguns dias. Não cochiche — sussurrar força mais que falar normal. Beba água ao longo do dia: '+
    'prega vocal hidratada aguenta treino. Evite pigarrear. Treino curto e diário rende muito mais que treino longo de vez em quando. '+
-   'Se puder, acompanhamento com fonoaudiólogo especializado em voz trans acelera demais o processo e evita vícios difíceis de desfazer.</p></div>';
+   'Se puder, acompanhamento com fonoaudiólogo especializado em voz trans acelera demais o processo e evita vícios difíceis de desfazer.</p></div>'+
+  stVozVideos();
 }
 function dentroAlvo(hz){
  const f=(vozAlvo().hz.match(/\d+/g)||[]).map(Number);
@@ -3379,7 +3404,7 @@ function stVozVideos(){
  const bloco=(t,icone,arr,sub)=>'<div class="card">'+chTtl(icone,t)+
   (sub?'<p class="tiny muted" style="margin-bottom:10px">'+esc(sub)+'</p>':'')+
   '<div class="stack" style="gap:8px">'+arr.map(v=>vidLink(v.t,v.q,v.d)).join('')+'</div></div>';
- $('#st-vozvideos').innerHTML=
+ return ''+
   '<div class="card hero">'+chTtl('play','Vídeos de treino de voz')+
    '<p class="tiny muted">Abrem a busca do YouTube numa aba nova. Prefira canais de fonoaudiólogos: '+
    'treino de voz feito de ouvido, copiando imitação, costuma gerar aperto na garganta.</p></div>'+
@@ -3426,7 +3451,8 @@ function stPele(){
    '<p class="tiny muted" style="line-height:1.65">Entre um produto novo e outro, espere duas semanas: assim você sabe o que funcionou '+
    'e o que irritou. Faça teste no antebraço antes de passar no rosto. Retinoides causam descamação e piora aparente nas primeiras '+
    'semanas — isso é esperado, mas ardência forte não é. Qualquer tratamento oral para acne, assim como tretinoína, exige receita '+
-   'e acompanhamento de dermatologista.</p></div>';
+   'e acompanhamento de dermatologista.</p></div>'+
+  stProdutos();
 }
 function stProdutos(){
  const tp=peleTipo();
@@ -3441,7 +3467,7 @@ function stProdutos(){
   ['Ácido mandélico','Esfoliante suave. O melhor para pelo encravado e foliculite da barba.','Pós-barba e depilação'],
   ['Protetor solar','O único produto com efeito comprovado contra manchas e envelhecimento. Nenhum outro substitui.','Todos, todo dia']
  ];
- $('#st-produtos').innerHTML=
+ return ''+
   '<div class="card hero">'+chTtl('cart','Lista de produtos — pele '+nome.toLowerCase())+
    '<p class="tiny muted">Montada a partir do seu tipo de pele. Você não precisa de tudo: '+
    'limpeza, hidratante e protetor solar já resolvem a maior parte. Os ativos entram depois, um de cada vez.</p>'+
@@ -3565,8 +3591,8 @@ function stCorpo(){
 function renderCuidados(){
  const s=S.ui.sub.cuidados;
  $$('#cuidTabs .subtab').forEach(b=>b.classList.toggle('on',b.dataset.st===s));
- ['corpo','voz','pele','produtos','vozvideos'].forEach(k=>{const el=$('#st-'+k);if(el)el.hidden=(k!==s)});
- ({corpo:stCorpo,voz:stVoz,pele:stPele,produtos:stProdutos,vozvideos:stVozVideos}[s]||stCorpo)();
+ ['corpo','voz','pele'].forEach(k=>{const el=$('#st-'+k);if(el)el.hidden=(k!==s)});
+ ({corpo:stCorpo,voz:stVoz,pele:stPele}[s]||stCorpo)();
 }
 
 /* =====================================================================
@@ -3644,7 +3670,9 @@ function stMedidas(){
   (ms.length?'<div class="card">'+chTtl('clock','Medições anteriores')+'<div class="stack" style="gap:0">'+
    ms.slice().reverse().slice(0,10).map(m=>'<div class="li"><div class="grow"><div class="ttl">'+fmtData(m.d)+'</div>'+
    '<div class="sub num">'+CAMPOS.filter(([k])=>m[k]).map(([k,n])=>n.slice(0,3)+' '+m[k]).join(' · ')+'</div></div>'+
-   '<button class="chip rm" data-a="rm-medida" data-d="'+m.d+'">'+ic('x')+'</button></div>').join('')+'</div></div>':'');
+   '<button class="chip rm" data-a="rm-medida" data-d="'+m.d+'">'+ic('x')+'</button></div>').join('')+'</div></div>':'')+
+  blocoFotos();
+ ligarFotos();
 }
 /* Estimativa de gordura corporal a partir das circunferências. */
 function blocoGordura(){
@@ -3666,9 +3694,9 @@ function blocoGordura(){
   'ao longo dos meses, sempre medido do mesmo jeito. Para quem está em hormonização, a composição corporal muda bastante '+
   'no primeiro ano, e essa conta ajuda a ver que o peso parado na balança pode ser gordura saindo e músculo entrando.</p></div>';
 }
-function stFotos(){
+function blocoFotos(){
  const f=S.fotos.slice().sort((a,b)=>a.d<b.d?-1:1);
- $('#st-fotos').innerHTML=
+ return ''+
   '<div class="card">'+chTtl('cam','Fotos de evolução','<span class="tag n">'+f.length+'</span>')+
   '<p class="tiny muted">A balança mente em semanas de recomposição; a foto não. Tire sempre no mesmo lugar, com a mesma luz e na mesma posição — de frente, de lado e de costas.</p>'+
   '<label class="btn gh bl sm" style="margin-top:11px;cursor:pointer">'+ic('plus')+' Adicionar foto'+
@@ -3685,6 +3713,9 @@ function stFotos(){
     '<button class="del" data-a="foto-del" data-id="'+esc(x.id)+'" aria-label="Remover">'+ic('x')+'</button>'+
     '<div class="cap">'+fmtCurto(x.d)+'</div></div>').join('')+'</div></div>'
    :'<div class="card">'+vazio('cam','Nenhuma foto ainda. A primeira é a mais importante: é a referência de tudo que vem depois.')+'</div>');
+}
+/* precisa rodar depois que o HTML já está na tela */
+function ligarFotos(){
  hidratarFotos();
  const inp=$('#fotoIn');
  if(inp)inp.addEventListener('change',ev=>{
@@ -3733,7 +3764,8 @@ function stResumo(){
   '</div></div>'+
   '<div class="card">'+chTtl('info','Leitura do período',
    '<button class="btn gh xs" data-a="copiar-resumo">copiar</button>')+
-   '<p class="tiny muted" id="leituraTxt" style="line-height:1.6">'+esc(leitura(ades,mediaK,mediaP,m,ps,vozes))+'</p></div>';
+   '<p class="tiny muted" id="leituraTxt" style="line-height:1.6">'+esc(leitura(ades,mediaK,mediaP,m,ps,vozes))+'</p></div>'+
+  stConquistas();
 }
 function leitura(ades,k,p,m,ps,vozes){
  const t=[];
@@ -3781,7 +3813,7 @@ function conquistas(){
 }
 function stConquistas(){
  const c=conquistas(),feitas=c.filter(x=>x[3]).length;
- $('#st-conquistas').innerHTML=
+ return ''+
   '<div class="card">'+chTtl('trophy','Conquistas','<span class="tag o">'+feitas+' de '+c.length+'</span>')+
   '<div style="margin-bottom:13px">'+barra(feitas,c.length,'var(--pink)')+'</div>'+
   '<div class="g2">'+c.map(([icone,t,d,ok,prog])=>
@@ -3795,8 +3827,8 @@ function stConquistas(){
 function renderProg(){
  const s=S.ui.sub.prog;
  $$('#progTabs .subtab').forEach(b=>b.classList.toggle('on',b.dataset.st===s));
- ['peso','medidas','fotos','resumo','conquistas'].forEach(k=>{const el=$('#st-'+k);if(el)el.hidden=(k!==s)});
- ({peso:stPeso,medidas:stMedidas,fotos:stFotos,resumo:stResumo,conquistas:stConquistas}[s]||stPeso)();
+ ['peso','medidas','resumo'].forEach(k=>{const el=$('#st-'+k);if(el)el.hidden=(k!==s)});
+ ({peso:stPeso,medidas:stMedidas,resumo:stResumo}[s]||stPeso)();
 }
 
 /* =====================================================================
@@ -4054,7 +4086,7 @@ function sheetRPE(){
 document.addEventListener('click',ev=>{
  const el=ev.target.closest('[data-a]');
  if(!el)return;
- const a=el.dataset.a,d=el.dataset,hj=hoje(),x=dia(hj);
+ const a=el.dataset.a,d=el.dataset,hj=hoje(),x=dia(hj),df=diaFoco(),xf=dia(df);
  if(a==='close-ovl'&&ev.target!==el)return;
  switch(a){
   /* navegação */
@@ -4119,20 +4151,20 @@ document.addEventListener('click',ev=>{
   case 'buscar-cod':buscarCodigo(($('#codIn')||{}).value||'');break;
   case 'add-scan':{if(!ultimoScan)return;
    const g=Math.max(1,Number(($('#scanG')||{}).value)||100);
-   addItem(hj,addMeal,{n:ultimoScan.n,q:g+' g',kcal:ultimoScan.kcal*g/100,
+   addItem(df,addMeal,{n:ultimoScan.n,q:g+' g',kcal:ultimoScan.kcal*g/100,
     p:ultimoScan.p*g/100,c:ultimoScan.c*g/100,g:ultimoScan.g*g/100});
    closeSheet();break}
   case 'salvar-ref':sheetSalvarRef(d.m);break;
   case 'salvar-ref-ok':{const nm=(($('#salvaNome')||{}).value||'').trim();
    if(!nm)return toast('Dê um nome ao modelo');
-   const itens=(dia(hj).ref[d.m]||[]).map(x=>Object.assign({},x));
+   const itens=(dia(df).ref[d.m]||[]).map(x=>Object.assign({},x));
    if(!itens.length)return toast('Nada para salvar');
    S.salvos=S.salvos||[];
    S.salvos=S.salvos.filter(s=>nrm(s.n)!==nrm(nm));
    S.salvos.unshift({id:'s'+Date.now().toString(36),n:nm,itens});
    save();closeSheet();render();toast('Modelo salvo: '+nm);break}
   case 'usar-salva':{const s=(S.salvos||[])[Number(d.i)];if(!s)return;
-   s.itens.forEach(x=>addItem(hj,addMeal,Object.assign({},x),true));
+   s.itens.forEach(z=>addItem(df,addMeal,Object.assign({},z),true));
    closeSheet();render();toast(s.itens.length+' itens registrados');break}
   case 'rm-salva':{(S.salvos||[]).splice(Number(d.i),1);save();sheetAdd(addMeal);break}
   case 'plano-semana':sheetSemana();break;
@@ -4222,29 +4254,41 @@ document.addEventListener('click',ev=>{
   case 'add-mode':addMode=d.v;sheetAdd(addMeal);break;
   case 'ver-receita':sheetReceita(d.id);break;
   case 'comi':{const r=RECIPES.find(z=>z.id===d.id);
-   addItem(hj,d.m,{n:r.nome,q:r.rende,kcal:r.kcal,p:r.p,c:r.c,g:r.g});closeSheet();break}
+   addItem(df,d.m,{n:r.nome,q:r.rende,kcal:r.kcal,p:r.p,c:r.c,g:r.g});closeSheet();break}
+  case 'dia-diario':{const v=d.v==='0'?null:addDias(diaFoco(),Number(d.v));
+   S.ui.diaDiario=(!v||v===hoje())?null:(v>hoje()?null:v);render();break}
+  case 'editar-item':sheetEditarItem(d.m,Number(d.i));break;
+  case 'editar-ok':{const arr=xf.ref[d.m]||[],it=arr[Number(d.i)];
+   if(!it)return closeSheet();
+   const nm=(($('#edNome')||{}).value||'').trim();
+   if(nm)it.n=nm;
+   it.q=(($('#edQtd')||{}).value||'').trim()||it.q;
+   it.kcal=Number(($('#edK')||{}).value)||0;it.p=Number(($('#edP')||{}).value)||0;
+   it.c=Number(($('#edC')||{}).value)||0;it.g=Number(($('#edG')||{}).value)||0;
+   save();closeSheet();render();toast('Item atualizado');break}
   case 'fav':{const i2=S.favs.indexOf(d.id);
    if(i2>=0)S.favs.splice(i2,1);else S.favs.push(d.id);
    save('base');if($('#sheetBox'))sheetReceita(d.id);else render();break}
   case 'add-alimento':{const f=FOODS[Number(d.i)],inp=$('#fg'+d.i);
    const g=Math.max(1,Number(inp&&inp.value)||f.d);
-   addItem(hj,addMeal,{n:f.n,q:g+' g',kcal:f.kcal*g/100,p:f.p*g/100,c:f.c*g/100,g:f.g*g/100});break}
-  case 'add-recente':{const r=S.recentes[Number(d.i)];if(r)addItem(hj,addMeal,{...r});break}
+   addItem(df,addMeal,{n:f.n,q:g+' g',kcal:f.kcal*g/100,p:f.p*g/100,c:f.c*g/100,g:f.g*g/100});break}
+  case 'add-recente':{const r=S.recentes[Number(d.i)];if(r)addItem(df,addMeal,{...r});break}
   case 'add-manual':{const nm=($('#mNome').value||'').trim()||'Refeição';
-   addItem(hj,addMeal,{n:nm,q:($('#mQtd').value||'').trim()||'porção',
+   addItem(df,addMeal,{n:nm,q:($('#mQtd').value||'').trim()||'porção',
     kcal:Number($('#mK').value)||0,p:Number($('#mP').value)||0,
     c:Number($('#mC').value)||0,g:Number($('#mG').value)||0});closeSheet();break}
-  case 'rm-item':{(x.ref[d.m]||[]).splice(Number(d.i),1);save('dia',hj);render();break}
-  case 'repetir':{const ont=((diaRO(addDias(hj,-1)).ref||{})[d.m]||[]);
+  case 'rm-item':{(xf.ref[d.m]||[]).splice(Number(d.i),1);save();
+   if($('#sheetBox'))closeSheet();render();break}
+  case 'repetir':{const ont=((diaRO(addDias(df,-1)).ref||{})[d.m]||[]);
    if(!ont.length)return toast('Nada registrado ontem');
-   ont.forEach(z=>addItem(hj,d.m,{...z},true));render();toast(ont.length+' itens copiados de ontem');break}
+   ont.forEach(z=>addItem(df,d.m,{...z},true));render();toast(ont.length+' itens copiados de ontem');break}
   case 'filtro-ref':S.ui.filtroRef=d.v;render();break;
   case 'novo-cardapio':S.ui.cardapio=gerarCardapio(Math.floor(Math.random()*9999));render();toast('Novo cardápio');break;
   case 'trocar-ref':sheetTrocar(d.m);break;
   case 'escolher-ref':S.ui.cardapio.itens[d.m]=d.id;closeSheet();render();break;
   case 'registrar-cardapio':{let n=0;
    MEALS.forEach(ref=>{const r=RECIPES.find(z=>z.id===S.ui.cardapio.itens[ref.k]);
-    if(r&&!(x.ref[ref.k]||[]).length){addItem(hj,ref.k,{n:r.nome,q:r.rende,kcal:r.kcal,p:r.p,c:r.c,g:r.g},true);n++}});
+    if(r&&!(xf.ref[ref.k]||[]).length){addItem(df,ref.k,{n:r.nome,q:r.rende,kcal:r.kcal,p:r.p,c:r.c,g:r.g},true);n++}});
    render();toast(n?n+' refeições registradas':'As refeições de hoje já estão preenchidas');break}
 
   /* despensa e compras */
