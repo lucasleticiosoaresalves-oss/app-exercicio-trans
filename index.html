@@ -249,6 +249,13 @@ textarea{min-height:66px;resize:vertical}
 .movthumb img{width:100%;height:100%;object-fit:cover;display:block}
 .movnome{display:block;font-weight:600;font-size:13px;padding:8px 10px 0;line-height:1.3}
 .movmusc{display:block;font-size:11px;color:var(--ink-2);padding:2px 10px 9px;line-height:1.3}
+/* leitor de código de barras */
+.scanwrap{position:relative;width:100%;aspect-ratio:4/3;background:#000;border-radius:var(--r-s);overflow:hidden}
+.scanwrap video{width:100%;height:100%;object-fit:cover;display:block}
+.scanmira{position:absolute;top:50%;left:12%;right:12%;height:2px;background:var(--pink);
+  box-shadow:0 0 0 1px rgba(0,0,0,.4);opacity:.9}
+.scanmira::before,.scanmira::after{content:"";position:absolute;top:-28px;bottom:-28px;width:2px;background:rgba(255,255,255,.55)}
+.scanmira::before{left:0}.scanmira::after{right:0}
 
 /* ---------- abas ---------- */
 .subtabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
@@ -1697,8 +1704,59 @@ const DEF={
    vozAlvo:'masc',pele:'oleosa',horaTreino:'18:00',acordar:'07:00',dormir:'23:00',
    lembretes:['09:00','11:00','14:00','16:30','19:00','21:00']},
  dias:{},pesos:[],medidas:[],cargas:{},despensa:[],fotos:[],compras:[],recentes:[],favs:[],vozLog:[],
+ salvos:[],trocas:{},th:{freq:14,hist:[]},
  ui:{tab:'inicio',sub:{treino:'hoje',nutri:'diario',prog:'peso',cuidados:'corpo'},
    calMes:null,diaSel:null,tema:'auto',filtroRef:'todas',cardapio:null,skinTipo:null}
+};
+/* Medidas caseiras dos alimentos mais registrados, para não depender da balança.
+   [rótulo, gramas equivalentes] */
+const MEDIDAS={
+ 'Ovo inteiro':[['1 unidade',50],['2 unidades',100]],
+ 'Clara de ovo':[['1 clara',35]],
+ 'Peito de frango grelhado':[['1 filé médio',120],['1 filé grande',180]],
+ 'Patinho moído':[['1 concha',120]],
+ 'Arroz branco cozido':[['1 colher de servir',45],['1 escumadeira',100],['1 prato raso',150]],
+ 'Arroz integral cozido':[['1 colher de servir',45],['1 escumadeira',100]],
+ 'Feijão carioca cozido':[['1 concha média',80],['1 concha cheia',130]],
+ 'Feijão preto cozido':[['1 concha média',80]],
+ 'Macarrão integral cozido':[['1 pegador',120]],
+ 'Macarrão comum cozido':[['1 pegador',120]],
+ 'Aveia em flocos':[['1 colher de sopa',15],['3 colheres de sopa',45]],
+ 'Pão francês':[['1 unidade',50]],
+ 'Pão integral (fatia)':[['1 fatia',25],['2 fatias',50]],
+ 'Tapioca (goma hidratada)':[['1 tapioca fina',40],['1 tapioca média',60]],
+ 'Batata-doce cozida':[['1 unidade pequena',120],['1 unidade média',180]],
+ 'Batata inglesa cozida':[['1 unidade média',120]],
+ 'Banana':[['1 unidade',100],['1 unidade grande',135]],
+ 'Maçã':[['1 unidade',130]],
+ 'Mamão':[['1 fatia',150]],
+ 'Laranja':[['1 unidade',150]],
+ 'Abacate':[['1 colher de sopa',25],['meia unidade',100]],
+ 'Leite integral':[['1 copo',200],['meio copo',100]],
+ 'Leite desnatado':[['1 copo',200],['meio copo',100]],
+ 'Iogurte natural integral':[['1 pote',170]],
+ 'Iogurte grego natural':[['1 pote',130]],
+ 'Queijo mussarela':[['1 fatia',20],['2 fatias',40]],
+ 'Queijo minas frescal':[['1 fatia',30]],
+ 'Queijo cottage':[['1 colher de sopa',30],['1 pote pequeno',100]],
+ 'Requeijão light':[['1 colher de sopa',20]],
+ 'Azeite de oliva':[['1 colher de chá',4],['1 colher de sopa',8]],
+ 'Óleo de soja':[['1 colher de sopa',8]],
+ 'Pasta de amendoim':[['1 colher de sopa',20]],
+ 'Castanha-do-pará':[['1 unidade',5],['3 unidades',15]],
+ 'Amendoim':[['1 punhado',25]],
+ 'Granola':[['1 colher de sopa',12],['3 colheres de sopa',36]],
+ 'Whey protein (pó)':[['1 scoop',30]],
+ 'Mel':[['1 colher de chá',7],['1 colher de sopa',15]],
+ 'Açúcar':[['1 colher de chá',5],['1 colher de sopa',12]],
+ 'Brócolis cozido':[['1 pires',80]],
+ 'Cenoura crua':[['1 unidade média',80]],
+ 'Tomate':[['1 unidade',100],['1 fatia',15]],
+ 'Alface':[['1 pires',30]],
+ 'Atum em água (lata)':[['1 lata escorrida',120]],
+ 'Tilápia grelhada':[['1 filé',140]],
+ 'Pipoca de panela':[['1 tigela',30]],
+ 'Chocolate 70%':[['1 quadradinho',6],['meia barra',40]]
 };
 let S=JSON.parse(JSON.stringify(DEF));
 
@@ -1798,18 +1856,30 @@ function sessaoDe(d){
  const fase=faseDe(n),idx=(n-fase.ini)%7,key=fase.ciclo[idx];
  return{n,fase,key,s:W[key],idx,semana:Math.floor((n-1)/7)+1};
 }
+/* Aplica as trocas que você escolheu: o exercício substituto herda séries e
+   repetições do original. */
 function exercicios(key){const s=W[key];if(!s)return[];
+ const bruto=listaBase(key);
+ return bruto.map(ex=>{const t=S.trocas[ex.n];return t?Object.assign({},ex,{n:t,trocado:ex.n}):ex});
+}
+function listaBase(key){const s=W[key];if(!s)return[];
  const L=S.perfil.local;
  return L==='academia'?s.gym:L==='cal'?(s.cal||s.home):s.home}
 function localInfo(){return LOCAIS.find(l=>l[0]===S.perfil.local)||LOCAIS[0]}
 function corTipo(t){return t==='treino'?'var(--pink)':t==='ativo'?'var(--ok)':'var(--warn)'}
-function nSeries(ex){const v=parseInt(ex.s);return isNaN(v)?1:Math.min(v,6)}
+/* A cada 8 semanas entra uma semana mais leve, para o corpo recuperar. */
+function ehDeload(semana){return semana>0&&semana%8===0}
+function nSeries(ex,semana){
+ const v=parseInt(ex.s);let n=isNaN(v)?1:Math.min(v,6);
+ if(semana&&ehDeload(semana)&&n>2)n--;
+ return n;
+}
 function setsFeitos(d,key,i){return (diaRO(d).treino.sets||{})[key+':'+i]||0}
-function exOk(d,key,i,ex){return setsFeitos(d,key,i)>=nSeries(ex)}
+function exOk(d,key,i,ex,semana){return setsFeitos(d,key,i)>=nSeries(ex,semana)}
 function progTreino(d){
  const se=sessaoDe(d);if(!se.s)return{f:0,t:0};
  const exs=exercicios(se.key);
- return{f:exs.filter((ex,i)=>exOk(d,se.key,i,ex)).length,t:exs.length};
+ return{f:exs.filter((ex,i)=>exOk(d,se.key,i,ex,se.semana)).length,t:exs.length};
 }
 function e1rm(kg,reps){return Math.round(kg*(1+reps/30))}
 
@@ -1850,6 +1920,57 @@ function metas(d){
  const m=p.manual;
  if(m){if(m.kcal)kcal=m.kcal;if(m.prot)prot=m.prot;if(m.carb)carb=m.carb;if(m.gord)gord=m.gord;if(m.agua)agua=m.agua}
  return{tmb:Math.round(tmb),gasto:Math.round(gasto),kcal,prot,carb,gord,agua,manual:!!m};
+}
+/* Gasto calórico medido pelos seus próprios dados, não pela fórmula.
+   Se você comeu X por dia e o peso mudou Y, o gasto real sai dessa conta.
+   Vale mais que qualquer estimativa — mas só depois de algumas semanas. */
+function tdeeReal(){
+ const d0=addDias(hoje(),-34);
+ const dias=Object.keys(S.dias).filter(d=>d>=d0&&d<=hoje()).sort();
+ /* só dias razoavelmente completos entram na média: um dia em que você
+    registrou só o café puxa o resultado para baixo e estraga a conta */
+ const comReg=dias.filter(d=>{
+  const ref=S.dias[d].ref||{};
+  const slots=MEALS.filter(m=>(ref[m.k]||[]).length).length;
+  return slots>=3||totalDia(d).kcal>=metas().kcal*0.6;
+ });
+ const ps=S.pesos.filter(p=>p.d>=d0).sort((a,b)=>a.d<b.d?-1:1);
+ if(comReg.length<10)return{faltam:'registre o dia inteiro em pelo menos 10 dias (contei '+comReg.length+
+  '; dias com só uma ou duas refeições não entram, porque distorceriam a média)'};
+ if(ps.length<2)return{faltam:'registre o peso pelo menos duas vezes'};
+ const span=diffDias(ps[0].d,ps[ps.length-1].d);
+ if(span<10)return{faltam:'as pesagens precisam estar a 10 dias ou mais de distância'};
+ const mediaKcal=comReg.reduce((a,d)=>a+totalDia(d).kcal,0)/comReg.length;
+ const deltaKg=ps[ps.length-1].v-ps[0].v;
+ const tdee=mediaKcal-(deltaKg*7700/span);
+ if(!isFinite(tdee)||tdee<800||tdee>6000)return{faltam:'os números ainda estão inconsistentes demais'};
+ const o=S.perfil.obj;
+ const alvo=o==='perder'?tdee*0.8:o==='ganhar'?tdee*1.15:tdee;
+ return{dias:comReg.length,span,mediaKcal:Math.round(mediaKcal),deltaKg:n1(deltaKg),
+  tdee:Math.round(tdee/10)*10,sugerido:Math.round(alvo/10)*10,atual:metas().kcal};
+}
+/* Estimativa de gordura corporal pelo método das circunferências (US Navy). */
+function gorduraCorporal(){
+ const ms=S.medidas.slice().sort((a,b)=>a.d<b.d?-1:1);
+ const m=ms[ms.length-1];
+ if(!m)return null;
+ const alt=S.perfil.altura,masc=S.perfil.sexo==='m',L=Math.log10;
+ if(!m.cintura||!m.pescoco||!alt)return{faltam:true,d:m.d};
+ let pct;
+ if(masc)pct=495/(1.0324-0.19077*L(m.cintura-m.pescoco)+0.15456*L(alt))-450;
+ else{if(!m.quadril)return{faltam:true,d:m.d};
+  pct=495/(1.29579-0.35004*L(m.cintura+m.quadril-m.pescoco)+0.22100*L(alt))-450}
+ if(!isFinite(pct)||pct<3||pct>70)return{faltam:true,d:m.d};
+ const peso=pesoAtual();
+ return{pct:n1(pct),d:m.d,gordura:n1(peso*pct/100),magra:n1(peso*(1-pct/100))};
+}
+/* Média móvel: a linha que mostra a tendência em vez do sobe e desce diário. */
+function mediaMovel(pts,janela){
+ janela=janela||7;
+ return pts.map((p,i)=>{
+  const ini=Math.max(0,i-janela+1),fatia=pts.slice(ini,i+1);
+  return{x:p.x,y:fatia.reduce((a,z)=>a+z.y,0)/fatia.length};
+ });
 }
 function totalRef(d,k){const it=((diaRO(d).ref||{})[k]||[]);
  return it.reduce((a,x)=>({kcal:a.kcal+(x.kcal||0),p:a.p+(x.p||0),c:a.c+(x.c||0),g:a.g+(x.g||0)}),{kcal:0,p:0,c:0,g:0})}
@@ -1931,7 +2052,10 @@ function sheet(titulo,html,sub){
   '<button class="x" data-a="close" aria-label="Fechar">'+ic('x')+'</button></div>'+html+'</div></div>';
  document.body.style.overflow='hidden';
 }
-function closeSheet(){$('#modalRoot').innerHTML='';document.body.style.overflow=''}
+function closeSheet(){
+ if(typeof pararCamera==='function')pararCamera();
+ $('#modalRoot').innerHTML='';document.body.style.overflow='';
+}
 function ring(pct,cor,size,txt,sub){
  size=size||84;const r=(size-10)/2,c=2*Math.PI*r,v=Math.min(1,Math.max(0,pct||0))*c;
  return '<div style="position:relative;width:'+size+'px;height:'+size+'px;flex:none">'+
@@ -1956,7 +2080,7 @@ function vidLink(t,q,d){return '<a class="vid" href="'+esc(yt(q))+'" target="_bl
  ic('right','color:var(--ink-3)')+'</a>'}
 
 /* ---------- gráficos ---------- */
-function lineChart(pts,unid,cor){
+function lineChart(pts,unid,cor,media){
  if(pts.length<2)return vazio('chart','Registre pelo menos duas medições para o gráfico aparecer.');
  cor=cor||'var(--pink)';
  const W=560,H=172,L=40,R=14,T=14,B=26;
@@ -1977,7 +2101,10 @@ function lineChart(pts,unid,cor){
  return '<div class="chartbox"><svg class="chart" viewBox="0 0 '+W+' '+H+'" style="width:100%;min-width:290px;height:auto" role="img" aria-label="Evolução em '+esc(unid||'')+'">'+
   '<defs><linearGradient id="'+gid+'" x1="0" y1="0" x2="0" y2="1">'+
   '<stop offset="0%" stop-color="'+cor+'" stop-opacity=".26"/><stop offset="100%" stop-color="'+cor+'" stop-opacity="0"/></linearGradient></defs>'+
-  g+'<path d="'+area+'" fill="url(#'+gid+')"/><path class="ln" d="'+d+'" stroke="'+cor+'"/>'+dots+lbl+'</svg></div>';
+  g+'<path d="'+area+'" fill="url(#'+gid+')"/><path class="ln" d="'+d+'" stroke="'+cor+'"/>'+
+  (media&&media.length===pts.length?'<path d="'+media.map((p,i)=>(i?'L':'M')+X(i).toFixed(1)+' '+Y(p.y).toFixed(1)).join(' ')+
+   '" fill="none" stroke="var(--ink-3)" stroke-width="1.8" stroke-dasharray="5 4" stroke-linecap="round"/>':'')+
+  dots+lbl+'</svg></div>';
 }
 function barChart(pts,meta,cor){
  if(!pts.length)return vazio('chart','Sem dados no período.');
@@ -2157,19 +2284,25 @@ function renderInicio(){
 /* =====================================================================
    TREINO
    ===================================================================== */
-function exCard(d,key,ex,i){
- const tot=nSeries(ex),f=setsFeitos(d,key,i),ok=f>=tot;
+function exCard(d,key,ex,i,semana){
+ const tot=nSeries(ex,semana),f=setsFeitos(d,key,i),ok=f>=tot;
  const reg=S.cargas[ex.n]||[],ult=reg.length?reg[reg.length-1]:null;
+ const rec=reg.length?Math.max.apply(null,reg.map(r=>r.kg)):0;
  const seg=(parseInt(ex.d)||0)*(String(ex.d).includes('min')?60:1);
  const peso=S.perfil.local!=='cal';
  return '<div class="ex '+(ok?'done':'')+'">'+
   '<div class="row top" style="gap:10px">'+
    '<div class="idx'+(ok?'':' pk')+'">'+(i+1)+'</div>'+
-   '<div class="grow"><div class="nm">'+esc(ex.n)+'</div>'+
-   '<div class="meta">'+esc(ex.s)+' × '+esc(ex.r)+(ex.d&&ex.d!=='—'?' · '+esc(ex.d)+' de descanso':'')+'</div>'+
+   '<div class="grow"><div class="nm">'+esc(ex.n)+
+    (ex.trocado?' <span class="tag n">trocado</span>':'')+'</div>'+
+   '<div class="meta">'+tot+' × '+esc(ex.r)+(ex.d&&ex.d!=='—'?' · '+esc(ex.d)+' de descanso':'')+
+    (rec?' · recorde '+rec+' kg':'')+'</div>'+
    (ex.o?'<div class="obs">'+esc(ex.o)+'</div>':'')+'</div>'+
+   '<div class="stack" style="gap:4px">'+
    '<button class="btn acc xs" data-a="ex-info" data-n="'+esc(ex.n)+'" '+
     'title="Ver a demonstração">'+ic('play')+' ver</button>'+
+   '<button class="btn gh xs" data-a="trocar-ex" data-n="'+esc(ex.trocado||ex.n)+'" '+
+    'title="Trocar exercício">'+ic('redo')+'</button></div>'+
   '</div>'+
   '<div class="row wrap spread" style="margin-top:9px;gap:8px">'+
    '<div class="sets">'+Array.from({length:tot},(_,s2)=>
@@ -2210,7 +2343,11 @@ function stHoje(){
     '<span class="tag p">'+esc(L[1])+'</span>')+
    '<p class="xtiny muted" style="margin:-4px 0 10px">Toque em '+ic('play')+' <b>ver</b> em qualquer exercício: a demonstração do movimento '+
    'roda aqui dentro, com o passo a passo, os erros mais comuns e o seu histórico de carga.</p>'+
-   '<div class="stack" style="gap:9px">'+exs.map((ex,i)=>exCard(d,se.key,ex,i)).join('')+'</div>'+
+   (ehDeload(se.semana)?'<p class="tiny" style="background:var(--warn-soft);color:var(--warn);border-radius:11px;'+
+     'padding:10px;margin-bottom:11px;line-height:1.5;font-weight:600">Semana leve (deload). '+
+     'Uma série a menos em cada exercício e carga uns 40% menor que a habitual. '+
+     'Isso não é perder tempo: é o que deixa o corpo absorver as sete semanas anteriores.</p>':'')+
+   '<div class="stack" style="gap:9px">'+exs.map((ex,i)=>exCard(d,se.key,ex,i,se.semana)).join('')+'</div>'+
    '<button class="btn '+(x.treino.feito?'gh':'acc')+' bl" style="margin-top:12px" data-a="fim-treino">'+
     (x.treino.feito?'Treino concluído — tocar para desfazer':'Concluir treino')+'</button>'+
    (x.treino.rpe?'<p class="xtiny muted" style="margin-top:8px;text-align:center">Esforço: '+
@@ -2454,6 +2591,31 @@ function cardVideo(t,id){
    '<span class="vplay">'+ic('play')+'</span></button>'+
   '<div class="vtit">'+esc(t)+'</div></div>';
 }
+/* Trocar um exercício por outro do mesmo grupo muscular. A escolha fica
+   guardada e vale para todos os treinos seguintes. */
+function sheetTrocarEx(nome){
+ const g=grupoDe(nome);
+ const vistos={},opcoes=[];
+ Object.keys(W).forEach(k=>{
+  ['gym','home','cal'].forEach(modo=>{
+   (W[k][modo]||[]).forEach(ex=>{
+    if(ex.n===nome||vistos[ex.n]||grupoDe(ex.n)!==g)return;
+    vistos[ex.n]=1;opcoes.push(ex.n);
+   });
+  });
+ });
+ const atual=S.trocas[nome];
+ sheet('Trocar exercício',
+  '<p class="tiny muted" style="margin-bottom:12px">No lugar de <b>'+esc(nome)+'</b>, escolha outro de '+
+  esc(g.toLowerCase())+'. As séries e repetições continuam as mesmas, e a troca vale para os próximos treinos também.</p>'+
+  (atual?'<p class="tiny" style="margin-bottom:11px">Hoje está trocado por <b>'+esc(atual)+'</b>. '+
+   '<button class="btn gh xs" data-a="destrocar" data-n="'+esc(nome)+'">desfazer troca</button></p>':'')+
+  '<div class="stack" style="gap:7px">'+(opcoes.length?opcoes.sort().map(o=>
+   '<button class="ex" data-a="trocar-ok" data-n="'+esc(nome)+'" data-v="'+esc(o)+'">'+
+   '<div class="nm" style="font-size:13.5px">'+esc(o)+'</div></button>').join('')
+   :vazio('dumb','Não encontrei outro exercício do mesmo grupo.'))+'</div>',
+  g);
+}
 function sheetMov(k){
  const mov=MOV[k];if(!mov)return;
  sheet(mov.n,blocoTecnica(mov)+
@@ -2622,9 +2784,51 @@ function stPlano(){
    '</div></div>';
  }).join('')+bibliotecaMovimentos();
 }
-/* Cargas e volume são a mesma pergunta: estou evoluindo? Ficam juntos. */
+/* Cargas, volume e histórico respondem a mesma pergunta: estou evoluindo? */
 function stEvolucao(){
- $('#st-evolucao').innerHTML=stCargas()+stVolume();
+ $('#st-evolucao').innerHTML=blocoRecordes()+stCargas()+stVolume()+blocoHistorico();
+}
+/* Os pesos mais altos já registrados, e quando. */
+function blocoRecordes(){
+ const recs=[];
+ Object.keys(S.cargas).forEach(n=>{
+  const r=S.cargas[n]||[];if(!r.length)return;
+  let melhor=r[0];r.forEach(x=>{if(x.kg>melhor.kg)melhor=x});
+  recs.push({n,kg:melhor.kg,d:melhor.d,reps:melhor.reps||10,
+   novo:diffDias(melhor.d,hoje())<=14,grupo:grupoDe(n)});
+ });
+ if(!recs.length)return '';
+ recs.sort((a,b)=>a.d<b.d?1:-1);
+ const novos=recs.filter(r=>r.novo);
+ return '<div class="card hero">'+chTtl('trophy','Recordes',
+   '<span class="tag '+(novos.length?'o':'n')+'">'+recs.length+'</span>')+
+  (novos.length?'<p class="tiny" style="color:var(--ok);font-weight:600;margin-bottom:11px">'+
+   novos.length+(novos.length===1?' recorde novo':' recordes novos')+' nas últimas duas semanas.</p>':'')+
+  '<div class="stack" style="gap:0">'+recs.slice(0,8).map(r=>
+   '<button class="li" data-a="ex-info" data-n="'+esc(r.n)+'">'+
+   ic('trophy',(r.novo?'color:var(--ok)':'color:var(--ink-3)')+';font-size:15px')+
+   '<div class="grow"><div class="ttl">'+esc(r.n)+'</div>'+
+   '<div class="sub">'+r.grupo+' · '+fmtData(r.d)+(r.novo?' · novo':'')+'</div></div>'+
+   '<div style="text-align:right"><div class="num" style="font-weight:600">'+r.kg+' kg</div>'+
+   '<div class="xtiny muted num">1RM '+e1rm(r.kg,r.reps)+'</div></div></button>').join('')+'</div></div>';
+}
+/* O que você de fato fez, sessão por sessão. */
+function blocoHistorico(){
+ const feitos=Object.keys(S.dias).filter(d=>(S.dias[d].treino||{}).feito).sort().reverse().slice(0,25);
+ if(!feitos.length)return '<div class="card">'+chTtl('clock','Histórico de treinos')+
+  vazio('clock','Nenhum treino concluído ainda. Quando você tocar em "Concluir treino", a sessão entra aqui.')+'</div>';
+ const esforco=['','muito leve','leve','moderado','puxado','máximo'];
+ return '<div class="card">'+chTtl('clock','Histórico de treinos',
+   '<span class="tag n">'+feitos.length+'</span>')+
+  '<div class="stack" style="gap:0">'+feitos.map(d=>{
+   const se=sessaoDe(d),x=S.dias[d],sets=Object.values(x.treino.sets||{}).reduce((a,b)=>a+b,0);
+   return '<button class="li" data-a="open-dia" data-d="'+d+'">'+
+    '<span style="width:9px;height:9px;border-radius:50%;background:'+(se.s?corTipo(se.s.tipo):'var(--line)')+';flex:none"></span>'+
+    '<div class="grow"><div class="ttl">'+(se.s?esc(se.s.nome):'Treino')+'</div>'+
+    '<div class="sub">'+fmtData(d)+' · dia '+se.n+(sets?' · '+sets+' séries':'')+
+    (x.treino.rpe?' · '+esforco[x.treino.rpe]:'')+'</div>'+
+    (x.treino.nota?'<div class="xtiny muted" style="margin-top:2px">"'+esc(x.treino.nota)+'"</div>':'')+
+    '</div>'+ic('right','color:var(--ink-3)')+'</button>';}).join('')+'</div></div>';
 }
 function renderTreino(){
  const s=S.ui.sub.treino;
@@ -2679,6 +2883,7 @@ function stDiario(){
      :'<p class="tiny muted" style="margin:2px 0 9px">'+esc(r.dica)+'</p>')+
     '<div class="row" style="gap:6px;margin-top:9px">'+
      '<button class="btn gh sm grow" data-a="add-food" data-m="'+r.k+'">'+ic('plus')+' Adicionar</button>'+
+     (it.length?'<button class="btn gh sm" data-a="salvar-ref" data-m="'+r.k+'" title="Salvar como modelo">'+ic('star')+'</button>':'')+
      (ontem.length?'<button class="btn gh sm" data-a="repetir" data-m="'+r.k+'" title="Repetir o que comi ontem">'+ic('redo')+'</button>':'')+
     '</div></div>';
   }).join('')+
@@ -2694,7 +2899,9 @@ function stCardapio(){
   if(rec){tot.kcal+=rec.kcal;tot.p+=rec.p;tot.c+=rec.c;tot.g+=rec.g}});
  return ''+
   '<div class="card hero">'+chTtl('wand','Cardápio sugerido para hoje',
-   '<button class="btn gh xs" data-a="novo-cardapio">'+ic('redo')+' outro</button>')+
+   '<div class="row" style="gap:5px">'+
+   '<button class="btn gh xs" data-a="plano-semana">'+ic('cal')+' semana</button>'+
+   '<button class="btn gh xs" data-a="novo-cardapio">'+ic('redo')+' outro</button></div>')+
    '<p class="tiny muted">Montado a partir das suas metas, das receitas favoritas e do que você marcou como disponível em casa.</p>'+
    '<div class="gauto" style="margin-top:11px">'+
     tile('Total',Math.round(tot.kcal),'de '+m.kcal+' kcal',Math.abs(tot.kcal-m.kcal)<m.kcal*.12?'var(--ok)':'var(--warn)')+
@@ -2831,14 +3038,32 @@ function sheetAdd(meal){
   const recentes=!q&&S.recentes.length?'<div class="lbl" style="margin-bottom:7px">Usados recentemente</div>'+
    '<div class="row wrap" style="gap:5px;margin-bottom:14px">'+S.recentes.slice(0,8).map((r,i2)=>
    '<button class="chip xs" data-a="add-recente" data-i="'+i2+'">'+esc(r.n)+'</button>').join('')+'</div>':'';
-  corpo=recentes+'<div class="stack" style="gap:7px">'+base.map(f=>{
-   const idx=FOODS.indexOf(f);
+  corpo='<button class="btn gh bl sm" style="margin-bottom:13px" data-a="scan">'+ic('cam')+
+    ' Ler código de barras da embalagem</button>'+
+   recentes+'<div class="stack" style="gap:7px">'+base.map(f=>{
+   const idx=FOODS.indexOf(f),med=MEDIDAS[f.n];
    return '<div class="ex"><div class="row top" style="gap:9px"><div class="grow">'+
     '<div class="nm" style="font-size:13.5px">'+esc(f.n)+'</div>'+
     '<div class="meta">'+f.kcal+' kcal · P '+f.p+' C '+f.c+' G '+f.g+' por 100 g</div></div>'+
     '<div class="row" style="gap:5px"><input type="number" inputmode="numeric" value="'+f.d+
      '" style="width:66px;padding:6px 8px;font-size:12.5px" id="fg'+idx+'">'+
-    '<button class="btn xs" data-a="add-alimento" data-i="'+idx+'">'+ic('plus')+'</button></div></div></div>';}).join('')+'</div>';
+    '<button class="btn xs" data-a="add-alimento" data-i="'+idx+'">'+ic('plus')+'</button></div></div>'+
+    (med?'<div class="row wrap" style="gap:4px;margin-top:7px">'+med.map(([rot,g])=>
+     '<button class="chip xs" data-a="med" data-i="'+idx+'" data-g="'+g+'">'+esc(rot)+'</button>').join('')+'</div>':'')+
+    '</div>';}).join('')+'</div>';
+ }else if(addMode==='salvas'){
+  const sv=S.salvos||[];
+  corpo=sv.length?'<p class="tiny muted" style="margin-bottom:10px">Um toque registra a refeição inteira.</p>'+
+   '<div class="stack" style="gap:8px">'+sv.map((s,i2)=>{
+    const t=s.itens.reduce((a,x)=>({kcal:a.kcal+(x.kcal||0),p:a.p+(x.p||0)}),{kcal:0,p:0});
+    return '<div class="ex"><div class="row top" style="gap:9px"><div class="grow">'+
+     '<div class="nm">'+esc(s.n)+'</div>'+
+     '<div class="meta">'+s.itens.length+' itens · '+Math.round(t.kcal)+' kcal · P '+Math.round(t.p)+' g</div>'+
+     '<div class="obs">'+esc(s.itens.map(x=>x.n).join(', '))+'</div></div>'+
+     '<div class="stack" style="gap:4px">'+
+     '<button class="btn xs" data-a="usar-salva" data-i="'+i2+'">usar</button>'+
+     '<button class="chip rm" data-a="rm-salva" data-i="'+i2+'">'+ic('trash')+'</button></div></div></div>';}).join('')+'</div>'
+   :vazio('book','Nenhuma refeição salva ainda. No diário, monte uma refeição e toque em "salvar como modelo" — depois ela entra com um toque só.');
  }else{
   corpo='<div class="stack" style="gap:10px">'+
    '<label class="fld">Nome<input type="text" id="mNome" placeholder="ex.: Pastel da feira"></label>'+
@@ -2853,14 +3078,149 @@ function sheetAdd(meal){
  }
  sheet('Adicionar em '+nome,
   '<div class="seg" style="margin-bottom:12px">'+
-   [['receitas','Receitas'],['alimentos','Alimentos'],['manual','Manual']].map(([k,n])=>
+   [['receitas','Receitas'],['alimentos','Alimentos'],['salvas','Salvas'],['manual','Manual']].map(([k,n])=>
    '<button class="'+(addMode===k?'on':'')+'" data-a="add-mode" data-v="'+k+'">'+n+'</button>').join('')+'</div>'+
-  (addMode!=='manual'?'<div class="srch" style="margin-bottom:12px">'+ic('search')+
+  (addMode==='receitas'||addMode==='alimentos'?'<div class="srch" style="margin-bottom:12px">'+ic('search')+
    '<input type="text" id="addBusca" placeholder="Buscar…" value="'+esc(addBusca)+'"></div>':'')+
   corpo);
  const b=$('#addBusca');
  if(b)b.addEventListener('input',ev=>{addBusca=ev.target.value;const p=ev.target.selectionStart;
   sheetAdd(addMeal);const n2=$('#addBusca');if(n2){n2.focus();n2.setSelectionRange(p,p)}});
+}
+
+/* =====================================================================
+   CÓDIGO DE BARRAS
+   A câmera lê o código e os valores vêm da Open Food Facts, uma base
+   aberta e colaborativa de produtos. Se o navegador não souber ler
+   código, dá para digitar os números na mão.
+   ===================================================================== */
+let scanStream=null,scanLoop=null,ultimoScan=null;
+function pararCamera(){
+ if(scanLoop){clearInterval(scanLoop);scanLoop=null}
+ if(scanStream){scanStream.getTracks().forEach(t=>t.stop());scanStream=null}
+}
+function sheetScan(){
+ const temLeitor=(typeof window.BarcodeDetector!=='undefined');
+ sheet('Código de barras',
+  (temLeitor?'<div class="scanwrap"><video id="scanVid" playsinline muted autoplay></video><div class="scanmira"></div></div>'+
+    '<p class="xtiny muted" style="margin:9px 0 13px;text-align:center">Aponte a câmera para o código de barras da embalagem.</p>'
+   :'<p class="tiny muted" style="margin-bottom:12px">Este navegador não lê código pela câmera. '+
+     'Digite os números que ficam embaixo das barras.</p>')+
+  '<div class="row" style="gap:7px"><input type="number" inputmode="numeric" id="codIn" placeholder="7891234567890" class="grow">'+
+  '<button class="btn sm" data-a="buscar-cod">Buscar</button></div>'+
+  '<div id="scanRes" style="margin-top:14px"></div>','Produtos de embalagem');
+ if(temLeitor)iniciarCamera();
+}
+function iniciarCamera(){
+ const v=$('#scanVid');if(!v)return;
+ if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia)return avisoCamera();
+ navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}}).then(st=>{
+  if(!$('#scanVid')){st.getTracks().forEach(t=>t.stop());return}
+  scanStream=st;v.srcObject=st;v.play().catch(()=>{});
+  const det=new window.BarcodeDetector({formats:['ean_13','ean_8','upc_a','upc_e']});
+  scanLoop=setInterval(()=>{
+   const vid=$('#scanVid');
+   if(!vid)return pararCamera();
+   det.detect(vid).then(cods=>{
+    if(cods&&cods.length){pararCamera();buscarCodigo(cods[0].rawValue)}
+   }).catch(()=>{});
+  },700);
+ }).catch(avisoCamera);
+}
+function avisoCamera(){
+ const w=document.querySelector('.scanwrap');
+ if(w)w.outerHTML='<p class="tiny" style="color:var(--warn);margin-bottom:12px">'+
+  'Não consegui abrir a câmera. Digite o número do código abaixo.</p>';
+}
+function buscarCodigo(cod){
+ const res=$('#scanRes');if(!res)return;
+ cod=String(cod||'').replace(/\D/g,'');
+ if(cod.length<8){res.innerHTML='<p class="tiny" style="color:var(--warn)">Código curto demais.</p>';return}
+ res.innerHTML='<p class="tiny muted">Procurando '+esc(cod)+'…</p>';
+ fetch('https://world.openfoodfacts.org/api/v2/product/'+cod+
+   '.json?fields=product_name,product_name_pt,brands,nutriments')
+  .then(r=>r.json())
+  .then(j=>{
+   const p=j&&j.product;
+   if(!j||j.status!==1||!p)throw new Error('sem produto');
+   const n=p.nutriments||{};
+   let kcal=Number(n['energy-kcal_100g']);
+   if(!kcal&&n.energy_100g)kcal=Number(n.energy_100g)/4.184;
+   if(!kcal||!isFinite(kcal))throw new Error('sem valores');
+   const nome=[(p.product_name_pt||p.product_name||'').trim(),(p.brands||'').split(',')[0].trim()]
+    .filter(Boolean).join(' — ').slice(0,70)||('Produto '+cod);
+   ultimoScan={n:nome,kcal:Math.round(kcal),p:Number(n.proteins_100g)||0,
+    c:Number(n.carbohydrates_100g)||0,g:Number(n.fat_100g)||0};
+   if(!$('#scanRes'))return;
+   $('#scanRes').innerHTML='<div class="ex"><div class="nm">'+esc(ultimoScan.n)+'</div>'+
+    '<div class="meta">'+ultimoScan.kcal+' kcal · P '+n1(ultimoScan.p)+' C '+n1(ultimoScan.c)+
+    ' G '+n1(ultimoScan.g)+' por 100 g</div>'+
+    '<div class="row" style="gap:7px;margin-top:11px">'+
+    '<input type="number" inputmode="numeric" id="scanG" value="100" class="grow">'+
+    '<button class="btn acc" data-a="add-scan">Registrar</button></div>'+
+    '<p class="xtiny muted" style="margin-top:8px">Valores da base aberta Open Food Facts. '+
+    'Confira no rótulo se parecer estranho.</p></div>';
+  })
+  .catch(()=>{
+   if(!$('#scanRes'))return;
+   $('#scanRes').innerHTML='<p class="tiny" style="color:var(--warn)">Não achei esse produto na base aberta. '+
+    'Use a aba Manual e copie os valores do rótulo da embalagem.</p>';
+  });
+}
+
+/* =====================================================================
+   PLANEJADOR DA SEMANA
+   ===================================================================== */
+function sheetSemana(){
+ const dias=[];
+ for(let i=0;i<7;i++){
+  const d=addDias(hoje(),i);
+  dias.push({d,c:gerarCardapio(1000+i*37)});
+ }
+ S.ui.semana=dias;
+ const falta={};
+ dias.forEach(x=>MEALS.forEach(ref=>{
+  const r=RECIPES.find(z=>z.id===x.c.itens[ref.k]);
+  if(!r)return;
+  const s=pontuar(r);
+  (s?s.faltantes:r.ing.map(i2=>i2.n)).forEach(f=>{falta[f]=(falta[f]||0)+1});
+ }));
+ const lista=Object.keys(falta).sort((a,b)=>falta[b]-falta[a]);
+ sheet('Semana planejada',
+  '<p class="tiny muted" style="margin-bottom:13px">Sete dias de cardápio de uma vez, '+
+  'com uma lista de compras só para a semana inteira.</p>'+
+  '<div class="stack" style="gap:10px">'+dias.map(x=>
+   '<div class="ex"><div class="lbl" style="margin-bottom:6px">'+fmtData(x.d)+'</div>'+
+   MEALS.map(ref=>{const r=RECIPES.find(z=>z.id===x.c.itens[ref.k]);
+    return r?'<div class="row spread" style="gap:8px;padding:3px 0">'+
+     '<span class="xtiny muted" style="width:62px;flex:none">'+ref.n.split(' ')[0]+'</span>'+
+     '<span class="grow" style="font-size:12.5px;font-weight:600">'+esc(r.nome)+'</span>'+
+     '<span class="xtiny muted num">'+r.kcal+'</span></div>':''}).join('')+'</div>').join('')+'</div>'+
+  (lista.length?'<hr class="sep"><div class="lbl" style="margin-bottom:8px">Comprar para a semana</div>'+
+   '<div class="row wrap" style="gap:5px;margin-bottom:12px">'+lista.map(x=>
+    '<span class="chip xs">'+esc(x)+(falta[x]>1?' ×'+falta[x]:'')+'</span>').join('')+'</div>'+
+   '<button class="btn acc bl" data-a="add-compras" data-v="'+esc(lista.join('|'))+'">'+
+    ic('cart')+' Jogar os '+lista.length+' itens na lista de compras</button>':''),
+  '7 dias');
+}
+
+/* =====================================================================
+   REFEIÇÕES SALVAS
+   ===================================================================== */
+function sheetSalvarRef(meal){
+ const itens=(dia(hoje()).ref[meal]||[]);
+ if(!itens.length)return toast('Registre algo nesta refeição primeiro');
+ const nome=(MEALS.find(m=>m.k===meal)||{}).n||'Refeição';
+ sheet('Salvar como modelo',
+  '<p class="tiny muted" style="margin-bottom:12px">Guarda os '+itens.length+
+  ' itens desta refeição com um nome. Depois você registra tudo com um toque, '+
+  'na aba <b>Salvas</b> ao adicionar comida.</p>'+
+  '<div class="stack" style="gap:0;margin-bottom:13px">'+itens.map(x=>
+   '<div class="li" style="padding:6px 0"><div class="grow"><div class="ttl" style="font-size:13px">'+esc(x.n)+'</div>'+
+   '<div class="sub num">'+esc(x.q)+'</div></div></div>').join('')+'</div>'+
+  '<label class="fld">Nome do modelo<input type="text" id="salvaNome" value="'+esc('Meu '+nome.toLowerCase())+'"></label>'+
+  '<button class="btn acc bl" style="margin-top:12px" data-a="salvar-ref-ok" data-m="'+meal+'">Salvar</button>',
+  nome);
 }
 
 function stAgua(){
@@ -3135,6 +3495,38 @@ const MASC_VIDEOS=[
  {t:'Ganho de massa para transmasculinos',q:'ganho de massa muscular transmasculino testosterona treino dieta',d:'Como a T muda a resposta ao treino'},
  {t:'Respiração diafragmática',q:'respiração diafragmática exercício diário 5 minutos',d:'Importante para quem usa binder e para o treino de voz'}
 ];
+/* Agenda de aplicação: o intervalo é o que VOCÊ configurar. O app só conta
+   os dias e guarda o histórico — nada sobre dose, marca ou via. */
+function blocoTH(){
+ const th=S.th||{freq:14,hist:[]};
+ const h=(th.hist||[]).slice().sort();
+ const ult=h.length?h[h.length-1]:null;
+ const prox=ult?addDias(ult,th.freq||14):null;
+ const faltam=prox?diffDias(hoje(),prox):null;
+ return '<div class="card">'+chTtl('cal','Agenda de aplicação',
+   h.length?'<span class="tag n">'+h.length+' registros</span>':'')+
+  (ult?'<div class="g3">'+
+    tile('Última',fmtCurto(ult),'aplicação')+
+    tile('Próxima',prox?fmtCurto(prox):'—','a cada '+(th.freq||14)+' dias')+
+    tile(faltam>0?'Faltam':faltam===0?'É hoje':'Atrasada',
+      faltam>0?faltam:faltam===0?'hoje':Math.abs(faltam),
+      faltam>0?'dias':faltam===0?'':'dias',
+      faltam<0?'var(--bad)':faltam===0?'var(--warn)':'var(--ok)')+'</div>'
+   :'<p class="tiny muted">Registre a aplicação e o app passa a contar os dias até a próxima, no intervalo que você definir.</p>')+
+  '<div class="row wrap" style="gap:7px;margin-top:12px">'+
+   '<button class="btn acc sm grow" data-a="th-apliquei">'+ic('check')+' Apliquei hoje</button>'+
+   '<label class="fld" style="width:120px">A cada (dias)'+
+    '<input type="number" inputmode="numeric" id="thFreq" value="'+(th.freq||14)+'"></label>'+
+   '<button class="btn gh sm" data-a="th-freq">salvar</button></div>'+
+  (h.length>1?'<hr class="sep"><div class="lbl" style="margin-bottom:7px">Histórico</div>'+
+   '<div class="stack" style="gap:0">'+h.slice().reverse().slice(0,10).map((d,i,arr)=>{
+    const ant=arr[i+1],gap=ant?diffDias(ant,d):null;
+    return '<div class="li"><div class="grow"><div class="ttl">'+fmtData(d)+'</div>'+
+     (gap?'<div class="sub">'+gap+' dias depois da anterior</div>':'')+'</div>'+
+     '<button class="chip rm" data-a="th-rm" data-d="'+d+'">'+ic('x')+'</button></div>';}).join('')+'</div>':'')+
+  '<p class="xtiny muted" style="margin-top:10px">Só um contador de dias e um histórico, com o intervalo que você mesmo definiu. '+
+  'Qualquer dúvida sobre intervalo, dose ou exames é com quem acompanha você.</p></div>';
+}
 function stCorpo(){
  const ms=S.medidas.slice().sort((a,b)=>a.d<b.d?-1:1),ult=ms[ms.length-1];
  const rel=ult&&ult.ombro&&ult.cintura?n1(ult.ombro/ult.cintura):null;
@@ -3163,11 +3555,12 @@ function stCorpo(){
    '<button class="btn bl sm" style="margin-top:11px" data-a="go-sub" data-tab="cuidados" data-st="voz">Abrir o treino de voz</button></div>'+
   '<div class="card">'+chTtl('play','Vídeos')+
    '<div class="stack" style="gap:8px">'+MASC_VIDEOS.map(v=>vidLink(v.t,v.q,v.d)).join('')+'</div></div>'+
+  blocoTH()+
   '<div class="card">'+chTtl('info','Hormonização')+
    '<p class="tiny muted" style="line-height:1.65">Este app não orienta nada sobre doses, marcas, vias de aplicação ou como começar a testosterona — '+
-   'isso é acompanhamento médico, com exames periódicos. O que ele faz é registrar a data de início em Perfil e acompanhar, ao lado dela, '+
+   'isso é acompanhamento médico, com exames periódicos. O que ele faz é guardar o que <b>você</b> registrar e acompanhar, ao lado disso, '+
    'o que muda no corpo: peso, medidas, fotos, pele e voz.</p>'+
-   '<button class="btn gh bl sm" style="margin-top:11px" data-a="go" data-tab="perfil">Registrar data da TH</button></div>';
+   '<button class="btn gh bl sm" style="margin-top:11px" data-a="go" data-tab="perfil">Registrar data de início no Perfil</button></div>';
 }
 function renderCuidados(){
  const s=S.ui.sub.cuidados;
@@ -3199,8 +3592,11 @@ function stPeso(){
   '<p class="tiny muted" style="margin-top:9px">Pese-se no mesmo horário, de preferência em jejum e depois do banheiro. '+
    'Faltam <b>'+falta+' kg</b> para a meta'+(ritmo?'; nos últimos 28 dias você variou <b>'+(ritmo>0?'+':'')+ritmo+' kg</b>.':'.')+'</p></div>'+
   '<div class="card">'+chTtl('chart','Evolução','<span class="tag n">'+ps.length+' registros</span>')+
-   lineChart(ps.map(p=>({x:fmtCurto(p.d),y:p.v})),'kg')+
-   (ps.length>1?'<p class="xtiny muted" style="margin-top:7px">Oscilações de até 1 kg entre dias são água e conteúdo intestinal. O que importa é a direção da linha ao longo de semanas.</p>':'')+'</div>'+
+   lineChart(ps.map(p=>({x:fmtCurto(p.d),y:p.v})),'kg',null,
+    ps.length>3?mediaMovel(ps.map(p=>({x:fmtCurto(p.d),y:p.v})),7):null)+
+   (ps.length>3?'<p class="xtiny muted" style="margin-top:7px">A linha cheia é cada pesagem; a tracejada é a média dos últimos 7 registros. '+
+    'Oscilações de até 1 kg entre dias são água e intestino — é a tracejada que mostra para onde você está indo.</p>'
+    :ps.length>1?'<p class="xtiny muted" style="margin-top:7px">Com mais algumas pesagens aparece também a linha de tendência, que ignora a oscilação do dia a dia.</p>':'')+'</div>'+
   (ps.length?'<div class="card">'+chTtl('clock','Histórico')+'<div class="stack" style="gap:0">'+
    ps.slice().reverse().slice(0,24).map((p,i,arr)=>{const ant=arr[i+1],dl=ant?p.v-ant.v:0;
     return '<div class="li"><div class="grow"><div class="ttl num">'+n1(p.v)+' kg</div>'+
@@ -3209,7 +3605,7 @@ function stPeso(){
     '<button class="chip rm" data-a="rm-peso" data-d="'+p.d+'">'+ic('x')+'</button></div>';}).join('')+'</div></div>':'');
 }
 const CAMPOS=[['ombro','Ombro'],['torax','Tórax'],['cintura','Cintura'],['quadril','Quadril'],
- ['braco','Braço'],['coxa','Coxa'],['pant','Panturrilha']];
+ ['pescoco','Pescoço'],['braco','Braço'],['coxa','Coxa'],['pant','Panturrilha']];
 function stMedidas(){
  const ms=S.medidas.slice().sort((a,b)=>a.d<b.d?-1:1);
  const ult=ms[ms.length-1],pri=ms[0];
@@ -3226,6 +3622,7 @@ function stMedidas(){
     n1(ult.ombro/ult.cintura)+'</b>. É o número que descreve o formato em V — referência entre 1,4 e 1,6.</p>':'')
    :vazio('ruler','Nenhuma medida registrada. Meça relaxado, sempre no mesmo ponto e no mesmo dia da semana.'))+
   '</div>'+
+  blocoGordura()+
   '<div class="card">'+chTtl('plus','Nova medição')+
    '<div class="g2">'+CAMPOS.map(([k,n])=>'<label class="fld">'+n+
     '<input type="number" step="0.5" inputmode="decimal" id="md_'+k+'" placeholder="'+(ult&&ult[k]?ult[k]:'—')+'"></label>').join('')+'</div>'+
@@ -3239,6 +3636,7 @@ function stMedidas(){
     ['Tórax','Na linha dos mamilos, no fim de uma expiração normal.'],
     ['Cintura','Na menor circunferência, acima do umbigo. Não puxe a barriga.'],
     ['Quadril','Na parte mais larga do glúteo.'],
+    ['Pescoço','Logo abaixo do pomo de adão, com a fita levemente inclinada para a frente. Serve para estimar a gordura corporal.'],
     ['Braço','Contraído, no ponto mais grosso do bíceps.'],
     ['Coxa','A 10 cm abaixo da virilha, sempre na mesma perna.'],
     ['Panturrilha','No ponto mais grosso, em pé com o peso nos dois pés.']].map(([t,d])=>
@@ -3247,6 +3645,26 @@ function stMedidas(){
    ms.slice().reverse().slice(0,10).map(m=>'<div class="li"><div class="grow"><div class="ttl">'+fmtData(m.d)+'</div>'+
    '<div class="sub num">'+CAMPOS.filter(([k])=>m[k]).map(([k,n])=>n.slice(0,3)+' '+m[k]).join(' · ')+'</div></div>'+
    '<button class="chip rm" data-a="rm-medida" data-d="'+m.d+'">'+ic('x')+'</button></div>').join('')+'</div></div>':'');
+}
+/* Estimativa de gordura corporal a partir das circunferências. */
+function blocoGordura(){
+ const g=gorduraCorporal();
+ if(!g)return '';
+ if(g.faltam)return '<div class="card">'+chTtl('target','Gordura corporal')+
+  '<p class="tiny muted">Para estimar, faltam medidas. Registre <b>cintura</b> e <b>pescoço</b>'+
+  (S.perfil.sexo==='m'?'':' e <b>quadril</b>')+' na mesma medição — com isso dá para calcular sem aparelho nenhum.</p></div>';
+ const faixa=S.perfil.sexo==='m'
+  ?(g.pct<6?['muito baixa','var(--warn)']:g.pct<14?['atlética','var(--ok)']:g.pct<19?['saudável','var(--ok)']:g.pct<25?['acima','var(--warn)']:['alta','var(--bad)'])
+  :(g.pct<14?['muito baixa','var(--warn)']:g.pct<21?['atlética','var(--ok)']:g.pct<25?['saudável','var(--ok)']:g.pct<32?['acima','var(--warn)']:['alta','var(--bad)']);
+ return '<div class="card">'+chTtl('target','Gordura corporal','<span class="tag n">'+fmtCurto(g.d)+'</span>')+
+  '<div class="g3">'+
+   tile('Estimativa',g.pct+'%',faixa[0],faixa[1])+
+   tile('Massa gorda',g.gordura,'kg')+
+   tile('Massa magra',g.magra,'kg','var(--ok)')+'</div>'+
+  '<p class="xtiny muted" style="margin-top:10px;line-height:1.6">Calculado pelas circunferências (método da Marinha americana). '+
+  'Tem margem de erro de alguns pontos, então o número solto importa pouco — o que vale é ele acompanhar a mesma direção '+
+  'ao longo dos meses, sempre medido do mesmo jeito. Para quem está em hormonização, a composição corporal muda bastante '+
+  'no primeiro ano, e essa conta ajuda a ver que o peso parado na balança pode ser gordura saindo e músculo entrando.</p></div>';
 }
 function stFotos(){
  const f=S.fotos.slice().sort((a,b)=>a.d<b.d?-1:1);
@@ -3384,6 +3802,32 @@ function renderProg(){
 /* =====================================================================
    PERFIL
    ===================================================================== */
+/* Gasto calórico medido pelos seus dados, com a sugestão de meta que sai dele. */
+function blocoTdee(){
+ const t=tdeeReal();
+ if(t.faltam)return '<div class="card">'+chTtl('wand','Ajustar pelos seus dados')+
+  '<p class="tiny muted">Depois de algumas semanas de registro, o app calcula seu gasto calórico <b>real</b> '+
+  'comparando o que você comeu com o que o peso fez — e isso vale mais que qualquer fórmula.</p>'+
+  '<p class="tiny" style="margin-top:9px;color:var(--warn)">Ainda falta: '+esc(t.faltam)+'.</p></div>';
+ const dif=t.sugerido-t.atual;
+ return '<div class="card hero">'+chTtl('wand','Ajustar pelos seus dados',
+   '<span class="tag '+(Math.abs(dif)<60?'o':'a')+'">'+(dif>0?'+':'')+dif+' kcal</span>')+
+  '<div class="g3">'+
+   tile('Gasto real',t.tdee,'kcal por dia','var(--blue)')+
+   tile('Você comeu',t.mediaKcal,'média de '+t.dias+' dias')+
+   tile('Peso',(t.deltaKg>0?'+':'')+t.deltaKg,'kg em '+t.span+' dias',
+    t.deltaKg>0?'var(--ok)':t.deltaKg<0?'var(--warn)':'var(--ink)')+'</div>'+
+  '<p class="tiny muted" style="margin-top:11px;line-height:1.6">Em '+t.span+' dias você comeu em média <b>'+
+  t.mediaKcal+' kcal</b> e o peso '+(t.deltaKg>0?'subiu':t.deltaKg<0?'caiu':'ficou igual')+
+  (t.deltaKg?' <b>'+Math.abs(t.deltaKg)+' kg</b>':'')+'. Isso coloca seu gasto real perto de <b>'+t.tdee+
+  ' kcal</b> por dia. Para '+(S.perfil.obj==='perder'?'perder gordura':S.perfil.obj==='ganhar'?'ganhar massa':'manter')+
+  ', a meta correspondente é <b>'+t.sugerido+' kcal</b>'+
+  (Math.abs(dif)<60?' — praticamente a que você já usa.':', contra as '+t.atual+' kcal de agora.')+'</p>'+
+  (Math.abs(dif)>=60?'<button class="btn acc bl" style="margin-top:12px" data-a="usar-tdee" data-v="'+t.sugerido+'">'+
+   'Passar a meta para '+t.sugerido+' kcal</button>':'')+
+  '<p class="xtiny muted" style="margin-top:9px">Refaça a conta a cada duas ou três semanas. '+
+  'Metabolismo muda com o peso e com a rotina — fórmula nenhuma acompanha isso, seus dados sim.</p></div>';
+}
 function camposPerfil(pref){
  const p=S.perfil;
  /* três blocos curtos em vez de um paredão de quinze campos */
@@ -3462,6 +3906,7 @@ function renderPerfil(){
     '<label class="fld" style="grid-column:1/-1">Água (ml)<input type="number" id="mn_agua" placeholder="'+m.agua+'" value="'+((p.manual&&p.manual.agua)||'')+'"></label></div>'+
    '<div class="row" style="gap:6px;margin-top:10px"><button class="btn gh sm grow" data-a="salvar-manual">Usar estes valores</button>'+
     (m.manual?'<button class="btn gh sm" data-a="limpar-manual">voltar ao cálculo</button>':'')+'</div></div>'+
+  blocoTdee()+
 
   '<div class="card">'+chTtl('bell','Lembretes de água')+
    '<div class="row wrap" style="gap:5px;margin-bottom:11px">'+(p.lembretes||[]).map((h,i)=>
@@ -3492,6 +3937,7 @@ function renderPerfil(){
    '<div class="row wrap" style="gap:7px;margin-top:11px">'+
     '<button class="btn gh sm" data-a="exportar">Copiar meus dados</button>'+
     '<button class="btn gh sm" data-a="importar">Importar dados</button>'+
+    '<button class="btn gh sm" data-a="baixar-csv">Baixar planilha</button>'+
     '<button class="btn gh sm" data-a="zerar-dia">Zerar o dia de hoje</button>'+
     '<button class="btn gh sm" data-a="onboard">Refazer a configuração</button></div></div>'+
 
@@ -3551,6 +3997,30 @@ function iniciaTimer(seg){
 function copiar(txt,msg){
  const fb=()=>sheet('Copie o texto','<textarea style="min-height:240px">'+esc(txt)+'</textarea>');
  try{navigator.clipboard.writeText(txt).then(()=>toast(msg),fb)}catch(e){fb()}
+}
+/* Planilha com um dia por linha, separada por ponto e vírgula, que é o que
+   o Excel em português espera. O BOM no começo preserva os acentos. */
+function baixarCSV(){
+ const cab=['data','kcal','proteina_g','carboidrato_g','gordura_g','agua_ml','peso_kg',
+  'treino','sono_h','passos','voz','pele_manha','pele_noite'];
+ const pesoDe={};S.pesos.forEach(p=>{pesoDe[p.d]=p.v});
+ const linhas=[cab];
+ Object.keys(S.dias).sort().forEach(d=>{
+  const x=S.dias[d],t=totalDia(d);
+  linhas.push([d,Math.round(t.kcal),n1(t.p),n1(t.c),n1(t.g),x.agua||0,pesoDe[d]||'',
+   (x.treino||{}).feito?'sim':'nao',x.sono||'',x.passos||'',
+   (x.voz||{}).feito?'sim':'nao',(x.pele||{}).manha?'sim':'nao',(x.pele||{}).noite?'sim':'nao']);
+ });
+ if(linhas.length<2)return toast('Ainda não há dias registrados');
+ const csv=linhas.map(l=>l.join(';')).join('\r\n');
+ try{
+  const blob=new Blob(['﻿'+csv],{type:'text/csv;charset=utf-8'});
+  const url=URL.createObjectURL(blob),a=document.createElement('a');
+  a.href=url;a.download='rota-trans-'+hoje()+'.csv';
+  document.body.appendChild(a);a.click();
+  setTimeout(()=>{URL.revokeObjectURL(url);a.remove()},1500);
+  toast((linhas.length-1)+' dias na planilha');
+ }catch(e){copiar(csv,'Planilha copiada')}
 }
 function aplicaTema(){
  const t=S.ui.tema;
@@ -3642,6 +4112,55 @@ document.addEventListener('click',ev=>{
    save('dia',dd);closeSheet();render();break}
   case 'ex-info':sheetEx(d.n);break;
   case 'mov-info':sheetMov(d.k);break;
+
+  /* medidas caseiras, código de barras e refeições salvas */
+  case 'med':{const inp=$('#fg'+d.i);if(inp){inp.value=d.g;inp.focus()}break}
+  case 'scan':sheetScan();break;
+  case 'buscar-cod':buscarCodigo(($('#codIn')||{}).value||'');break;
+  case 'add-scan':{if(!ultimoScan)return;
+   const g=Math.max(1,Number(($('#scanG')||{}).value)||100);
+   addItem(hj,addMeal,{n:ultimoScan.n,q:g+' g',kcal:ultimoScan.kcal*g/100,
+    p:ultimoScan.p*g/100,c:ultimoScan.c*g/100,g:ultimoScan.g*g/100});
+   closeSheet();break}
+  case 'salvar-ref':sheetSalvarRef(d.m);break;
+  case 'salvar-ref-ok':{const nm=(($('#salvaNome')||{}).value||'').trim();
+   if(!nm)return toast('Dê um nome ao modelo');
+   const itens=(dia(hj).ref[d.m]||[]).map(x=>Object.assign({},x));
+   if(!itens.length)return toast('Nada para salvar');
+   S.salvos=S.salvos||[];
+   S.salvos=S.salvos.filter(s=>nrm(s.n)!==nrm(nm));
+   S.salvos.unshift({id:'s'+Date.now().toString(36),n:nm,itens});
+   save();closeSheet();render();toast('Modelo salvo: '+nm);break}
+  case 'usar-salva':{const s=(S.salvos||[])[Number(d.i)];if(!s)return;
+   s.itens.forEach(x=>addItem(hj,addMeal,Object.assign({},x),true));
+   closeSheet();render();toast(s.itens.length+' itens registrados');break}
+  case 'rm-salva':{(S.salvos||[]).splice(Number(d.i),1);save();sheetAdd(addMeal);break}
+  case 'plano-semana':sheetSemana();break;
+
+  /* trocar exercício */
+  case 'trocar-ex':sheetTrocarEx(d.n);break;
+  case 'trocar-ok':{S.trocas[d.n]=d.v;save();closeSheet();render();
+   toast('Trocado por '+d.v);break}
+  case 'destrocar':{delete S.trocas[d.n];save();closeSheet();render();toast('Troca desfeita');break}
+
+  /* agenda de aplicação */
+  case 'th-apliquei':{S.th=S.th||{freq:14,hist:[]};S.th.hist=S.th.hist||[];
+   if(S.th.hist.indexOf(hj)<0)S.th.hist.push(hj);
+   S.th.hist.sort();save();render();toast('Aplicação registrada');break}
+  case 'th-freq':{const v=Number(($('#thFreq')||{}).value);
+   if(!v||v<1||v>120)return toast('Informe um intervalo entre 1 e 120 dias');
+   S.th=S.th||{hist:[]};S.th.freq=v;save();render();toast('Intervalo: '+v+' dias');break}
+  case 'th-rm':{S.th.hist=(S.th.hist||[]).filter(x=>x!==d.d);save();render();break}
+
+  /* metas pelos próprios dados */
+  case 'usar-tdee':{const v=Number(d.v);if(!v)return;
+   const m=metas();
+   S.perfil.manual=Object.assign({},S.perfil.manual||{},{kcal:v,
+    prot:S.perfil.manual&&S.perfil.manual.prot?S.perfil.manual.prot:m.prot,
+    gord:S.perfil.manual&&S.perfil.manual.gord?S.perfil.manual.gord:m.gord,
+    carb:Math.max(40,Math.round((v-m.prot*4-m.gord*9)/4))});
+   save();render();toast('Meta ajustada para '+v+' kcal');break}
+  case 'baixar-csv':baixarCSV();break;
   case 'play-video':{const c=el.closest('.vcard'),th=c&&c.querySelector('.vthumb');
    if(!th)return;
    const w=document.createElement('div');w.className='vframe';
@@ -3823,6 +4342,12 @@ document.addEventListener('keydown',ev=>{
    INÍCIO
    ===================================================================== */
 lsLoad();
+/* garante que as listas novas existam e sejam próprias deste estado,
+   mesmo em dados salvos por uma versão anterior */
+S.salvos=Array.isArray(S.salvos)?S.salvos.slice():[];
+S.trocas=(S.trocas&&typeof S.trocas==='object')?Object.assign({},S.trocas):{};
+S.th=Object.assign({freq:14,hist:[]},S.th||{});
+S.th.hist=Array.isArray(S.th.hist)?S.th.hist.slice():[];
 if(!S.perfil.inicio)S.perfil.inicio=hoje();
 migrar();
 aplicaTema();
