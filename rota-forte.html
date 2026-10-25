@@ -1668,11 +1668,11 @@ const MEALS=[
  {k:'jantar',n:'Jantar',pct:.20,h:'19:30',dica:'Mais proteína e legumes, menos carboidrato. Ajuda no sono e na perda de gordura.'},
  {k:'ceia',n:'Ceia',pct:.05,h:'22:00',dica:'Opcional. Proteína de digestão lenta ajuda a recuperação durante a noite.'}
 ];
-const HABITS=[['treino','Fazer o treino do dia','i-dumb'],['voz','Treinar a voz','i-mic'],
- ['pele','Skincare manhã e noite','i-sparkle'],['prot','Bater a meta de proteína','i-target'],
- ['agua','Bater a meta de água','i-drop'],['sono','Dormir 7 a 9 horas','i-moon'],
- ['passos','Caminhar 8 mil passos','i-steps'],['ultra','Zero ultraprocessado','i-leaf']];
-const LOCAIS=[['casa','Em casa','i-home'],['academia','Academia','i-dumb'],['cal','Calistenia','i-wave']];
+const HABITS=[['treino','Fazer o treino do dia','dumb'],['voz','Treinar a voz','mic'],
+ ['pele','Skincare manhã e noite','sparkle'],['prot','Bater a meta de proteína','target'],
+ ['agua','Bater a meta de água','drop'],['sono','Dormir 7 a 9 horas','moon'],
+ ['passos','Caminhar 8 mil passos','steps'],['ultra','Zero ultraprocessado','leaf']];
+const LOCAIS=[['casa','Em casa','home'],['academia','Academia','dumb'],['cal','Calistenia','wave']];
 const DEF={
  perfil:{nome:'',sexo:'f',idade:28,altura:172,peso:70,meta:74,ativ:1.375,obj:'ganhar',
    inicio:'',local:'casa',thIni:'',onboard:false,manual:null,mig:0,
@@ -3348,7 +3348,8 @@ function stFotos(){
   '<p class="tiny muted">A balança mente em semanas de recomposição; a foto não. Tire sempre no mesmo lugar, com a mesma luz e na mesma posição — de frente, de lado e de costas.</p>'+
   (ASSETS?'<label class="btn gh bl sm" style="margin-top:11px;cursor:pointer">'+ic('plus')+' Adicionar foto'+
     '<input type="file" accept="image/*" id="fotoIn" style="display:none"></label>'
-   :'<p class="tiny" style="margin-top:10px;color:var(--warn)">O envio de fotos precisa que você esteja na sua conta, com permissão de edição nesta página.</p>')+
+   :'<p class="tiny" style="margin-top:10px;color:var(--warn)">Esta versão do app não guarda fotos: o envio de arquivo depende da sua conta Claude. '+
+     'Todo o resto funciona normalmente. Se quiser a galeria, use o app pelo link do Claude e mantenha as fotos por lá.</p>')+
   '</div>'+
   (f.length?
    (f.length>1?'<div class="card">'+chTtl('redo','Antes e agora')+'<div class="g2">'+
@@ -3436,20 +3437,20 @@ function conquistas(){
  const perda=S.pesos.length?S.pesos[0].v-pesoAtual():0;
  const st=streak(),n=Math.max(0,diaPlano());
  return [
-  ['i-check','Primeiro treino','Concluir 1 treino',treinos>=1,treinos+'/1'],
-  ['i-redo','Semana fechada','7 dias seguidos ativos',st>=7,Math.min(st,7)+'/7'],
-  ['i-cal','Um mês de pé','30 dias seguidos',st>=30,Math.min(st,30)+'/30'],
-  ['i-dumb','25 treinos','Concluir 25 treinos',treinos>=25,Math.min(treinos,25)+'/25'],
-  ['i-trophy','100 treinos','Concluir 100 treinos',treinos>=100,Math.min(treinos,100)+'/100'],
-  ['i-mic','Voz constante','30 dias de treino de voz',vozes>=30,Math.min(vozes,30)+'/30'],
-  ['i-sparkle','Pele em dia','30 rotinas completas',peles>=30,Math.min(peles,30)+'/30'],
-  ['i-book','Diário em dia','100 itens registrados',refs>=100,Math.min(refs,100)+'/100'],
-  ['i-drop','Hidratado','10 dias batendo a meta',diasAgua>=10,Math.min(diasAgua,10)+'/10'],
-  ['i-scale','Primeiro quilo','Perder 1 kg do inicial',perda>=1,n1(Math.max(0,perda))+'/1 kg'],
-  ['i-cam','Registro visual','3 fotos de evolução',S.fotos.length>=3,Math.min(S.fotos.length,3)+'/3'],
-  ['i-target','Fase 2','Chegar ao dia 91',n>=91,Math.min(n,91)+'/91'],
-  ['i-flame','Fase 3','Chegar ao dia 181',n>=181,Math.min(n,181)+'/181'],
-  ['i-star','Um ano','Chegar ao dia 365',n>=365,Math.min(n,365)+'/365']
+  ['check','Primeiro treino','Concluir 1 treino',treinos>=1,treinos+'/1'],
+  ['redo','Semana fechada','7 dias seguidos ativos',st>=7,Math.min(st,7)+'/7'],
+  ['cal','Um mês de pé','30 dias seguidos',st>=30,Math.min(st,30)+'/30'],
+  ['dumb','25 treinos','Concluir 25 treinos',treinos>=25,Math.min(treinos,25)+'/25'],
+  ['trophy','100 treinos','Concluir 100 treinos',treinos>=100,Math.min(treinos,100)+'/100'],
+  ['mic','Voz constante','30 dias de treino de voz',vozes>=30,Math.min(vozes,30)+'/30'],
+  ['sparkle','Pele em dia','30 rotinas completas',peles>=30,Math.min(peles,30)+'/30'],
+  ['book','Diário em dia','100 itens registrados',refs>=100,Math.min(refs,100)+'/100'],
+  ['drop','Hidratado','10 dias batendo a meta',diasAgua>=10,Math.min(diasAgua,10)+'/10'],
+  ['scale','Primeiro quilo','Perder 1 kg do inicial',perda>=1,n1(Math.max(0,perda))+'/1 kg'],
+  ['cam','Registro visual','3 fotos de evolução',S.fotos.length>=3,Math.min(S.fotos.length,3)+'/3'],
+  ['target','Fase 2','Chegar ao dia 91',n>=91,Math.min(n,91)+'/91'],
+  ['flame','Fase 3','Chegar ao dia 181',n>=181,Math.min(n,181)+'/181'],
+  ['star','Um ano','Chegar ao dia 365',n>=365,Math.min(n,365)+'/365']
  ];
 }
 function stConquistas(){
@@ -3572,9 +3573,12 @@ function renderPerfil(){
 
   '<div class="card">'+chTtl('info','Seus dados')+
    '<p class="tiny muted">'+(UID?'Seus registros ficam salvos na sua conta e voltam em qualquer aparelho onde você abrir esta página.':
-    'Seus registros estão salvos apenas neste navegador. Entre na sua conta para sincronizar entre aparelhos.')+'</p>'+
+    'Seus registros ficam salvos neste navegador, neste aparelho. Eles não somem ao fechar a aba, mas não viajam sozinhos '+
+    'para outro celular ou computador: para isso, use <b>Copiar meus dados</b> aqui e <b>Importar dados</b> do outro lado. '+
+    'Limpar os dados do site no navegador apaga tudo.')+'</p>'+
    '<div class="row wrap" style="gap:7px;margin-top:11px">'+
     '<button class="btn gh sm" data-a="exportar">Copiar meus dados</button>'+
+    '<button class="btn gh sm" data-a="importar">Importar dados</button>'+
     '<button class="btn gh sm" data-a="zerar-dia">Zerar o dia de hoje</button>'+
     '<button class="btn gh sm" data-a="onboard">Refazer a configuração</button></div></div>'+
 
@@ -3838,8 +3842,26 @@ document.addEventListener('click',ev=>{
   case 'copiar-resumo':copiar(($('#leituraTxt')||{}).textContent||'','Resumo copiado');break;
 
   /* dados */
-  case 'exportar':copiar(JSON.stringify({perfil:S.perfil,pesos:S.pesos,medidas:S.medidas,
-   cargas:S.cargas,vozLog:S.vozLog,dias:S.dias},null,1),'Dados copiados');break;
+  case 'exportar':copiar(JSON.stringify({v:3,perfil:S.perfil,pesos:S.pesos,medidas:S.medidas,
+   cargas:S.cargas,vozLog:S.vozLog,despensa:S.despensa,compras:S.compras,favs:S.favs,
+   recentes:S.recentes,fotos:S.fotos,dias:S.dias},null,1),'Dados copiados');break;
+  case 'importar':sheet('Importar dados',
+   '<p class="tiny muted" style="margin-bottom:11px">Cole aqui o texto que você copiou no botão <b>Copiar meus dados</b>, '+
+   'em outro navegador ou na outra versão do app. O que já está aqui é mantido; o que vier no texto entra por cima.</p>'+
+   '<textarea id="impTxt" placeholder="Cole o texto aqui" style="min-height:190px;font-family:var(--f-m);font-size:11px"></textarea>'+
+   '<button class="btn acc bl" style="margin-top:11px" data-a="importar-ok">Importar</button>','Trazer dados de outro lugar');break;
+  case 'importar-ok':{
+   let o;try{o=JSON.parse(($('#impTxt')||{}).value||'')}catch(e){return toast('Não consegui ler esse texto')}
+   if(!o||typeof o!=='object')return toast('Texto inválido');
+   if(o.perfil)S.perfil={...S.perfil,...o.perfil};
+   ['pesos','medidas','vozLog','despensa','compras','favs','recentes','fotos'].forEach(k=>{
+    if(Array.isArray(o[k]))S[k]=o[k]});
+   if(o.cargas)S.cargas={...S.cargas,...o.cargas};
+   let nd=0;
+   if(o.dias&&typeof o.dias==='object')Object.keys(o.dias).forEach(dd=>{
+    if(/^\d{4}-\d{2}-\d{2}$/.test(dd)){S.dias[dd]=o.dias[dd];save('dia',dd);nd++}});
+   save('base');closeSheet();render();
+   toast('Importado: '+nd+' dias de registro');break}
   case 'zerar-dia':{S.dias[hj]={d:hj,ref:{},agua:0,treino:{feito:false,sets:{}},voz:{feito:false,min:0,ex:{}},
    pele:{manha:false,noite:false},hab:{},sono:0,passos:0,humor:0,nota:''};
    save('dia',hj);render();toast('Dia de hoje zerado');break}
