@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#9fdffb" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#123c53" media="(prefers-color-scheme: dark)">
 <meta name="robots" content="noindex">
-<title>Rota Trans</title>
+<title>Norte</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <style>
@@ -366,7 +366,7 @@ nav.tabbar button.on::before{content:"";position:absolute;top:-6px;width:22px;he
  <div class="in">
   <div class="row top spread">
    <div class="grow">
-    <div class="eyebrow">Rota Trans</div>
+    <div class="eyebrow">Norte</div>
     <h1 id="hdrTitle">Sua jornada</h1>
     <div class="sub" id="hdrSub">Carregando…</div>
    </div>
@@ -417,11 +417,9 @@ nav.tabbar button.on::before{content:"";position:absolute;top:-6px;width:22px;he
  <section id="tab-cuidados" hidden>
   <div class="stack" style="gap:14px">
    <div class="subtabs" id="cuidTabs">
-    <button class="subtab on" data-st="corpo">Corpo</button>
-    <button class="subtab" data-st="voz">Voz</button>
-    <button class="subtab" data-st="pele">Pele e produtos</button>
    </div>
-   <div id="st-corpo" class="stack" style="gap:14px"></div>
+   <div id="st-higiene" class="stack" style="gap:14px"></div>
+   <div id="st-corpo" class="stack" style="gap:14px" hidden></div>
    <div id="st-voz" class="stack" style="gap:14px" hidden></div>
    <div id="st-pele" class="stack" style="gap:14px" hidden></div>
   </div>
@@ -1685,14 +1683,121 @@ const MEALS=[
  {k:'jantar',n:'Jantar',pct:.20,h:'19:30',dica:'Mais proteína e legumes, menos carboidrato. Ajuda no sono e na perda de gordura.'},
  {k:'ceia',n:'Ceia',pct:.05,h:'22:00',dica:'Opcional. Proteína de digestão lenta ajuda a recuperação durante a noite.'}
 ];
-const HABITS=[['treino','Fazer o treino do dia','dumb'],['voz','Treinar a voz','mic'],
+const HABITS=[['higiene','Higiene: alguma coisa feita','sparkle'],
+ ['treino','Fazer o treino do dia','dumb'],['voz','Treinar a voz','mic'],
  ['pele','Skincare manhã e noite','sparkle'],['prot','Bater a meta de proteína','target'],
  ['agua','Bater a meta de água','drop'],['sono','Dormir 7 a 9 horas','moon'],
  ['passos','Caminhar 8 mil passos','steps'],['ultra','Zero ultraprocessado','leaf']];
 const LOCAIS=[['casa','Em casa','home'],['academia','Academia','dumb'],['cal','Calistenia','wave']];
+
+/* =====================================================================
+   TRILHAS
+   O app serve a três caminhos diferentes. A trilha muda o que aparece,
+   os padrões e o tom — não só um rótulo.
+   ===================================================================== */
+const TRILHAS={
+ masc:{n:'Masculinizar',ic:'dumb',
+  res:'Treino com prioridade em ombro e dorsal, voz mais grave, pele preparada para a oleosidade da testosterona.',
+  voz:'masc',pele:'oleosa',obj:'ganhar',
+  corpo:true,voznota:true,
+  nota:'Com testosterona a massa magra sobe e a gordura desce, e a maior mudança acontece no primeiro ano. '+
+   'Por isso a balança pode subir enquanto o corpo afina: aqui as medidas e as fotos valem mais que o peso.'},
+ fem:{n:'Feminilizar',ic:'sparkle',
+  res:'Treino que preserva massa magra, voz mais aguda e ressonante, pele preparada para ficar mais seca.',
+  voz:'fem',pele:'seca',obj:'manter',
+  corpo:true,voznota:true,
+  nota:'Com estrogênio e antiandrógeno a massa magra tende a cair e a gordura a subir, e a pele fica mais fina e seca. '+
+   'Treino de força e proteína em dia não são opcionais aqui: são o que protege a massa magra durante a transição.'},
+ bem:{n:'Bem-estar',ic:'heart',
+  res:'Rotina simples de higiene, movimento leve, comida e sono — feita para funcionar em dias ruins.',
+  voz:'off',pele:'mista',obj:'manter',
+  corpo:false,voznota:false,
+  nota:'Caminhar reduz sintomas depressivos já em doses muito baixas — a partir de uns 70 minutos por semana, '+
+   'ou seja, 10 minutos por dia. A meta aqui não é treinar pesado, é não parar.'}
+};
+function trilha(){return TRILHAS[S.perfil.trilha]||TRILHAS.masc}
+
+/* =====================================================================
+   HIGIENE PESSOAL
+   Construída para o dia ruim, não para o dia bom. Cada tarefa tem três
+   níveis e QUALQUER um conta como feito — a literatura de ativação
+   comportamental é clara em fracionar a tarefa até ela caber na energia
+   que a pessoa tem, e em registrar o que foi feito.
+   ===================================================================== */
+const HIG=[
+ {id:'dentes_m',n:'Dentes de manhã',ic:'sparkle',freq:1,per:'manha',ess:true,
+  niveis:['Bochechar água ou enxaguante','Escovar rápido, sem cronometrar','Escovar 2 minutos e passar o fio'],
+  porque:'Entre não escovar e bochechar existe diferença real para a boca. Depressão derruba muito a escovação — '+
+   'num estudo com pacientes com depressão maior, só 40% escovavam todo dia. Não é frescura sua.'},
+ {id:'dentes_n',n:'Dentes antes de dormir',ic:'moon',freq:1,per:'noite',ess:true,
+  niveis:['Bochechar e passar o fio em alguns dentes','Escovar rápido','Escovar 2 minutos e passar o fio'],
+  porque:'Se for para escovar uma vez só no dia, que seja esta: à noite a saliva diminui e a placa age sem freio.'},
+ {id:'rosto',n:'Lavar o rosto',ic:'drop',freq:1,per:'manha',
+  niveis:['Passar água no rosto','Água e sabonete','Limpeza completa com hidratante'],
+  porque:'É o passo mais curto da rotina de pele e já muda bastante.'},
+ {id:'banho',n:'Banho',ic:'drop',freq:1,per:'qualquer',ess:true,
+  niveis:['Lavar axilas, virilha e pés na pia','Banho rápido, sem lavar o cabelo','Banho completo'],
+  porque:'Em dia muito ruim, banho de gato nas três áreas que mais importam já resolve o essencial. '+
+   'Vale mais que adiar para amanhã.'},
+ {id:'cabelo',n:'Lavar o cabelo',ic:'sparkle',freq:3,per:'qualquer',
+  niveis:['Só molhar e enxaguar','Lavar com shampoo','Shampoo e condicionador, secar direito'],
+  porque:'Cabelo não precisa de lavagem diária. A cada 2 ou 3 dias é suficiente para a maioria — '+
+   'deixar de lavar hoje não é falha, pode ser só o intervalo normal.'},
+ {id:'roupa',n:'Roupa limpa',ic:'check',freq:1,per:'manha',
+  niveis:['Trocar a peça de baixo','Trocar a roupa toda','Trocar e separar a suja para lavar'],
+  porque:'Trocar de roupa marca a passagem do dormir para o acordar, mesmo em dia de ficar em casa.'},
+ {id:'desodorante',n:'Desodorante',ic:'check',freq:1,per:'manha',
+  niveis:['Passar desodorante'],
+  porque:'Cinco segundos. Nos dias difíceis, é o que segura o constrangimento de sair.'},
+ {id:'agua_hig',n:'Beber água ao acordar',ic:'drop',freq:1,per:'manha',
+  niveis:['Um gole','Um copo cheio'],
+  porque:'Desidratação piora cansaço e dor de cabeça, que já estão altos na depressão.'},
+ {id:'luz',n:'Pegar luz do dia',ic:'sun',freq:1,per:'manha',ess:true,
+  niveis:['Abrir a janela e ficar perto dela','5 minutos na varanda ou na porta','15 minutos na rua'],
+  porque:'Luz de manhã ajusta o relógio biológico e tem efeito sobre o humor e o sono. '+
+   'Não precisa sair: a janela aberta já conta.'},
+ {id:'mover',n:'Mover o corpo',ic:'steps',freq:1,per:'qualquer',
+  niveis:['Levantar e alongar por 2 minutos','Caminhar 10 minutos','Caminhada ou treino mais longo'],
+  porque:'Caminhada reduz sintomas depressivos já em doses muito baixas, perto de 70 minutos na semana inteira. '+
+   'Dez minutos por dia chega lá.'},
+ {id:'cama',n:'Arrumar a cama',ic:'check',freq:1,per:'manha',
+  niveis:['Puxar o lençol por cima','Arrumar direito'],
+  porque:'Tarefa de trinta segundos que entrega uma coisa concluída logo cedo. Nos dias ruins isso pesa.'},
+ {id:'louca',n:'Lavar a louça do dia',ic:'pot',freq:1,per:'noite',
+  niveis:['Lavar só o que vai usar amanhã','Lavar um copo e um prato','Lavar tudo'],
+  porque:'Pia cheia aumenta a sensação de descontrole e atrapalha comer direito no dia seguinte.'},
+ {id:'unhas',n:'Cortar as unhas',ic:'check',freq:10,per:'qualquer',
+  niveis:['Cortar as que estão incomodando','Cortar todas as mãos','Mãos e pés'],
+  porque:'A cada 10 dias basta. Entra aqui para você não precisar lembrar sozinho.'},
+ {id:'lencol',n:'Trocar a roupa de cama',ic:'moon',freq:10,per:'qualquer',
+  niveis:['Trocar só a fronha','Trocar lençol e fronha','Trocar tudo e lavar'],
+  porque:'A fronha sozinha já ajuda a pele do rosto e o cheiro da cama. É a versão mínima que vale.'},
+ {id:'remedio',n:'Medicação',ic:'bell',freq:1,per:'qualquer',ess:true,
+  niveis:['Tomei'],
+  porque:'Se você usa alguma medicação contínua, este é o item que não tem versão reduzida. '+
+   'Se não usa, desligue este item nas opções.'}
+];
+function higDoDia(d){
+ const x=diaRO(d).hig||{};
+ return HIG.filter(t=>{
+  if((S.perfil.higOff||[]).indexOf(t.id)>=0)return false;
+  if(t.freq<=1)return true;
+  /* tarefas espaçadas: aparecem se já passou o intervalo desde a última vez */
+  const ult=ultimaHig(t.id,d);
+  return !ult||diffDias(ult,d)>=t.freq;
+ }).map(t=>Object.assign({},t,{nivel:x[t.id]||0}));
+}
+function ultimaHig(id,ate){
+ const ds=Object.keys(S.dias).filter(z=>z<=ate&&((S.dias[z].hig||{})[id]>0)).sort();
+ return ds.length?ds[ds.length-1]:null;
+}
+function progHig(d){
+ const l=higDoDia(d);
+ return{f:l.filter(t=>t.nivel>0).length,t:l.length};
+}
 const DEF={
  perfil:{nome:'',sexo:'f',idade:28,altura:172,peso:70,meta:74,ativ:1.375,obj:'ganhar',
-   inicio:'',local:'casa',thIni:'',onboard:false,manual:null,mig:0,
+   inicio:'',local:'casa',thIni:'',onboard:false,manual:null,mig:0,trilha:'masc',higOff:[],
    vozAlvo:'masc',pele:'oleosa',horaTreino:'18:00',acordar:'07:00',dormir:'23:00',
    lembretes:['09:00','11:00','14:00','16:30','19:00','21:00']},
  dias:{},pesos:[],medidas:[],cargas:{},despensa:[],fotos:[],compras:[],recentes:[],favs:[],vozLog:[],
@@ -1783,6 +1888,7 @@ function dia(d){d=d||hoje();
  x.treino=x.treino||{feito:false,sets:{}};x.treino.sets=x.treino.sets||{};
  x.voz=x.voz||{feito:false,min:0,ex:{}};x.voz.ex=x.voz.ex||{};
  x.pele=x.pele||{manha:false,noite:false};
+ x.hig=x.hig||{};
  return x}
 function diaRO(d){return S.dias[d]||{ref:{},agua:0,treino:{feito:false,sets:{}},voz:{feito:false,ex:{}},pele:{},hab:{}}}
 /* O diário de comida pode estar mostrando um dia passado; tudo que for
@@ -1814,7 +1920,7 @@ function migrar(){
    FOTOS — ficam no IndexedDB deste navegador, que aguenta arquivos
    grandes. O texto do app fica no localStorage; só a imagem vem daqui.
    ===================================================================== */
-const FOTO_DB='rotatrans-fotos';
+const FOTO_DB='norte-fotos';
 function fotoStore(modo){
  return new Promise((res,rej)=>{
   if(!window.indexedDB)return rej(new Error('sem indexedDB'));
@@ -1907,7 +2013,11 @@ function metas(d){
  const tmb=10*peso+6.25*p.altura-5*p.idade+(p.sexo==='m'?5:-161);
  const gasto=tmb*p.ativ;
  let kcal=Math.round((p.obj==='perder'?gasto*.8:p.obj==='ganhar'?gasto*1.15:gasto)/10)*10;
- let prot=Math.round(peso*(p.obj==='perder'?2.2:2));
+ /* piso de segurança: a meta nunca fica abaixo do gasto em repouso */
+ if(kcal<tmb*1.05)kcal=Math.round(tmb*1.05/10)*10;
+ /* Proteína: meta-análises colocam o ponto de virada perto de 1,6 g/kg para
+    quem treina. Em déficit calórico sobe, porque protege a massa magra. */
+ let prot=Math.round(peso*(p.obj==='perder'?2.2:1.8));
  let gord=Math.round(peso*.9);
  let carb=Math.max(40,Math.round((kcal-prot*4-gord*9)/4));
  const treinou=((sessaoDe(d||hoje()).s||{}).tipo==='treino');
@@ -2010,7 +2120,12 @@ function rotinaDoDia(d){
  const it=[];
  it.push({h:p.acordar||'07:00',n:'Acordar e beber 1 copo de água',ic:'sun',tipo:'agua',
   ok:(x.agua||0)>=250,act:'agua',v:250,sub:'250 ml logo ao acordar acelera o metabolismo e tira a névoa do sono'});
- it.push({h:somaMin(p.acordar||'07:00',10),n:'Skincare da manhã',ic:'sparkle',tipo:'pele',
+ const ph=progHig(d);
+ it.push({h:somaMin(p.acordar||'07:00',5),n:'Higiene da manhã',ic:'sparkle',tipo:'hig',
+  ok:ph.f>0,act:'go-sub',v:'cuidados|higiene',
+  sub:ph.f?ph.f+' de '+ph.t+' itens marcados hoje':'dentes, rosto, roupa — o mínimo já conta'});
+ if(S.perfil.trilha!=='bem')
+ it.push({h:somaMin(p.acordar||'07:00',12),n:'Skincare da manhã',ic:'sparkle',tipo:'pele',
   ok:!!x.pele.manha,act:'pele',v:'manha',sub:passosPele('manha').length+' passos · termina sempre no protetor solar'});
  MEALS.forEach(r=>{
   const t=totalRef(d,r.k);
@@ -2023,6 +2138,7 @@ function rotinaDoDia(d){
   sub:(se.s.tipo==='off'?'Dia de descanso — checklist curto':se.s.foco+' · '+localInfo()[1].toLowerCase())});
  if(p.vozAlvo!=='off')it.push({h:somaMin(p.horaTreino||'18:00',150),n:'Treino de voz — '+vz.bloco.t,ic:'mic',tipo:'voz',
   ok:!!x.voz.feito,act:'go-sub',v:'cuidados|voz',sub:vz.min+' minutos · '+vz.exs.length+' exercícios'});
+ if(S.perfil.trilha!=='bem')
  it.push({h:somaMin(p.dormir||'23:00',-60),n:'Skincare da noite',ic:'moon',tipo:'pele',
   ok:!!x.pele.noite,act:'pele',v:'noite',sub:passosPele('noite').length+' passos · um ativo por noite, nunca dois'});
  it.push({h:p.dormir||'23:00',n:'Dormir',ic:'moon',tipo:'sono',ok:(x.sono||0)>=7,act:'go',v:'inicio',
@@ -2197,6 +2313,7 @@ function cardRotina(){
   else if(i.tipo==='ref')attrs='data-a="add-food" data-m="'+i.v+'"';
   else if(i.tipo==='treino')attrs='data-a="go" data-tab="treino"';
   else if(i.tipo==='voz')attrs='data-a="go-sub" data-tab="cuidados" data-st="voz"';
+  else if(i.tipo==='hig')attrs='data-a="go-sub" data-tab="cuidados" data-st="higiene"';
   else attrs='data-a="go" data-tab="prog"';
   const agora=!i.ok&&hm2min(i.h)<=ag&&hm2min(i.h)>ag-120;
   return '<button class="li" '+attrs+' style="'+(agora?'background:var(--pink-soft);border-radius:9px;padding-left:7px;padding-right:7px':'')+'">'+
@@ -2247,9 +2364,10 @@ function proxLembrete(){
  return lista.find(x=>hm2min(x.h)>ag)||null;
 }
 function cardHabitos(){
- const x=dia(hoje()),n=HABITS.filter(h=>x.hab[h[0]]).length;
+ const x=dia(hoje()),LH=HABITS.filter(h=>h[0]!=='voz'||trilha().voz!=='off');
+ const n=LH.filter(h=>x.hab[h[0]]).length;
  return '<div class="card">'+chTtl('check','Hábitos de hoje','<span class="tag '+(n===HABITS.length?'o':'n')+'">'+n+'/'+HABITS.length+'</span>')+
-  '<div class="stack" style="gap:0">'+HABITS.map(([k,t,i2])=>
+  '<div class="stack" style="gap:0">'+LH.map(([k,t,i2])=>
    '<button class="li" data-a="hab" data-k="'+k+'"><span class="chk '+(x.hab[k]?'on':'')+'">'+ic('check')+'</span>'+
    ic(i2,'font-size:16px;color:var(--ink-3)')+
    '<span class="grow" style="font-size:13.8px;font-weight:600;'+(x.hab[k]?'text-decoration:line-through;color:var(--ink-3)':'')+'">'+t+'</span></button>').join('')+'</div>'+
@@ -3588,11 +3706,97 @@ function stCorpo(){
    'o que muda no corpo: peso, medidas, fotos, pele e voz.</p>'+
    '<button class="btn gh bl sm" style="margin-top:11px" data-a="go" data-tab="perfil">Registrar data de início no Perfil</button></div>';
 }
+/* =====================================================================
+   HIGIENE — a tela é desenhada para o dia em que você não consegue.
+   Nenhum item fica vermelho, nada é cobrado, e o nível mínimo conta
+   como feito. O objetivo é tirar a tarefa do lugar de "falhei de novo".
+   ===================================================================== */
+function sequenciaHig(){
+ let n=0,d=hoje();
+ const fez=z=>Object.values((S.dias[z]||{}).hig||{}).some(v=>v>0);
+ if(!fez(d))d=addDias(d,-1);
+ for(let i=0;i<400;i++){if(fez(d))n++;else break;d=addDias(d,-1)}
+ return n;
+}
+function stHigiene(){
+ const d=hoje(),x=dia(d),ruim=!!S.ui.diaRuim;
+ let lista=higDoDia(d);
+ if(ruim)lista=lista.filter(t=>t.ess);
+ const pr={f:lista.filter(t=>t.nivel>0).length,t:lista.length};
+ const seq=sequenciaHig();
+ const grupos=[['manha','De manhã','sun'],['qualquer','Em algum momento do dia','clock'],['noite','À noite','moon']];
+ const cartao=t=>'<div class="ex '+(t.nivel?'done':'')+'">'+
+  '<div class="row top" style="gap:10px">'+
+   ic(t.ic,'font-size:17px;color:'+(t.nivel?'var(--ok)':'var(--ink-3)')+';margin-top:2px')+
+   '<div class="grow"><div class="nm">'+esc(t.n)+'</div>'+
+   (t.nivel?'<div class="meta" style="color:var(--ok)">'+esc(t.niveis[t.nivel-1])+'</div>'
+    :'<div class="meta">escolha o que couber hoje</div>')+'</div>'+
+   '<button class="btn gh xs" data-a="hig-porque" data-id="'+t.id+'" aria-label="Por quê">'+ic('info')+'</button>'+
+  '</div>'+
+  '<div class="row wrap" style="gap:5px;margin-top:9px">'+t.niveis.map((lab,i)=>
+   '<button class="chip xs '+(t.nivel===i+1?'on':'')+'" data-a="hig" data-id="'+t.id+'" data-n="'+(i+1)+'">'+
+   esc(lab)+'</button>').join('')+'</div></div>';
+ $('#st-higiene').innerHTML=
+  '<div class="card hero">'+chTtl('sparkle','Higiene de hoje',
+   '<span class="tag '+(pr.f?'o':'n')+'">'+pr.f+'/'+pr.t+'</span>')+
+   '<div style="margin-bottom:11px">'+barra(pr.f,pr.t,'var(--ok)')+'</div>'+
+   '<p class="tiny muted">'+(pr.f===0
+    ?'Nada marcado ainda. Comece pelo que for mais fácil — não precisa ser na ordem.'
+    :pr.f===pr.t?'Tudo que estava na lista de hoje, você fez.'
+    :'Você já fez '+pr.f+(pr.f===1?' coisa':' coisas')+' hoje. Isso já conta.')+'</p>'+
+   (seq>1?'<p class="tiny" style="margin-top:7px;color:var(--ok);font-weight:600">'+seq+
+    ' dias seguidos com pelo menos uma coisa feita.</p>':'')+
+   '<div class="seg" style="margin-top:12px">'+
+    '<button class="'+(ruim?'':'on')+'" data-a="dia-ruim" data-v="0">Lista normal</button>'+
+    '<button class="'+(ruim?'on':'')+'" data-a="dia-ruim" data-v="1">Hoje está difícil</button></div>'+
+   (ruim?'<p class="tiny" style="margin-top:10px;background:var(--surface-2);border-radius:11px;padding:10px;line-height:1.55">'+
+    'Modo dia difícil: sobraram só os itens essenciais, e o nível mínimo de cada um vale como feito. '+
+    'Bochechar em vez de escovar conta. Banho de gato conta. Abrir a janela conta.</p>':'')+
+  '</div>'+
+  grupos.map(([per,tit,icone])=>{
+   const t=lista.filter(z=>z.per===per);
+   return t.length?'<div class="card">'+chTtl(icone,tit,'<span class="tag n">'+
+    t.filter(z=>z.nivel>0).length+'/'+t.length+'</span>')+
+    '<div class="stack" style="gap:9px">'+t.map(cartao).join('')+'</div></div>':'';
+  }).join('')+
+  '<div class="card">'+chTtl('info','Como esta lista funciona')+
+   '<div class="stack" style="gap:0">'+
+   [['Qualquer nível conta','Bochechar água conta como dentes feitos. A diferença entre o mínimo e o nada é muito maior que a diferença entre o mínimo e o completo.'],
+    ['A sequência não quebra por pouco','Basta uma coisa marcada no dia para a sequência continuar.'],
+    ['Nada fica vermelho','O que você não fez simplesmente não aparece marcado. Não existe cobrança aqui.'],
+    ['Itens espaçados somem sozinhos','Cabelo, unhas e roupa de cama só reaparecem quando o intervalo passa, para a lista não ficar artificialmente grande.'],
+    ['Dá para desligar o que não serve','Se algum item não faz sentido para você, desligue nas opções abaixo.']].map(([t2,dd])=>
+   '<div class="li"><div class="grow"><div class="ttl">'+t2+'</div>'+
+   '<div class="sub" style="line-height:1.55">'+dd+'</div></div></div>').join('')+'</div></div>'+
+  '<div class="card">'+chTtl('check','Itens da sua lista')+
+   '<p class="tiny muted" style="margin-bottom:10px">Desmarque o que não se aplica a você.</p>'+
+   '<div class="row wrap" style="gap:5px">'+HIG.map(t=>
+    '<button class="chip xs '+((S.perfil.higOff||[]).indexOf(t.id)<0?'on':'')+'" '+
+    'data-a="hig-toggle" data-id="'+t.id+'">'+esc(t.n)+'</button>').join('')+'</div></div>'+
+  '<div class="card">'+chTtl('heart','Se estiver pesado demais')+
+   '<p class="tiny muted" style="line-height:1.65">Esta lista ajuda a atravessar o dia, mas não trata depressão. '+
+   'Se os dias ruins estão virando a regra, vale procurar acompanhamento — psicólogo, psiquiatra, ou o CAPS da sua cidade, '+
+   'que é gratuito pelo SUS. E se bater desespero, o CVV atende de graça, 24 horas, no <b>188</b>, '+
+   'por telefone ou pelo site. Não é exagero ligar.</p></div>';
+}
+/* As abas de Cuidados mudam conforme a trilha: quem está só buscando
+   bem-estar não precisa de binder nem de treino de voz na frente. */
+function abasCuidados(){
+ const t=trilha();
+ const abas=[['higiene','Higiene']];
+ if(t.corpo)abas.push(['corpo','Corpo']);
+ if(t.voz!=='off')abas.push(['voz','Voz']);
+ abas.push(['pele','Pele e produtos']);
+ return abas;
+}
 function renderCuidados(){
- const s=S.ui.sub.cuidados;
- $$('#cuidTabs .subtab').forEach(b=>b.classList.toggle('on',b.dataset.st===s));
- ['corpo','voz','pele'].forEach(k=>{const el=$('#st-'+k);if(el)el.hidden=(k!==s)});
- ({corpo:stCorpo,voz:stVoz,pele:stPele}[s]||stCorpo)();
+ const abas=abasCuidados(),chaves=abas.map(a=>a[0]);
+ let s=S.ui.sub.cuidados;
+ if(chaves.indexOf(s)<0){s=chaves[0];S.ui.sub.cuidados=s}
+ $('#cuidTabs').innerHTML=abas.map(([k,n])=>
+  '<button class="subtab '+(k===s?'on':'')+'" data-st="'+k+'">'+n+'</button>').join('');
+ ['higiene','corpo','voz','pele'].forEach(k=>{const el=$('#st-'+k);if(el)el.hidden=(k!==s)});
+ ({higiene:stHigiene,corpo:stCorpo,voz:stVoz,pele:stPele}[s]||stHigiene)();
 }
 
 /* =====================================================================
@@ -3617,6 +3821,7 @@ function stPeso(){
    '<button class="btn acc" data-a="add-peso">Registrar</button></div>'+
   '<p class="tiny muted" style="margin-top:9px">Pese-se no mesmo horário, de preferência em jejum e depois do banheiro. '+
    'Faltam <b>'+falta+' kg</b> para a meta'+(ritmo?'; nos últimos 28 dias você variou <b>'+(ritmo>0?'+':'')+ritmo+' kg</b>.':'.')+'</p></div>'+
+  blocoRecalculo()+
   '<div class="card">'+chTtl('chart','Evolução','<span class="tag n">'+ps.length+' registros</span>')+
    lineChart(ps.map(p=>({x:fmtCurto(p.d),y:p.v})),'kg',null,
     ps.length>3?mediaMovel(ps.map(p=>({x:fmtCurto(p.d),y:p.v})),7):null)+
@@ -3675,6 +3880,48 @@ function stMedidas(){
  ligarFotos();
 }
 /* Estimativa de gordura corporal a partir das circunferências. */
+/* Metas para um peso qualquer — serve para mostrar o que mudou desde
+   a pesagem anterior, já que tudo é recalculado sozinho. */
+function metasDoPeso(peso){
+ const p=S.perfil;
+ const tmb=10*peso+6.25*p.altura-5*p.idade+(p.sexo==='m'?5:-161);
+ const gasto=tmb*p.ativ;
+ let kcal=Math.round((p.obj==='perder'?gasto*.8:p.obj==='ganhar'?gasto*1.15:gasto)/10)*10;
+ if(kcal<tmb*1.05)kcal=Math.round(tmb*1.05/10)*10;
+ return{kcal,prot:Math.round(peso*(p.obj==='perder'?2.2:1.8)),
+  agua:Math.round(peso*35/50)*50,tmb:Math.round(tmb)};
+}
+function blocoRecalculo(){
+ const ps=S.pesos.slice().sort((a,b)=>a.d<b.d?-1:1);
+ if(ps.length<2)return '';
+ const atual=ps[ps.length-1];
+ const antes=ps.filter(p=>diffDias(p.d,atual.d)<=45)[0];
+ if(!antes||antes.d===atual.d)return '';
+ const a=metasDoPeso(antes.v),b=metasDoPeso(atual.v);
+ const mudou=(a.kcal!==b.kcal)||(a.prot!==b.prot)||(a.agua!==b.agua);
+ const med=S.medidas.slice().sort((x,y)=>x.d<y.d?-1:1);
+ const m0=med[0],m1=med[med.length-1];
+ const difMed=(m0&&m1&&m0!==m1)?CAMPOS.filter(([k])=>m0[k]&&m1[k]&&Math.abs(m1[k]-m0[k])>=0.5)
+  .map(([k,n])=>n+' '+(m1[k]-m0[k]>0?'+':'')+n1(m1[k]-m0[k])):[];
+ return '<div class="card">'+chTtl('redo','O que mudou com a sua evolução')+
+  '<p class="tiny muted" style="margin-bottom:11px">Tudo no app é recalculado a partir do seu peso atual. '+
+  'Comparando <b>'+fmtCurto(antes.d)+'</b> com <b>'+fmtCurto(atual.d)+'</b>:</p>'+
+  '<div class="stack" style="gap:0">'+
+  [['Peso',n1(antes.v)+' kg',n1(atual.v)+' kg'],
+   ['Meta de calorias',a.kcal+' kcal',b.kcal+' kcal'],
+   ['Meta de proteína',a.prot+' g',b.prot+' g'],
+   ['Meta de água',(a.agua/1000).toFixed(1)+' L',(b.agua/1000).toFixed(1)+' L'],
+   ['Gasto em repouso',a.tmb+' kcal',b.tmb+' kcal']].map(([n,x,y])=>
+   '<div class="li"><div class="grow"><div class="ttl">'+n+'</div></div>'+
+   '<div class="num tiny muted">'+x+'</div>'+ic('right','color:var(--ink-3);font-size:13px')+
+   '<div class="num tiny" style="font-weight:600">'+y+'</div></div>').join('')+'</div>'+
+  (difMed.length?'<p class="tiny" style="margin-top:11px;color:var(--ok)">Nas medidas: '+esc(difMed.join(' · '))+' cm.</p>':'')+
+  '<p class="xtiny muted" style="margin-top:10px;line-height:1.6">'+
+  (mudou?'As metas acima já estão valendo — você não precisa ajustar nada na mão.'
+   :'A variação foi pequena demais para mexer nas metas.')+
+  (S.perfil.thIni?' Em hormonização, peso parado pode significar gordura saindo e músculo entrando ao mesmo tempo: '+
+   'é por isso que medida e foto contam mais que a balança aqui.':'')+'</p></div>';
+}
 function blocoGordura(){
  const g=gorduraCorporal();
  if(!g)return '';
@@ -3865,7 +4112,18 @@ function camposPerfil(pref){
  /* três blocos curtos em vez de um paredão de quinze campos */
  const grupo=(t,d)=>'</div><div class="lbl" style="margin:15px 0 7px">'+t+'</div>'+
   (d?'<p class="xtiny muted" style="margin:-3px 0 8px">'+d+'</p>':'')+'<div class="g2">';
- return '<div class="lbl" style="margin-bottom:7px">Sobre você</div><div class="g2">'+
+ return '<div class="lbl" style="margin-bottom:7px">O que você está buscando</div>'+
+  '<div class="stack" style="gap:7px">'+Object.keys(TRILHAS).map(k=>{
+   const tr=TRILHAS[k],on=S.perfil.trilha===k;
+   return '<button class="ex'+(on?' done':'')+'" data-a="trilha" data-v="'+k+'">'+
+    '<div class="row top" style="gap:10px">'+
+    ic(tr.ic,'font-size:18px;margin-top:2px;color:'+(on?'var(--ok)':'var(--ink-3)'))+
+    '<div class="grow"><div class="nm">'+tr.n+'</div><div class="obs">'+esc(tr.res)+'</div></div>'+
+    (on?ic('check','color:var(--ok);font-size:16px'):'')+'</div></button>';
+  }).join('')+'</div>'+
+  '<p class="xtiny muted" style="margin-top:8px">Dá para trocar depois. A trilha muda o que aparece no app, '+
+  'não tranca nada: o treino, a comida e a higiene funcionam igual nas três.</p>'+
+  '<div class="lbl" style="margin:16px 0 7px">Sobre você</div><div class="g2">'+
   '<label class="fld" style="grid-column:1/-1">Como quer ser chamado<input type="text" id="'+pref+'nome" value="'+esc(p.nome)+'" placeholder="Seu nome"></label>'+
   '<label class="fld">Base do cálculo metabólico<select id="'+pref+'sexo">'+
    '<option value="f"'+(p.sexo==='f'?' selected':'')+'>Antes da T ou primeiro ano</option>'+
@@ -3927,8 +4185,11 @@ function renderPerfil(){
     (p.obj==='perder'?'Objetivo de perda: 20% abaixo do gasto, cerca de 0,5 kg por semana.':
      p.obj==='ganhar'?'Objetivo de ganho: 15% acima do gasto, para ganhar massa com o mínimo de gordura.':
      'Objetivo de manutenção: calorias iguais ao gasto.')+
-    ' Proteína em '+(p.obj==='perder'?'2,2':'2,0')+' g e gordura em 0,9 g por quilo; o restante vira carboidrato. '+
-    'Se você faz terapia hormonal, a composição corporal muda com o tempo e vale revisar esses números a cada poucos meses.</p>'+
+    ' Proteína em '+(p.obj==='perder'?'2,2':'1,8')+' g por quilo — meta-análises colocam o ponto em que o ganho '+
+    'para de crescer perto de 1,6 g/kg, e em déficit o valor sobe porque a proteína é o que protege a massa magra. '+
+    'Gordura em 0,9 g por quilo; o restante vira carboidrato. A meta nunca desce abaixo do seu gasto em repouso. '+
+    (S.perfil.thIni?'Como você registrou terapia hormonal: a composição corporal muda bastante no primeiro ano, '+
+     'então vale refazer estas contas a cada dois ou três meses.':'')+'</p>'+
    '<hr class="sep"><div class="lbl" style="margin-bottom:8px">Ajustar na mão (opcional)</div>'+
    '<div class="g2">'+
     '<label class="fld">Calorias<input type="number" id="mn_kcal" placeholder="'+m.kcal+'" value="'+((p.manual&&p.manual.kcal)||'')+'"></label>'+
@@ -4144,6 +4405,38 @@ document.addEventListener('click',ev=>{
    save('dia',dd);closeSheet();render();break}
   case 'ex-info':sheetEx(d.n);break;
   case 'mov-info':sheetMov(d.k);break;
+
+  /* higiene */
+  case 'hig':{const y=dia(hj),n=Number(d.n);
+   y.hig[d.id]=(y.hig[d.id]===n)?0:n;
+   y.hab.higiene=progHig(hj).f>0;
+   save();render();
+   if(y.hig[d.id])toast(['','Conta.','Bom.','Completo.'][Math.min(3,n)]||'Conta.');
+   break}
+  case 'hig-porque':{const t=HIG.find(z=>z.id===d.id);if(!t)return;
+   sheet(t.n,'<p class="tiny muted" style="line-height:1.65">'+esc(t.porque)+'</p>'+
+    '<hr class="sep"><div class="lbl" style="margin-bottom:8px">Os níveis</div>'+
+    '<div class="stack" style="gap:8px">'+t.niveis.map((l,i)=>
+     '<div class="row top" style="gap:10px"><div class="idx">'+(i+1)+'</div>'+
+     '<div class="grow tiny" style="line-height:1.5">'+esc(l)+
+     (i===0?'<br><span class="xtiny" style="color:var(--ok)">este já conta como feito</span>':'')+
+     '</div></div>').join('')+'</div>'+
+    (t.freq>1?'<p class="xtiny muted" style="margin-top:12px">Reaparece a cada '+t.freq+' dias.</p>':''),
+    'Por que isso está na lista');break}
+  case 'hig-toggle':{const L=S.perfil.higOff||[],i2=L.indexOf(d.id);
+   if(i2>=0)L.splice(i2,1);else L.push(d.id);
+   S.perfil.higOff=L;save();render();break}
+  case 'dia-ruim':S.ui.diaRuim=(d.v==='1');render();break;
+
+  /* trilha */
+  case 'trilha':{const t=TRILHAS[d.v];if(!t)return;
+   S.perfil.trilha=d.v;
+   if(!S.perfil.onboard){S.perfil.vozAlvo=t.voz;S.perfil.pele=t.pele;S.perfil.obj=t.obj}
+   S.ui.sub.cuidados=null;S.ui.cardapio=null;
+   const naFolha=!!$('#sheetBox');
+   save();render();
+   if(naFolha)sheetOnboard();
+   toast('Trilha: '+t.n);break}
 
   /* medidas caseiras, código de barras e refeições salvas */
   case 'med':{const inp=$('#fg'+d.i);if(inp){inp.value=d.g;inp.focus()}break}
