@@ -496,7 +496,7 @@ F1A:{nome:'Treino A — Corpo Inteiro',foco:'Corpo inteiro · aprender o movimen
   e('Rosca com mochila ou garrafas','2','12','45s',''),
   e('Prancha isométrica','3','20 seg','45s','')]},
 
-F1B:{nome:'Treino B — Superior Leve',foco:'Costas e ombros · base do formato em V',dur:40,tipo:'treino',cor:'p',
+F1B:{nome:'Treino B — Superior Leve',foco:'Costas e ombros',dur:40,tipo:'treino',cor:'p',
  nota:'As costas largas e o ombro arredondado são o que mais muda a silhueta. Nesta fase o objetivo é sentir o músculo certo trabalhando, não levantar peso.',
  aquec:AQ_SUP,alonga:ALONGA,
  gym:[e('Puxada alta pegada aberta','3','12','60s','Pegada mais aberta que o ombro — é ela que dá a largura'),
@@ -551,7 +551,7 @@ F2PUSH:{nome:'Empurrar — Peito, Ombro e Tríceps',foco:'Push · hipertrofia',d
   e('Tríceps francês com mochila','3','12','60s',''),
   e('Mergulho na cadeira','3','12','45s','')]},
 
-F2PULL:{nome:'Puxar — Costas e Bíceps',foco:'Pull · largura em V',dur:55,tipo:'treino',cor:'a',
+F2PULL:{nome:'Puxar — Costas e Bíceps',foco:'Pull · costas e bíceps',dur:55,tipo:'treino',cor:'a',
  nota:'Dorsal largo + cintura firme = o V. Puxada aberta e remada são os dois exercícios que mais entregam isso.',
  aquec:AQ_SUP,alonga:ALONGA,
  gym:[e('Barra fixa (ou puxada assistida)','4','6 a 8','90s','Não conseguiu? Faça a descida devagar em 5 segundos'),
@@ -1553,7 +1553,7 @@ const VIDEOS={
   {t:'Rotina para pele seca',q:'rotina skincare pele seca ceramidas dermatologista',d:'Barreira cutânea, ceramidas e quando o creme é melhor que o sérum'},
   {t:'Como usar adapaleno',q:'como usar adapaleno corretamente retinoide acne',d:'Frequência, quantidade e o período de piora inicial'},
   {t:'Protetor solar na prática',q:'protetor solar rosto quantidade correta reaplicação',d:'Quantidade certa, reaplicação e qual textura escolher'},
-  {t:'Pele e hormonização',q:'cuidados com a pele hormonização trans acne testosterona',d:'O que muda na pele com T e com estrogênio'},
+  {t:'Pele e hormonização',q:'cuidados com a pele hormonização trans acne testosterona',d:'O que muda na pele com T e com estrogênio',tr:['masc','fem']},
   {t:'Barba, foliculite e pelos encravados',q:'foliculite barba pelos encravados como evitar cuidados',d:'Importa para quem faz a barba e para quem faz depilação'}
  ]
 };
@@ -1695,14 +1695,17 @@ const SKIN_SEMANAL=[
  {n:'Hidratação intensa',freq:'2× por semana (pele seca)',como:'Máscara ou creme mais denso à noite, por cima do hidratante comum.'},
  {n:'Troca da fronha',freq:'2× por semana',como:'Fronha suja é causa silenciosa de acne nas bochechas e no queixo.'}
 ];
+/* O terceiro item diz em quais trilhas a nota faz sentido. */
 const SKIN_NOTAS=[
- ['Acne de hormonização com testosterona','A T aumenta a oleosidade e a acne nos primeiros 6 a 18 meses, principalmente em rosto, costas e peito. Ácido salicílico no corpo (sabonete ou spray) e adapaleno no rosto resolvem a maioria dos casos. Acne nodular ou com cicatriz é assunto de dermatologista — existe tratamento oral eficaz.'],
- ['Pele seca com estrogênio e antiandrógeno','A pele fica mais fina, mais seca e mais sensível. Troque o sabonete por um de limpeza sem espuma, aumente a densidade do hidratante e reduza a frequência dos ácidos.'],
- ['Barba e foliculite','Faça a barba com a pele quente e úmida, sempre no sentido do pelo, com lâmina nova. Pós-barba sem álcool. Ácido mandélico 2 a 3 vezes por semana reduz muito o pelo encravado.'],
- ['Depilação a laser ou eletrólise','Suspenda ácidos e retinoides 3 a 5 dias antes e 3 dias depois da sessão. Protetor solar rigoroso na área nas semanas seguintes.'],
- ['Cicatrizes de cirurgia','A partir da liberação médica, gel de silicone (Kelo-cote, Cicatricure Gel) por 12 semanas e proteção solar total na cicatriz por pelo menos um ano.'],
- ['Corpo','Hidratante corporal com ureia 10% em pele seca; sabonete com ácido salicílico nas costas se houver acne; protetor solar nas áreas expostas.']
+ ['Acne de hormonização com testosterona','A T aumenta a oleosidade e a acne nos primeiros 6 a 18 meses, principalmente em rosto, costas e peito. Ácido salicílico no corpo (sabonete ou spray) e adapaleno no rosto resolvem a maioria dos casos. Acne nodular ou com cicatriz é assunto de dermatologista — existe tratamento oral eficaz.',['masc']],
+ ['Pele seca com estrogênio e antiandrógeno','A pele fica mais fina, mais seca e mais sensível. Troque o sabonete por um de limpeza sem espuma, aumente a densidade do hidratante e reduza a frequência dos ácidos.',['fem']],
+ ['Barba e foliculite','Faça a barba com a pele quente e úmida, sempre no sentido do pelo, com lâmina nova. Pós-barba sem álcool. Ácido mandélico 2 a 3 vezes por semana reduz muito o pelo encravado.',['masc','fem']],
+ ['Depilação a laser ou eletrólise','Suspenda ácidos e retinoides 3 a 5 dias antes e 3 dias depois da sessão. Protetor solar rigoroso na área nas semanas seguintes.',['masc','fem']],
+ ['Cicatrizes de cirurgia','A partir da liberação médica, gel de silicone (Kelo-cote, Cicatricure Gel) por 12 semanas e proteção solar total na cicatriz por pelo menos um ano.',['masc','fem']],
+ ['Acne nas costas e no peito','Sabonete com ácido salicílico no banho e evitar ficar com a roupa suada depois do treino resolvem a maior parte.',['masc','fem','bem']],
+ ['Corpo','Hidratante corporal com ureia 10% em pele seca; protetor solar nas áreas expostas.',['masc','fem','bem']]
 ];
+function notasPele(){return SKIN_NOTAS.filter(n=>!n[2]||n[2].indexOf(S.perfil.trilha)>=0)}
 
 /* =====================================================================
    ESTADO
@@ -3608,7 +3611,7 @@ function stPele(){
     '<div class="li"><div class="grow"><div class="ttl">'+esc(s.n)+' <span class="tag n">'+esc(s.freq)+'</span></div>'+
     '<div class="sub">'+esc(s.como)+'</div></div></div>').join('')+'</div></div>'+
   '<div class="card">'+chTtl('info','Situações específicas')+
-   '<div class="stack" style="gap:0">'+SKIN_NOTAS.map(([t,dd])=>
+   '<div class="stack" style="gap:0">'+notasPele().map(([t,dd])=>
     '<div class="li"><div class="grow"><div class="ttl">'+esc(t)+'</div>'+
     '<div class="sub" style="line-height:1.55">'+esc(dd)+'</div></div></div>').join('')+'</div></div>'+
   '<div class="card">'+chTtl('bell','Antes de começar')+
@@ -3646,7 +3649,9 @@ function stProdutos(){
     '<div class="sub">'+esc(dd)+'</div>'+
     '<div class="xtiny" style="color:var(--blue);margin-top:2px">'+esc(q)+'</div></div></div>').join('')+'</div></div>'+
   '<div class="card">'+chTtl('play','Vídeos sobre pele')+
-   '<div class="stack" style="gap:8px">'+VIDEOS.pele.map(v=>vidLink(v.t,v.q,v.d)).join('')+'</div></div>';
+   '<div class="stack" style="gap:8px">'+VIDEOS.pele
+    .filter(v=>!v.tr||v.tr.indexOf(S.perfil.trilha)>=0)
+    .map(v=>vidLink(v.t,v.q,v.d)).join('')+'</div></div>';
 }
 /* =====================================================================
    CUIDADOS — CORPO (masculinização)
@@ -3717,7 +3722,68 @@ function blocoTH(){
   '<p class="xtiny muted" style="margin-top:10px">Só um contador de dias e um histórico, com o intervalo que você mesmo definiu. '+
   'Qualquer dúvida sobre intervalo, dose ou exames é com quem acompanha você.</p></div>';
 }
+/* Conteúdo de corpo da trilha feminilizar. Nada aqui serve para a trilha
+   masculinizar e vice-versa — por isso as duas telas são separadas. */
+const CORPO_FEM=[
+ ['O que o estrogênio faz','A massa magra tende a cair e a gordura a redistribuir para quadril e coxa. A maior parte da mudança de músculo acontece no primeiro ano; a de gordura continua por vários anos. Isso significa que o peso na balança diz pouco: o que muda é onde o corpo guarda.'],
+ ['Por que treinar força mesmo assim','Com a massa magra caindo sozinha, o treino de força deixa de ser estética e vira proteção: é o que segura força, densidade óssea e metabolismo. Parar de treinar durante a transição acelera a perda.'],
+ ['A proporção que importa aqui','Cintura dividida por quadril, com referência entre 0,7 e 0,8. Dá para mexer nos dois lados: treino de glúteo e perna aumenta o denominador, cintura firme diminui o numerador.'],
+ ['Cintura: firme, não grossa','Abdominal com carga pesada e flexão lateral engrossam os oblíquos e alargam a cintura. Prancha e hollow sustentam o core sem isso — é por isso que o plano usa esses.'],
+ ['Ombro','O treino de ombro com foco em largura sai do ciclo desta trilha. O de força continua, porque preserva massa magra sem alargar a linha. Se você quiser o contrário, o botão de trocar exercício está em todo treino.']
+];
+const PELOS_FEM=[
+ ['Depilação é maratona','Pelo facial responde devagar e o estrogênio sozinho quase não reduz o que já existe. Quem busca remoção definitiva costuma precisar de muitas sessões ao longo de um a dois anos. Não é lentidão sua.'],
+ ['Laser e eletrólise','Laser funciona melhor em pelo escuro e pele clara; eletrólise funciona em qualquer cor, é mais lenta e é a única considerada definitiva. Muita gente combina as duas. Avaliação com profissional antes.'],
+ ['Antes e depois da sessão','Suspenda ácidos e retinoides de 3 a 5 dias antes e 3 dias depois. Protetor solar rigoroso na área nas semanas seguintes, senão aparece mancha.'],
+ ['Enquanto não termina','Fazer a barba com pele quente e úmida, lâmina nova e sempre no sentido do pelo reduz irritação. Pós-barba sem álcool. Ácido mandélico 2 a 3 vezes por semana ajuda com pelo encravado.'],
+ ['Cabelo','O estrogênio costuma reduzir a queda e pode melhorar a densidade, mas o que já foi perdido não volta sozinho. Qualquer tratamento é assunto de dermatologista.']
+];
+const FEM_VIDEOS=[
+ {t:'Treino de glúteo e perna',q:'treino de glúteo e perna hipertrofia execução feminino',d:'A base do trabalho de proporção nesta trilha'},
+ {t:'Core sem engrossar a cintura',q:'exercícios de core sem engrossar a cintura oblíquos',d:'Por que prancha e hollow em vez de abdominal com carga'},
+ {t:'Treino de força na transição',q:'treino de força transfeminina preservar massa magra hormonização',d:'O que muda com estrogênio e antiandrógeno'},
+ {t:'Depilação a laser e eletrólise',q:'laser ou eletrólise pelo facial diferença quantas sessões',d:'Como escolher e o que esperar'},
+ {t:'Cuidados com o cabelo',q:'cuidados com o cabelo queda densidade dermatologista',d:'O que tem e o que não tem evidência'},
+ {t:'Respiração diafragmática',q:'respiração diafragmática exercício diário 5 minutos',d:'Base para o treino de voz'}
+];
 function stCorpo(){
+ return S.perfil.trilha==='fem'?stCorpoFem():stCorpoMasc();
+}
+function stCorpoFem(){
+ const ms=S.medidas.slice().sort((a,b)=>a.d<b.d?-1:1),ult=ms[ms.length-1];
+ const rel=ult&&ult.cintura&&ult.quadril?n1(ult.cintura/ult.quadril):null;
+ const lista=(titulo,icone,arr)=>'<div class="card">'+chTtl(icone,titulo)+
+  '<div class="stack" style="gap:0">'+arr.map(([t,dd])=>
+   '<div class="li"><div class="grow"><div class="ttl">'+esc(t)+'</div>'+
+   '<div class="sub" style="line-height:1.55">'+esc(dd)+'</div></div></div>').join('')+'</div></div>';
+ $('#st-corpo').innerHTML=
+  '<div class="card hero">'+chTtl('target','Corpo na trilha feminilizar')+
+   '<p class="tiny muted">O que muda a leitura do corpo na prática: proporção de cintura e quadril, massa magra preservada, '+
+   'pelos e cabelo. O plano de treino do app já é montado em cima disso.</p>'+
+   (rel?'<div class="g3" style="margin-top:12px">'+
+    tile('Cintura',n1(ult.cintura),'cm')+tile('Quadril',n1(ult.quadril),'cm')+
+    tile('Relação',rel,rel<=0.8?'na faixa de referência':'acima de 0,8',rel<=0.8?'var(--ok)':'var(--warn)')+'</div>'+
+    '<p class="xtiny muted" style="margin-top:8px">Faixa de referência: 0,7 a 0,8. Dá para mexer dos dois lados — '+
+    'ganhando glúteo e perna, e mantendo a cintura firme sem engrossar.</p>'
+    :'<p class="tiny" style="margin-top:11px;color:var(--pink);font-weight:600">Meça cintura e quadril em Progresso para acompanhar a relação entre os dois.</p>'+
+     '<button class="btn gh bl sm" style="margin-top:9px" data-a="go-sub" data-tab="prog" data-st="medidas">Registrar medidas</button>')+
+  '</div>'+
+  lista('Composição corporal','dumb',CORPO_FEM)+
+  lista('Pelos e cabelo','face',PELOS_FEM)+
+  '<div class="card">'+chTtl('mic','Voz')+
+   '<p class="tiny muted">A voz é o outro grande marcador, e é o que o estrogênio <b>não</b> muda: a laringe já formada não volta atrás. '+
+   'Aqui tudo vem de treino — altura, ressonância, peso vocal e entonação.</p>'+
+   '<button class="btn bl sm" style="margin-top:11px" data-a="go-sub" data-tab="cuidados" data-st="voz">Abrir o treino de voz</button></div>'+
+  '<div class="card">'+chTtl('play','Vídeos')+
+   '<div class="stack" style="gap:8px">'+FEM_VIDEOS.map(v=>vidLink(v.t,v.q,v.d)).join('')+'</div></div>'+
+  blocoTH()+
+  '<div class="card">'+chTtl('info','Hormonização')+
+   '<p class="tiny muted" style="line-height:1.65">Este app não orienta nada sobre doses, marcas, vias de aplicação ou como começar — '+
+   'isso é acompanhamento médico, com exames periódicos. O que ele faz é guardar o que <b>você</b> registrar e acompanhar, ao lado disso, '+
+   'o que muda no corpo: peso, medidas, fotos, pele e voz.</p>'+
+   '<button class="btn gh bl sm" style="margin-top:11px" data-a="go" data-tab="perfil">Registrar data de início no Perfil</button></div>';
+}
+function stCorpoMasc(){
  const ms=S.medidas.slice().sort((a,b)=>a.d<b.d?-1:1),ult=ms[ms.length-1];
  const rel=ult&&ult.ombro&&ult.cintura?n1(ult.ombro/ult.cintura):null;
  const lista=(titulo,icone,arr,dir)=>'<div class="card">'+chTtl(icone,titulo,dir||'')+
@@ -3895,8 +3961,7 @@ function stMedidas(){
     const bom=k==='cintura'?d0<0:d0>0;
     return tile(n,n1(v),d0?((d0>0?'+':'')+d0+' cm'):'sem mudança',d0?(bom?'var(--ok)':'var(--warn)'):'var(--ink)');
    }).join('')+'</div>'+
-   (ult.ombro&&ult.cintura?'<p class="tiny muted" style="margin-top:10px">Relação ombro ÷ cintura: <b class="num">'+
-    n1(ult.ombro/ult.cintura)+'</b>. É o número que descreve o formato em V — referência entre 1,4 e 1,6.</p>':'')
+   proporcaoDaTrilha(ult)
    :vazio('ruler','Nenhuma medida registrada. Meça relaxado, sempre no mesmo ponto e no mesmo dia da semana.'))+
   '</div>'+
   blocoGordura()+
@@ -3913,7 +3978,7 @@ function stMedidas(){
     ['Tórax','Na linha dos mamilos, no fim de uma expiração normal.'],
     ['Cintura','Na menor circunferência, acima do umbigo. Não puxe a barriga.'],
     ['Quadril','Na parte mais larga do glúteo.'],
-    ['Pescoço','Logo abaixo do pomo de adão, com a fita levemente inclinada para a frente. Serve para estimar a gordura corporal.'],
+    ['Pescoço','Na parte mais estreita do pescoço, com a fita levemente inclinada para a frente. Serve para estimar a gordura corporal.'],
     ['Braço','Contraído, no ponto mais grosso do bíceps.'],
     ['Coxa','A 10 cm abaixo da virilha, sempre na mesma perna.'],
     ['Panturrilha','No ponto mais grosso, em pé com o peso nos dois pés.']].map(([t,d])=>
@@ -3968,6 +4033,29 @@ function blocoRecalculo(){
   (S.perfil.thIni?' Em hormonização, peso parado pode significar gordura saindo e músculo entrando ao mesmo tempo: '+
    'é por isso que medida e foto contam mais que a balança aqui.':'')+'</p></div>';
 }
+/* A proporção que importa depende da trilha: ombro sobre cintura descreve
+   a leitura masculina; cintura sobre quadril, a feminina. Na trilha de
+   bem-estar não existe alvo estético nenhum — só o número. */
+function proporcaoDaTrilha(m){
+ if(!m)return '';
+ const t=S.perfil.trilha;
+ if(t==='masc'&&m.ombro&&m.cintura){
+  const v=n1(m.ombro/m.cintura);
+  return '<p class="tiny muted" style="margin-top:10px">Ombro ÷ cintura: <b class="num">'+v+'</b>. '+
+   'É a proporção que mais descreve a leitura masculina do corpo — referência entre 1,4 e 1,6. '+
+   'Dá para subir dos dois lados: ganhando ombro e dorsal, e segurando a cintura.</p>';
+ }
+ if(t==='fem'&&m.cintura&&m.quadril){
+  const v=n1(m.cintura/m.quadril);
+  return '<p class="tiny muted" style="margin-top:10px">Cintura ÷ quadril: <b class="num">'+v+'</b>. '+
+   'É a proporção que mais descreve a leitura feminina do corpo — referência entre 0,7 e 0,8. '+
+   'Treino de glúteo e perna mexe no denominador; cintura firme, sem engrossar os oblíquos, mexe no numerador.</p>';
+ }
+ if(t==='bem')return '<p class="xtiny muted" style="margin-top:10px">Aqui as medidas servem só para você acompanhar '+
+  'o próprio corpo ao longo do tempo. Não há número certo nem meta estética.</p>';
+ const falta=t==='fem'?'cintura e quadril':'ombro e cintura';
+ return '<p class="xtiny muted" style="margin-top:10px">Registre '+falta+' na mesma medição para ver a proporção.</p>';
+}
 function blocoGordura(){
  const g=gorduraCorporal();
  if(!g)return '';
@@ -3984,8 +4072,11 @@ function blocoGordura(){
    tile('Massa magra',g.magra,'kg','var(--ok)')+'</div>'+
   '<p class="xtiny muted" style="margin-top:10px;line-height:1.6">Calculado pelas circunferências (método da Marinha americana). '+
   'Tem margem de erro de alguns pontos, então o número solto importa pouco — o que vale é ele acompanhar a mesma direção '+
-  'ao longo dos meses, sempre medido do mesmo jeito. Para quem está em hormonização, a composição corporal muda bastante '+
-  'no primeiro ano, e essa conta ajuda a ver que o peso parado na balança pode ser gordura saindo e músculo entrando.</p></div>';
+  'ao longo dos meses, sempre medido do mesmo jeito.'+
+  (S.perfil.trilha==='bem'?''
+   :' Em hormonização, a composição corporal muda bastante no primeiro ano, e essa conta ajuda a ver '+
+    'que o peso parado na balança pode ser gordura saindo e músculo entrando ao mesmo tempo.')+
+  '</p></div>';
 }
 function blocoFotos(){
  const f=S.fotos.slice().sort((a,b)=>a.d<b.d?-1:1);
@@ -4093,7 +4184,7 @@ function conquistas(){
   ['cal','Um mês de pé','30 dias seguidos',st>=30,Math.min(st,30)+'/30'],
   ['dumb','25 treinos','Concluir 25 treinos',treinos>=25,Math.min(treinos,25)+'/25'],
   ['trophy','100 treinos','Concluir 100 treinos',treinos>=100,Math.min(treinos,100)+'/100'],
-  ['mic','Voz constante','30 dias de treino de voz',vozes>=30,Math.min(vozes,30)+'/30'],
+  trilha().voz!=='off'?['mic','Voz constante','30 dias de treino de voz',vozes>=30,Math.min(vozes,30)+'/30']:null,
   ['sparkle','Pele em dia','30 rotinas completas',peles>=30,Math.min(peles,30)+'/30'],
   ['book','Diário em dia','100 itens registrados',refs>=100,Math.min(refs,100)+'/100'],
   ['drop','Hidratado','10 dias batendo a meta',diasAgua>=10,Math.min(diasAgua,10)+'/10'],
@@ -4102,7 +4193,7 @@ function conquistas(){
   ['target','Fase 2','Chegar ao dia 91',n>=91,Math.min(n,91)+'/91'],
   ['flame','Fase 3','Chegar ao dia 181',n>=181,Math.min(n,181)+'/181'],
   ['star','Um ano','Chegar ao dia 365',n>=365,Math.min(n,365)+'/365']
- ];
+ ].filter(Boolean);
 }
 function stConquistas(){
  const c=conquistas(),feitas=c.filter(x=>x[3]).length;
@@ -4172,8 +4263,12 @@ function camposPerfil(pref){
   '<div class="lbl" style="margin:16px 0 7px">Sobre você</div><div class="g2">'+
   '<label class="fld" style="grid-column:1/-1">Como quer ser chamado<input type="text" id="'+pref+'nome" value="'+esc(p.nome)+'" placeholder="Seu nome"></label>'+
   '<label class="fld">Base do cálculo metabólico<select id="'+pref+'sexo">'+
-   '<option value="f"'+(p.sexo==='f'?' selected':'')+'>Antes da T ou primeiro ano</option>'+
-   '<option value="m"'+(p.sexo==='m'?' selected':'')+'>Mais de 1 ano de testosterona</option></select></label>'+
+   (p.trilha==='masc'
+    ?'<option value="f"'+(p.sexo==='f'?' selected':'')+'>Antes da T ou primeiro ano</option>'+
+     '<option value="m"'+(p.sexo==='m'?' selected':'')+'>Mais de 1 ano de testosterona</option>'
+    :'<option value="f"'+(p.sexo==='f'?' selected':'')+'>Fórmula feminina</option>'+
+     '<option value="m"'+(p.sexo==='m'?' selected':'')+'>Fórmula masculina</option>')+
+   '</select></label>'+
   '<label class="fld">Idade<input type="number" inputmode="numeric" id="'+pref+'idade" value="'+p.idade+'"></label>'+
   '<label class="fld">Altura (cm)<input type="number" inputmode="numeric" id="'+pref+'altura" value="'+p.altura+'"></label>'+
   '<label class="fld">Peso atual (kg)<input type="number" step="0.1" inputmode="decimal" id="'+pref+'peso" value="'+n1(pesoAtual())+'"></label>'+
@@ -4191,9 +4286,9 @@ function camposPerfil(pref){
    LOCAIS.map(([v,t])=>'<option value="'+v+'"'+(p.local===v?' selected':'')+'>'+t+'</option>').join('')+
    '</select></label>'+
   grupo('Voz, pele e horários','Os horários montam a rotina do dia na tela de Início.')+
-  '<label class="fld">Objetivo da voz<select id="'+pref+'vozAlvo">'+
+  (p.trilha==='bem'?'':'<label class="fld">Objetivo da voz<select id="'+pref+'vozAlvo">'+
    [['fem','Feminilizar'],['masc','Masculinizar'],['neutro','Voz neutra'],['off','Não quero treinar voz']].map(([v,n])=>
-   '<option value="'+v+'"'+(p.vozAlvo===v?' selected':'')+'>'+n+'</option>').join('')+'</select></label>'+
+   '<option value="'+v+'"'+(p.vozAlvo===v?' selected':'')+'>'+n+'</option>').join('')+'</select></label>')+
   '<label class="fld">Tipo de pele<select id="'+pref+'pele">'+
    SKIN_TIPOS.map(([v,n])=>'<option value="'+v+'"'+(p.pele===v?' selected':'')+'>'+n+'</option>').join('')+'</select></label>'+
   '<label class="fld">Acorda às<input type="time" id="'+pref+'acordar" value="'+(p.acordar||'07:00')+'"></label>'+
@@ -4255,12 +4350,13 @@ function renderPerfil(){
    '<p class="xtiny muted" style="margin-top:9px">Estes horários aparecem no Início e na aba de Água como marcos do dia. '+
    'A página não envia notificação pelo celular — ela mostra o que já passou e o quanto você deveria ter bebido até ali.</p></div>'+
 
-  '<div class="card">'+chTtl('heart','Acompanhamento da transição')+
+  (p.trilha==='bem'?''
+   :'<div class="card">'+chTtl('heart','Acompanhamento da transição')+
    '<label class="fld">Início da terapia hormonal (opcional)<input type="date" id="pf_th" value="'+esc(p.thIni||'')+'"></label>'+
    (p.thIni?'<div class="g2" style="margin-top:10px">'+tile('Tempo em TH',temTH(p.thIni),'desde '+fmtCurto(p.thIni))+
     tile('Medições','a cada 30 dias','registre em Progresso')+'</div>':
     '<p class="tiny muted" style="margin-top:9px">Registrar a data permite acompanhar as mudanças de corpo, pele e voz ao lado do tempo de tratamento.</p>')+
-   '<button class="btn gh bl sm" style="margin-top:10px" data-a="salvar-th">Salvar data</button></div>'+
+   '<button class="btn gh bl sm" style="margin-top:10px" data-a="salvar-th">Salvar data</button></div>')+
 
   '<div class="card">'+chTtl('moon','Aparência')+
    '<div class="seg">'+[['auto','Automático'],['light','Claro'],['dark','Escuro']].map(([v,n])=>
