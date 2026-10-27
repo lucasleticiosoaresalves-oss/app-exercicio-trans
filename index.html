@@ -825,24 +825,57 @@ OFF:{nome:'Descanso Total',foco:'O músculo cresce hoje',dur:0,tipo:'off',cor:'w
   e('Alongamento leve se quiser','1','5 a 10 min','—','Opcional')]}
 };
 
+/* O ciclo da semana muda conforme a trilha. Não é rótulo: a ordem dos
+   treinos, quantas vezes cada região aparece e quantos dias de descanso
+   existem são diferentes em cada uma. */
 const PHASES=[
  {id:1,nome:'Fase 1 — Base e Adaptação',ini:1,fim:90,
   reg:'2 a 3 séries · 12 a 15 repetições · carga leve · 60s de descanso',
   obj:'Aprender a execução, criar o hábito e condicionar tendões e articulações. Carga propositalmente baixa: termine cada série sentindo que faria mais 3.',
-  ciclo:['F1A','ATIVO','F1B','OFF','F1C','ATIVO','OFF']},
+  ciclos:{
+   masc:['F1A','ATIVO','F1B','OFF','F1C','ATIVO','OFF'],
+   fem: ['F1A','ATIVO','F1C','OFF','F1B','ATIVO','OFF'],
+   bem: ['ATIVO','F1A','OFF','ATIVO','F1B','OFF','OFF']}},
  {id:2,nome:'Fase 2 — Construção',ini:91,fim:180,
   reg:'3 a 4 séries · 8 a 12 repetições · carga moderada · 60 a 90s',
   obj:'Agora o corpo aguenta volume. Entram divisão empurrar/puxar/perna e um dia de HIIT. Progrida a carga toda semana que fechar todas as séries.',
-  ciclo:['F2PUSH','F2PULL','ATIVO','F2LEG','F2UP','F2HIIT','OFF']},
+  ciclos:{
+   masc:['F2PUSH','F2PULL','ATIVO','F2LEG','F2UP','F2HIIT','OFF'],
+   fem: ['F2LEG','F2PULL','ATIVO','F2PUSH','F2LEG','F2HIIT','OFF'],
+   bem: ['ATIVO','F1A','OFF','ATIVO','F1C','OFF','OFF']}},
  {id:3,nome:'Fase 3 — Intensidade',ini:181,fim:365,
   reg:'4 a 5 séries · 6 a 12 repetições · carga alta · 60s a 2 min',
   obj:'Cinco treinos por semana com técnicas avançadas: drop-set, bi-set e séries até a falha controlada. Aqui o formato realmente aparece.',
-  ciclo:['F3PUSH','F3PULL','F3LEG','OFF','F3UP','F3ARMS','ATIVO']},
+  ciclos:{
+   masc:['F3PUSH','F3PULL','F3LEG','OFF','F3UP','F3ARMS','ATIVO'],
+   fem: ['F3LEG','F3PULL','F3PUSH','OFF','F3LEG','F3ARMS','ATIVO'],
+   bem: ['ATIVO','F1A','OFF','ATIVO','F1C','OFF','OFF']}},
  {id:4,nome:'Fase 4 — Especialização',ini:366,fim:99999,
   reg:'Blocos alternados de força (5×5) e hipertrofia (4×12)',
   obj:'Periodização: dois dias de força pura nos movimentos grandes e três de volume. É o modelo que você pode repetir por anos, só trocando as cargas.',
-  ciclo:['F4A','F4B','ATIVO','F4C','F4D','F4E','OFF']}
+  ciclos:{
+   masc:['F4A','F4B','ATIVO','F4C','F4D','F4E','OFF'],
+   fem: ['F4B','F4C','ATIVO','F4E','F4D','F4E','OFF'],
+   bem: ['ATIVO','F1A','OFF','ATIVO','F1C','OFF','OFF']}}
 ];
+/* O ciclo da semana para a trilha ativa. */
+function cicloDa(fase){return (fase.ciclos||{})[S.perfil.trilha]||fase.ciclos.masc}
+/* O que muda no treino em cada trilha, dito em português claro. */
+const ENFASE={
+ masc:{t:'Prioridade em ombro e dorsal',
+  l:['Empurrar e puxar aparecem antes de perna na semana.',
+   'Elevação lateral e puxada aberta entram em quase todo ciclo: são elas que alargam a silhueta vista de frente.',
+   'Core treinado sem carga pesada, para a cintura ficar firme sem engrossar.']},
+ fem:{t:'Prioridade em perna e glúteo',
+  l:['Perna aparece duas vezes por semana a partir da fase 2.',
+   'O treino de ombro com foco em largura sai do ciclo — sobra o de força, que preserva massa magra sem alargar a linha do ombro.',
+   'Com estrogênio a massa magra tende a cair, então o treino de força e a proteína viram proteção, não estética.',
+   'Se mesmo assim quiser mais ombro, use o botão de trocar exercício em qualquer treino.']},
+ bem:{t:'Movimento leve, sem cobrança',
+  l:['Dois treinos curtos de corpo inteiro por semana, nada de divisão avançada.',
+   'Dois dias de caminhada e três de descanso. O plano não escala para fases pesadas.',
+   'A meta é não parar: caminhar reduz sintomas depressivos já a partir de uns 10 minutos por dia.']}
+};
 
 /* =====================================================================
    TABELA DE ALIMENTOS — valores por 100 g (ou por 100 ml)
@@ -1950,11 +1983,17 @@ function hidratarFotos(){
    PLANO DE TREINO
    ===================================================================== */
 function diaPlano(d){return diffDias(S.perfil.inicio||hoje(),d||hoje())+1}
-function faseDe(n){return PHASES.find(f=>n>=f.ini&&n<=f.fim)||PHASES[0]}
+/* Na trilha de bem-estar o plano não escala para as fases pesadas:
+   fica na base e na construção, onde o objetivo é constância. */
+function faseDe(n){
+ const f=PHASES.find(z=>n>=z.ini&&n<=z.fim)||PHASES[0];
+ const teto=S.perfil.trilha==='bem'?2:4;
+ return f.id>teto?PHASES[teto-1]:f;
+}
 function sessaoDe(d){
  const n=diaPlano(d);
  if(n<1)return{n,fase:PHASES[0],key:null,s:null,idx:0,semana:0};
- const fase=faseDe(n),idx=(n-fase.ini)%7,key=fase.ciclo[idx];
+ const fase=faseDe(n),idx=(n-fase.ini)%7,key=cicloDa(fase)[idx];
  return{n,fase,key,s:W[key],idx,semana:Math.floor((n-1)/7)+1};
 }
 /* Aplica as trocas que você escolheu: o exercício substituto herda séries e
@@ -2450,7 +2489,10 @@ function stHoje(){
     '<button class="'+(S.perfil.local===v?'on':'')+'" data-a="set-local" data-v="'+v+'">'+
     ic(e3,'font-size:14px;margin-right:5px')+t+'</button>').join('')+'</div>'+
    '<p class="tiny" style="background:var(--surface-2);border-radius:11px;padding:10px;line-height:1.5">'+esc(se.s.nota)+'</p>'+
-   '<div class="row wrap" style="gap:12px;margin-top:11px"><span class="tag '+se.s.cor+'">'+esc(se.fase.reg)+'</span></div></div>'+
+   '<div class="row wrap" style="gap:6px;margin-top:11px">'+
+    '<span class="tag '+se.s.cor+'">'+esc(se.fase.reg)+'</span>'+
+    '<button class="tag p" data-a="go-sub" data-tab="treino" data-st="plano">'+
+     ic(trilha().ic)+' trilha '+esc(trilha().n.toLowerCase())+'</button></div></div>'+
   lista('Aquecimento',se.s.aquec,'flame')+
   '<div class="card">'+chTtl(se.s.tipo==='off'?'moon':'dumb',se.s.tipo==='off'?'Checklist do descanso':'Treino',
     '<span class="tag p">'+esc(L[1])+'</span>')+
@@ -2865,22 +2907,26 @@ function bibliotecaMovimentos(){
    :L==='casa'?bloco('Treino em casa','home',VIDEOS.casa)+bloco('Calistenia','wave',VIDEOS.calistenia)
    :bloco('Musculação','dumb',VIDEOS.musculacao)+bloco('Calistenia','wave',VIDEOS.calistenia));
 }
+/* O que realmente muda no treino de cada trilha. */
+function blocoEnfase(){
+ const e=ENFASE[S.perfil.trilha]||ENFASE.masc;
+ return '<div class="card">'+chTtl('target',e.t)+
+  '<div class="stack" style="gap:9px">'+e.l.map(t=>
+   '<div class="row top" style="gap:9px">'+ic('check','color:var(--ok);font-size:14px;margin-top:3px')+
+   '<span class="grow tiny" style="line-height:1.55">'+esc(t)+'</span></div>').join('')+'</div>'+
+  '<p class="xtiny muted" style="margin-top:11px">Trocar de trilha no Perfil troca este ciclo inteiro, '+
+  'junto com a voz, a pele e o objetivo da dieta.</p></div>';
+}
 function stPlano(){
  const n=diaPlano();
  $('#st-plano').innerHTML=
-  '<div class="card hero">'+chTtl('cal','O ano inteiro já está montado')+
-   '<p class="tiny muted">Quatro fases, um ciclo de 7 dias que se repete dentro de cada uma. '+
-   'Todo dia do calendário tem destino: treino, descanso ativo ou descanso total — e um bloco de voz e de pele junto.</p></div>'+
-  '<div class="card">'+chTtl('target','Por que este plano masculiniza')+
-   '<div class="stack" style="gap:0">'+
-   [['Prioridade em ombro e dorsal','Puxada aberta, remada e elevação lateral aparecem em praticamente toda semana do plano. São eles que alargam a silhueta vista de frente — a mudança de proporção que mais altera a leitura do corpo.'],
-    ['Cintura firme, não grossa','O core é treinado com prancha, hollow e abdominal sem carga pesada. Abdominal com muito peso e flexão lateral engrossam os oblíquos e alargam a cintura, que é o contrário do objetivo.'],
-    ['Trapézio e pescoço','Encolhimento e face pull entram a partir da fase 2 e deixam a linha do pescoço mais larga.'],
-    ['Superávit calórico','Com objetivo de ganhar massa, a meta fica 15% acima do gasto e a proteína em 2 g por quilo. Sem essa matéria-prima o treino não vira músculo.'],
-    ['A testosterona muda a resposta','Se você está em TH, a mesma rotina rende mais: a força sobe mais rápido e a gordura redistribui. Vale revisar as metas a cada poucos meses.']].map(([t,dd])=>
-   '<div class="li"><div class="grow"><div class="ttl">'+esc(t)+'</div>'+
-   '<div class="sub" style="line-height:1.55">'+esc(dd)+'</div></div></div>').join('')+'</div></div>'+
-  PHASES.map(f=>{
+  '<div class="card hero">'+chTtl('cal','O plano da trilha '+trilha().n.toLowerCase())+
+   '<p class="tiny muted">'+(S.perfil.trilha==='bem'
+    ?'Duas fases, um ciclo de 7 dias que se repete. O plano não escala para fases pesadas: aqui o objetivo é constância, não intensidade.'
+    :'Quatro fases, um ciclo de 7 dias que se repete dentro de cada uma. '+
+     'Todo dia do calendário tem destino: treino, descanso ativo ou descanso total.')+'</p></div>'+
+  blocoEnfase()+
+  PHASES.filter(f=>S.perfil.trilha!=='bem'||f.id<=2).map(f=>{
   const atual=n>=f.ini&&n<=f.fim,passou=n>f.fim;
   return '<div class="card'+(atual?' lift':'')+'"'+(atual?' style="border-color:var(--pink)"':'')+'>'+
    '<div class="ch"><div class="grow"><div class="lbl">Dia '+f.ini+(f.fim>9999?' em diante':' ao '+f.fim)+'</div>'+
@@ -2888,7 +2934,7 @@ function stPlano(){
    (atual?'<span class="tag a">você está aqui</span>':passou?'<span class="tag o">concluída</span>':'<span class="tag n">a seguir</span>')+'</div>'+
    '<p class="tiny muted">'+esc(f.obj)+'</p>'+
    '<p class="tiny" style="margin-top:8px"><b>'+esc(f.reg)+'</b></p>'+
-   '<div class="stack" style="gap:0;margin-top:10px">'+f.ciclo.map((k,i)=>{const s=W[k];
+   '<div class="stack" style="gap:0;margin-top:10px">'+cicloDa(f).map((k,i)=>{const s=W[k];
     return '<button class="li" data-a="ver-sessao" data-k="'+k+'">'+
      '<span class="idx" style="background:var(--surface-2);color:var(--ink-3)">'+(i+1)+'</span>'+
      '<div class="grow"><div class="ttl">'+esc(s.nome)+'</div>'+
@@ -4430,13 +4476,21 @@ document.addEventListener('click',ev=>{
 
   /* trilha */
   case 'trilha':{const t=TRILHAS[d.v];if(!t)return;
-   S.perfil.trilha=d.v;
-   if(!S.perfil.onboard){S.perfil.vozAlvo=t.voz;S.perfil.pele=t.pele;S.perfil.obj=t.obj}
-   S.ui.sub.cuidados=null;S.ui.cardapio=null;
+   if(S.perfil.trilha===d.v)return;
+   const p=S.perfil,mud=[];
+   p.trilha=d.v;
+   /* A trilha é a escolha mais pesada do app: ela reconfigura o treino,
+      a voz, a pele e o objetivo. Antes isso só valia antes do onboarding,
+      e por isso trocar de trilha não parecia fazer nada. */
+   if(p.vozAlvo!==t.voz){p.vozAlvo=t.voz;mud.push(t.voz==='off'?'treino de voz desligado':'voz '+(t.voz==='masc'?'masculina':t.voz==='fem'?'feminina':'neutra'))}
+   if(p.pele!==t.pele){p.pele=t.pele;mud.push('pele '+t.pele)}
+   if(p.obj!==t.obj){p.obj=t.obj;mud.push(t.obj==='ganhar'?'ganhar massa':t.obj==='perder'?'perder gordura':'manter')}
+   mud.push('treino da trilha');
+   S.ui.sub.cuidados=null;S.ui.cardapio=null;S.ui.sub.treino='hoje';
    const naFolha=!!$('#sheetBox');
    save();render();
    if(naFolha)sheetOnboard();
-   toast('Trilha: '+t.n);break}
+   toast(t.n+': '+mud.join(', '));break}
 
   /* medidas caseiras, código de barras e refeições salvas */
   case 'med':{const inp=$('#fg'+d.i);if(inp){inp.value=d.g;inp.focus()}break}
