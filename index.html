@@ -174,6 +174,16 @@ hr.sep{border:0;border-top:1px solid var(--line);margin:12px 0}
 .tag.w{background:var(--warn-soft);color:var(--warn)}
 .tag.b{background:var(--water-soft);color:var(--water)}
 .tag.n{background:var(--surface-2);color:var(--ink-3)}
+.selo{display:inline-flex;align-items:center;gap:4px;vertical-align:middle;border:1px solid var(--line);
+ background:var(--surface-2);color:var(--ink-2);border-radius:7px;padding:2px 7px 2px 5px;
+ font-size:10.5px;font-weight:700;line-height:1.5;white-space:nowrap;cursor:pointer;transition:.14s}
+.selo .ic{font-size:12px}
+.selo:hover{border-color:var(--blue);color:var(--blue)}
+.fonte{display:flex;align-items:flex-start;gap:8px;padding:9px 0;border-top:1px solid var(--line);
+ font-size:11.5px;line-height:1.55;color:var(--ink-2)}
+.fonte:first-of-type{border-top:0;padding-top:2px}
+.fonte:hover{color:var(--blue)}
+.fonte .ic{margin-top:2px}
 .seg{display:flex;background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:3px;gap:3px}
 .seg button{flex:1;text-align:center;padding:7px 6px;border-radius:7px;font-size:12.5px;font-weight:600;color:var(--ink-2);transition:.14s}
 .seg button.on{background:var(--surface);color:var(--ink);box-shadow:var(--sh-1)}
@@ -439,6 +449,7 @@ nav.tabbar button.on::before{content:"";position:absolute;top:-6px;width:22px;he
  </section>
 
  <section id="tab-perfil" hidden><div class="stack" style="gap:14px" id="perfilBox"></div></section>
+<section id="tab-ciencia" hidden><div class="stack" style="gap:14px" id="cienciaBox"></div></section>
 
 </main>
 
@@ -552,7 +563,7 @@ F2PUSH:{nome:'Empurrar — Peito, Ombro e Tríceps',foco:'Push · hipertrofia',d
   e('Mergulho na cadeira','3','12','45s','')]},
 
 F2PULL:{nome:'Puxar — Costas e Bíceps',foco:'Pull · costas e bíceps',dur:55,tipo:'treino',cor:'a',
- nota:'Dorsal largo + cintura firme = o V. Puxada aberta e remada são os dois exercícios que mais entregam isso.',
+ nota:'Puxada aberta e remada são os dois exercícios que mais entregam costas. Puxe com o cotovelo, não com a mão.',
  aquec:AQ_SUP,alonga:ALONGA,
  gym:[e('Barra fixa (ou puxada assistida)','4','6 a 8','90s','Não conseguiu? Faça a descida devagar em 5 segundos'),
   e('Puxada alta pegada aberta','4','10','75s',''),
@@ -587,8 +598,44 @@ F2LEG:{nome:'Pernas e Glúteos',foco:'Inferior completo',dur:55,tipo:'treino',co
   e('Cadeirinha isométrica na parede','3','40 seg','60s',''),
   e('Panturrilha no degrau','4','20','40s','')]},
 
-F2UP:{nome:'Superior Completo',foco:'Ombro e dorsal · desenho do V',dur:50,tipo:'treino',cor:'a',
- nota:'Treino de volume pro que mais muda a silhueta: ombro redondo e costas largas.',
+F2LEGB:{nome:'Pernas B — Posterior e Glúteo',foco:'Inferior · posterior de coxa',dur:50,tipo:'treino',cor:'a',
+ nota:'Segundo dia de perna da semana, e isso é de propósito: treinar o mesmo grupo duas vezes por semana rende mais do que uma só. Aqui o foco é o que o agachamento não alcança — posterior de coxa, glúteo e uma perna por vez.',
+ aquec:AQ_INF,alonga:ALONGA,
+ gym:[e('Levantamento terra romeno com barra','4','8','90s','Desça até sentir a coxa atrás esticar, sem curvar a lombar'),
+  e('Agachamento búlgaro','4','10 por perna','75s',''),
+  e('Mesa flexora','4','12','60s',''),
+  e('Cadeira abdutora','3','15','45s','Glúteo médio — é ele que arredonda a lateral'),
+  e('Elevação pélvica com barra','4','12','60s',''),
+  e('Panturrilha sentado','4','15','40s',''),
+  e('Circuito de core: prancha + abdominal bicicleta','3','40 seg + 20','60s','Um atrás do outro')],
+ home:[e('Stiff unilateral com mochila','4','10 por perna','90s','Uma perna só: o equilíbrio já cobra do glúteo'),
+  e('Agachamento búlgaro com mochila','4','12 por perna','75s',''),
+  e('Elevação pélvica unilateral','4','12 por lado','60s',''),
+  e('Abdução deitado com elástico','3','20 por lado','45s',''),
+  e('Bom-dia com mochila nas costas','3','15','60s','Movimento curto e controlado'),
+  e('Panturrilha unilateral no degrau','4','20','40s',''),
+  e('Circuito de core: prancha + abdominal bicicleta','3','40 seg + 20','60s','')]},
+
+F2UPB:{nome:'Superior Completo B',foco:'Superior · variação de ângulo',dur:50,tipo:'treino',cor:'a',
+ nota:'Os mesmos grupos do Superior Completo, com exercícios diferentes. A variação muda o ângulo e o estímulo sem repetir o treino idêntico duas vezes na semana.',
+ aquec:AQ_SUP,alonga:ALONGA,
+ gym:[e('Remada baixa pegada neutra','4','10','75s',''),
+  e('Supino reto com halteres','4','10','75s',''),
+  e('Puxada alta pegada supinada','3','12','60s','Pega mais a parte de baixo do dorsal'),
+  e('Desenvolvimento Arnold','3','12','60s','Gira o punho na subida'),
+  e('Crucifixo invertido','3','15','45s',''),
+  e('Rosca inversa','3','15','45s',''),
+  e('Tríceps coice','3','15 por braço','45s','')],
+ home:[e('Remada curvada com mochila','4','12','75s',''),
+  e('Flexão tradicional lenta','4','12','75s','Três segundos para descer'),
+  e('Puxada com elástico, pegada supinada','3','15','60s',''),
+  e('Desenvolvimento Arnold com garrafas','3','12','60s',''),
+  e('Crucifixo invertido com garrafas','3','15','45s',''),
+  e('Rosca inversa com mochila','3','15','45s',''),
+  e('Tríceps coice com garrafa','3','15 por braço','45s','')]},
+
+F2UP:{nome:'Superior Completo',foco:'Superior inteiro · ombro e dorsal',dur:50,tipo:'treino',cor:'a',
+ nota:'Segunda passada da semana no superior inteiro. Ombro e costas levam o maior volume porque são os grupos que mais sustentam a postura.',
  aquec:AQ_SUP,alonga:ALONGA,
  gym:[e('Puxada alta pegada aberta','4','10','75s',''),
   e('Desenvolvimento com halteres','4','10','75s',''),
@@ -606,7 +653,7 @@ F2UP:{nome:'Superior Completo',foco:'Ombro e dorsal · desenho do V',dur:50,tipo
   e('Bi-set: rosca + tríceps banco','3','12 + 12','60s','')]},
 
 F2HIIT:{nome:'Cardio HIIT e Core',foco:'Condicionamento e abdômen',dur:35,tipo:'treino',cor:'b',
- nota:'Queima calórica alta em pouco tempo e cintura mais firme — o que destaca o V. Se estiver muito cansado, troque por 35 min de caminhada.',
+ nota:'Gasto calórico alto em pouco tempo e core mais forte. Se estiver muito cansado, troque por 35 min de caminhada — o benefício para a saúde é parecido.',
  aquec:AQ_FULL,alonga:ALONGA,
  gym:[e('HIIT na esteira ou bike','10 blocos','30 seg forte / 60 seg leve','—','20 minutos no total. Forte = você não consegue conversar'),
   e('Prancha','3','40 seg','40s',''),
@@ -678,22 +725,40 @@ F3LEG:{nome:'Pernas Pesado',foco:'Força de membro inferior',dur:65,tipo:'treino
   e('Cadeirinha na parede','3','60 seg','60s',''),
   e('Panturrilha unilateral no degrau','5','20 por perna','40s','')]},
 
-F3UP:{nome:'Superior — Foco V',foco:'Dorsal e deltoide lateral',dur:55,tipo:'treino',cor:'p',
- nota:'Treino desenhado pra largura: muita puxada aberta e muita elevação lateral, com repetições mais altas.',
+F3LEGB:{nome:'Pernas B — Posterior Pesado',foco:'Posterior de coxa e glúteo',dur:60,tipo:'treino',cor:'a',
+ nota:'O agachamento cobre a frente da coxa. Este treino cobre o resto: terra romeno e flexora para o posterior, pélvica e abdutora para o glúteo.',
+ aquec:AQ_INF,alonga:ALONGA,
+ gym:[e('Levantamento terra romeno','4','8','2 min','Série principal do treino'),
+  e('Agachamento na máquina ou hack','4','10','90s',''),
+  e('Mesa flexora unilateral','4','12 por lado','60s',''),
+  e('Afundo com barra','3','10 por perna','75s',''),
+  e('Elevação pélvica com carga','4','10','60s',''),
+  e('Cadeira abdutora com drop-set','3','15 + drop','45s','Última série: solte metade da carga e vá até falhar'),
+  e('Panturrilha sentado','5','15','40s','')],
+ home:[e('Stiff unilateral com mochila','4','10 por perna','2 min',''),
+  e('Agachamento búlgaro com salto','4','8 por perna','90s',''),
+  e('Flexão nórdica assistida','3','6','75s','Joelhos presos, desça devagar e empurre o chão para voltar'),
+  e('Afundo caminhando com carga','4','12 por perna','60s',''),
+  e('Elevação pélvica unilateral','4','15 por lado','60s',''),
+  e('Abdução com elástico','3','20 por lado','45s',''),
+  e('Panturrilha unilateral no degrau','5','20','40s','')]},
+
+F3UP:{nome:'Superior — Ombro e Dorsal',foco:'Dorsal e deltoide lateral',dur:55,tipo:'treino',cor:'p',
+ nota:'Repetições mais altas em puxada aberta e elevação lateral, os dois movimentos que mais recrutam dorsal e deltoide lateral.',
  aquec:AQ_SUP,alonga:ALONGA,
  gym:[e('Puxada alta bem aberta','5','10','75s',''),
   e('Remada aberta (pegada pronada)','4','12','60s','Cotovelo aberto pega a parte alta das costas'),
   e('Crucifixo invertido','4','15','45s',''),
   e('Elevação lateral','5','15','45s','Série 5 em drop-set'),
   e('Desenvolvimento com halteres','4','10','75s',''),
-  e('Encolhimento de ombros','3','15','45s',''),
+  e('Supino inclinado com halteres','3','10','60s','Segunda vez do peito na semana'),
   e('Abdominal infra na paralela','3','15','45s','')],
  home:[e('Puxada com elástico, pegada aberta','5','12','75s',''),
   e('Remada aberta com elástico','4','15','60s',''),
   e('Crucifixo invertido com garrafas','4','15','45s',''),
   e('Elevação lateral','5','15','45s','Última em drop'),
   e('Desenvolvimento com mochila','4','12','75s',''),
-  e('Encolhimento com mochila','3','15','45s',''),
+  e('Flexão com os pés elevados','3','12','60s','Segunda vez do peito na semana'),
   e('Elevação de pernas suspenso ou no chão','3','15','45s','')]},
 
 F3ARMS:{nome:'Braços e Core',foco:'Bíceps, tríceps e abdômen',dur:45,tipo:'treino',cor:'b',
@@ -831,50 +896,52 @@ OFF:{nome:'Descanso Total',foco:'O músculo cresce hoje',dur:0,tipo:'off',cor:'w
 const PHASES=[
  {id:1,nome:'Fase 1 — Base e Adaptação',ini:1,fim:90,
   reg:'2 a 3 séries · 12 a 15 repetições · carga leve · 60s de descanso',
-  obj:'Aprender a execução, criar o hábito e condicionar tendões e articulações. Carga propositalmente baixa: termine cada série sentindo que faria mais 3.',
+  obj:'Aprender a execução, criar o hábito e condicionar tendões e articulações. Carga propositalmente baixa: termine cada série sentindo que faria mais 3. Os três treinos se cruzam de propósito, para que superior e inferior apareçam duas vezes na semana.',
   ciclos:{
    masc:['F1A','ATIVO','F1B','OFF','F1C','ATIVO','OFF'],
    fem: ['F1A','ATIVO','F1C','OFF','F1B','ATIVO','OFF'],
-   bem: ['ATIVO','F1A','OFF','ATIVO','F1B','OFF','OFF']}},
+   bem: ['ATIVO','F1A','OFF','ATIVO','F1B','OFF','F1C']}},
  {id:2,nome:'Fase 2 — Construção',ini:91,fim:180,
   reg:'3 a 4 séries · 8 a 12 repetições · carga moderada · 60 a 90s',
-  obj:'Agora o corpo aguenta volume. Entram divisão empurrar/puxar/perna e um dia de HIIT. Progrida a carga toda semana que fechar todas as séries.',
+  obj:'Agora o corpo aguenta volume. Cinco sessões montadas de um jeito só: peito, costas, ombro e perna aparecem duas vezes por semana cada, porque essa frequência rende mais que treinar o grupo uma vez só. Progrida a carga toda semana que fechar todas as séries.',
   ciclos:{
-   masc:['F2PUSH','F2PULL','ATIVO','F2LEG','F2UP','F2HIIT','OFF'],
-   fem: ['F2LEG','F2PULL','ATIVO','F2PUSH','F2LEG','F2HIIT','OFF'],
-   bem: ['ATIVO','F1A','OFF','ATIVO','F1C','OFF','OFF']}},
+   masc:['F2PUSH','F2PULL','F2LEG','ATIVO','F2UP','F2LEGB','OFF'],
+   fem: ['F2LEG','F2UP','ATIVO','F2LEGB','F2PULL','F2PUSH','OFF'],
+   bem: ['F2UP','F2LEG','ATIVO','OFF','F2UPB','F2LEGB','OFF']}},
  {id:3,nome:'Fase 3 — Intensidade',ini:181,fim:365,
   reg:'4 a 5 séries · 6 a 12 repetições · carga alta · 60s a 2 min',
-  obj:'Cinco treinos por semana com técnicas avançadas: drop-set, bi-set e séries até a falha controlada. Aqui o formato realmente aparece.',
+  obj:'Cinco treinos por semana com técnicas avançadas: drop-set, bi-set e séries até a falha controlada. A frequência de duas vezes por grupo continua, agora com carga alta. O treino de Braços e Core fica disponível para trocar em qualquer dia que você quiser encurtar.',
   ciclos:{
-   masc:['F3PUSH','F3PULL','F3LEG','OFF','F3UP','F3ARMS','ATIVO'],
-   fem: ['F3LEG','F3PULL','F3PUSH','OFF','F3LEG','F3ARMS','ATIVO'],
-   bem: ['ATIVO','F1A','OFF','ATIVO','F1C','OFF','OFF']}},
+   masc:['F3PUSH','F3PULL','F3LEG','ATIVO','F3UP','F3LEGB','OFF'],
+   fem: ['F3LEG','F3UP','ATIVO','F3LEGB','F3PULL','F3PUSH','OFF'],
+   bem: ['F2UP','F2LEG','ATIVO','OFF','F2UPB','F2LEGB','OFF']}},
  {id:4,nome:'Fase 4 — Especialização',ini:366,fim:99999,
   reg:'Blocos alternados de força (5×5) e hipertrofia (4×12)',
-  obj:'Periodização: dois dias de força pura nos movimentos grandes e três de volume. É o modelo que você pode repetir por anos, só trocando as cargas.',
+  obj:'Periodização: dois dias de força pura nos movimentos grandes e três de volume. Os dias de força e os de volume se complementam, então cada grupo segue aparecendo duas vezes na semana. É o modelo que você pode repetir por anos, só trocando as cargas.',
   ciclos:{
    masc:['F4A','F4B','ATIVO','F4C','F4D','F4E','OFF'],
-   fem: ['F4B','F4C','ATIVO','F4E','F4D','F4E','OFF'],
-   bem: ['ATIVO','F1A','OFF','ATIVO','F1C','OFF','OFF']}}
+   fem: ['F4B','F4C','ATIVO','F4E','F4D','F4A','OFF'],
+   bem: ['F2UP','F2LEG','ATIVO','OFF','F2UPB','F2LEGB','OFF']}}
 ];
 /* O ciclo da semana para a trilha ativa. */
 function cicloDa(fase){return (fase.ciclos||{})[S.perfil.trilha]||fase.ciclos.masc}
 /* O que muda no treino em cada trilha, dito em português claro. */
 const ENFASE={
  masc:{t:'Prioridade em ombro e dorsal',
-  l:['Empurrar e puxar aparecem antes de perna na semana.',
-   'Elevação lateral e puxada aberta entram em quase todo ciclo: são elas que alargam a silhueta vista de frente.',
-   'Core treinado sem carga pesada, para a cintura ficar firme sem engrossar.']},
+  l:['A semana abre com empurrar e puxar, e perna entra no terceiro dia.',
+   'Elevação lateral e puxada aberta aparecem nos dois dias de superior: são elas que alargam a silhueta vista de frente.',
+   'Core treinado sem carga pesada, para a cintura ficar firme sem engrossar.',
+   'Todo grupo grande treina duas vezes por semana — é a frequência que rende mais, segundo as revisões de estudos.']},
  fem:{t:'Prioridade em perna e glúteo',
-  l:['Perna aparece duas vezes por semana a partir da fase 2.',
-   'O treino de ombro com foco em largura sai do ciclo — sobra o de força, que preserva massa magra sem alargar a linha do ombro.',
+  l:['A semana abre com perna, e o segundo dia de perna é um treino diferente, com foco em posterior de coxa e glúteo.',
+   'Os dois dias de superior são treinos completos, sem volume extra de deltoide lateral: ombro recebe o que precisa para a postura, não mais que isso.',
    'Com estrogênio a massa magra tende a cair, então o treino de força e a proteína viram proteção, não estética.',
-   'Se mesmo assim quiser mais ombro, use o botão de trocar exercício em qualquer treino.']},
- bem:{t:'Movimento leve, sem cobrança',
-  l:['Dois treinos curtos de corpo inteiro por semana, nada de divisão avançada.',
-   'Dois dias de caminhada e três de descanso. O plano não escala para fases pesadas.',
-   'A meta é não parar: caminhar reduz sintomas depressivos já a partir de uns 10 minutos por dia.']}
+   'Se quiser mais ombro, use o botão de trocar exercício em qualquer treino.']},
+ bem:{t:'Movimento que caiba no seu dia',
+  l:['Começa com três sessões curtas por semana, duas de caminhada e dois dias livres.',
+   'Depois de três meses vira superior e inferior duas vezes por semana, e para aí: não escala para divisões de cinco dias.',
+   'Força e caminhada são as duas modalidades com melhor relação entre efeito sobre sintomas depressivos e chance de você não desistir.',
+   'Dia ruim não zera nada: trocar o treino por caminhada mantém a sequência.']}
 };
 
 /* =====================================================================
@@ -1422,6 +1489,20 @@ W.F2LEG.cal=[e('Agachamento búlgaro','4','10 por perna','90s','Pé de trás no 
  e('Ponte de glúteo unilateral','3','12 por lado','60s',''),
  e('Cadeirinha na parede','3','45 seg','60s',''),
  e('Panturrilha unilateral no degrau','4','15','40s','')];
+W.F2LEGB.cal=[e('Stiff unilateral só com o peso do corpo','4','12 por perna','75s','Braços soltos, desça devagar e sinta a coxa atrás'),
+ e('Agachamento búlgaro','4','12 por perna','75s',''),
+ e('Ponte de glúteo unilateral','4','15 por lado','60s',''),
+ e('Abdução deitado de lado','3','20 por lado','45s',''),
+ e('Nordic curl assistido na cama','3','6','75s','Joelhos presos, desça devagar e empurre para voltar'),
+ e('Panturrilha unilateral no degrau','4','20','40s',''),
+ e('Hollow hold + prancha lateral','3','25 seg + 25 seg','60s','')];
+W.F2UPB.cal=[e('Remada australiana pegada neutra','4','12','75s',''),
+ e('Flexão lenta (3 seg descendo)','4','12','75s',''),
+ e('Barra fixa pegada supinada (ou negativa)','3','6','60s',''),
+ e('Pike push-up','3','10','60s',''),
+ e('Remada australiana com cotovelo aberto','3','15','45s','Pega a parte alta das costas'),
+ e('Flexão diamante','3','10','45s',''),
+ e('Dead hang','3','25 seg','45s','')];
 W.F2UP.cal=[e('Remada australiana','4','12','75s',''),
  e('Pike push-up','4','10','75s',''),
  e('Mergulho entre cadeiras','3','10','60s',''),
@@ -1452,6 +1533,13 @@ W.F3LEG.cal=[e('Pistol squat apoiado','4','6 por perna','2 min','Segure numa por
  e('Nordic curl assistido','3','6','90s','Alguém segura os pés ou prenda sob o sofá; desça devagar'),
  e('Ponte de glúteo unilateral','4','15 por lado','60s',''),
  e('Panturrilha unilateral','4','20','40s','')];
+W.F3LEGB.cal=[e('Stiff unilateral com pausa embaixo','4','12 por perna','90s',''),
+ e('Agachamento búlgaro com salto','4','8 por perna','90s',''),
+ e('Nordic curl assistido','4','6','75s',''),
+ e('Afundo caminhando','4','14 por perna','60s',''),
+ e('Ponte de glúteo unilateral com pé elevado','4','15 por lado','60s',''),
+ e('Abdução com pausa de 2 segundos','3','20 por lado','45s',''),
+ e('Panturrilha unilateral no degrau','5','20','40s','')];
 W.F3UP.cal=[e('Barra fixa pegada aberta','5','6','90s','A pegada aberta é a que mais abre as costas'),
  e('Mergulho nas paralelas','4','10','75s',''),
  e('Parada de mão na parede','4','30 seg','75s','De costas para a parede, suba com os pés'),
@@ -1588,13 +1676,14 @@ const VOZ_EX=[
    'Agora faça a vibração subindo e descendo de altura, como uma sirene.',
    'Repita 8 vezes. Se os lábios não vibrarem, apoie os dedos nas bochechas.'],
   dica:'Solta a musculatura sem forçar as pregas vocais. É aquecimento seguro.'},
- {id:'canudo',n:'Exercício do canudo',min:3,tipo:'aquecimento',
+ {id:'canudo',n:'Exercício do canudo',min:3,tipo:'aquecimento',ev:'sovt',
   como:['Pegue um canudo comum e um copo com dois dedos de água.',
    'Com o canudo na boca e a ponta dentro da água, faça um som contínuo "uuu" borbulhando.',
    'Faça 4 séries de 15 segundos.',
    'Depois, sem a água, faça glides subindo e descendo soprando no canudo.'],
-  dica:'Um dos exercícios mais seguros e eficazes que existem para a voz. Reduz o esforço das pregas vocais.'},
- {id:'pitch',n:'Glides de altura (sirene)',min:4,tipo:'altura',
+  dica:'É um exercício seguro e de efeito imediato na qualidade da voz: reduz o esforço das pregas vocais. '+
+   'O efeito de curto prazo é bem demonstrado; o de longo prazo ainda tem pouca evidência. Serve como aquecimento.'},
+ {id:'pitch',n:'Glides de altura (sirene)',min:4,tipo:'altura',ev:'voz',
   como:['Comece num "mmm" confortável, na sua altura natural.',
    'Suba devagar, como uma sirene, até o ponto mais alto que sai sem apertar a garganta. Desça do mesmo jeito.',
    'Faça 8 subidas e descidas completas, sem pressa.',
@@ -1761,7 +1850,7 @@ function trilha(){return TRILHAS[S.perfil.trilha]||TRILHAS.masc}
    que a pessoa tem, e em registrar o que foi feito.
    ===================================================================== */
 const HIG=[
- {id:'dentes_m',n:'Dentes de manhã',ic:'sparkle',freq:1,per:'manha',ess:true,
+ {id:'dentes_m',n:'Dentes de manhã',ic:'sparkle',freq:1,per:'manha',ess:true,ev:'ativacao',
   niveis:['Bochechar água ou enxaguante','Escovar rápido, sem cronometrar','Escovar 2 minutos e passar o fio'],
   porque:'Entre não escovar e bochechar existe diferença real para a boca. Depressão derruba muito a escovação — '+
    'num estudo com pacientes com depressão maior, só 40% escovavam todo dia. Não é frescura sua.'},
@@ -1788,14 +1877,14 @@ const HIG=[
  {id:'agua_hig',n:'Beber água ao acordar',ic:'drop',freq:1,per:'manha',
   niveis:['Um gole','Um copo cheio'],
   porque:'Desidratação piora cansaço e dor de cabeça, que já estão altos na depressão.'},
- {id:'luz',n:'Pegar luz do dia',ic:'sun',freq:1,per:'manha',ess:true,
+ {id:'luz',n:'Pegar luz do dia',ic:'sun',freq:1,per:'manha',ess:true,ev:'luz',
   niveis:['Abrir a janela e ficar perto dela','5 minutos na varanda ou na porta','15 minutos na rua'],
-  porque:'Luz de manhã ajusta o relógio biológico e tem efeito sobre o humor e o sono. '+
-   'Não precisa sair: a janela aberta já conta.'},
- {id:'mover',n:'Mover o corpo',ic:'steps',freq:1,per:'qualquer',
+  porque:'Luz de manhã ajuda a acertar o relógio biológico, e há sinal de efeito sobre humor e sono — '+
+   'mas a evidência aqui é pequena, e vale saber disso. Não precisa sair: a janela aberta já conta.'},
+ {id:'mover',n:'Mover o corpo',ic:'steps',freq:1,per:'qualquer',ev:'exerc_humor',
   niveis:['Levantar e alongar por 2 minutos','Caminhar 10 minutos','Caminhada ou treino mais longo'],
-  porque:'Caminhada reduz sintomas depressivos já em doses muito baixas, perto de 70 minutos na semana inteira. '+
-   'Dez minutos por dia chega lá.'},
+  porque:'Na maior revisão sobre o assunto, 218 estudos, caminhar e correr foram as modalidades com maior efeito '+
+   'sobre sintomas depressivos. Dez minutos por dia já é um começo de verdade.'},
  {id:'cama',n:'Arrumar a cama',ic:'check',freq:1,per:'manha',
   niveis:['Puxar o lençol por cima','Arrumar direito'],
   porque:'Tarefa de trinta segundos que entrega uma coisa concluída logo cedo. Nos dias ruins isso pesa.'},
@@ -1997,7 +2086,17 @@ function sessaoDe(d){
  const n=diaPlano(d);
  if(n<1)return{n,fase:PHASES[0],key:null,s:null,idx:0,semana:0};
  const fase=faseDe(n),idx=(n-fase.ini)%7,key=cicloDa(fase)[idx];
- return{n,fase,key,s:W[key],idx,semana:Math.floor((n-1)/7)+1};
+ const semana=Math.floor((n-1)/7)+1;
+ /* Treino escolhido na mão para este dia ganha do ciclo. É o que permite
+    encurtar um dia pesado sem furar a semana inteira. */
+ const esc2=(S.dias[d||hoje()]||{}).sess;
+ if(esc2&&W[esc2]&&esc2!==key)return{n,fase,key:esc2,s:W[esc2],idx,semana,noLugarDe:key};
+ return{n,fase,key,s:W[key],idx,semana};
+}
+/* Os treinos que você pode colocar no lugar do treino do dia: tudo que é
+   treino de verdade, mais descanso ativo, na ordem em que aparecem. */
+function sessoesTrocaveis(){
+ return Object.keys(W).filter(k=>W[k].tipo==='treino'||k==='ATIVO');
 }
 /* Aplica as trocas que você escolheu: o exercício substituto herda séries e
    repetições do original. */
@@ -2063,7 +2162,12 @@ function metas(d){
  let gord=Math.round(peso*.9);
  let carb=Math.max(40,Math.round((kcal-prot*4-gord*9)/4));
  const treinou=((sessaoDe(d||hoje()).s||{}).tipo==='treino');
- let agua=Math.round((peso*35+(treinou?500:0))/50)*50;
+ /* Água: a conta de 35 ml por quilo circula muito, mas não vem de nenhuma
+    recomendação oficial. A EFSA fixa a ingestão adequada de água TOTAL em
+    2,0 L/dia para mulheres e 2,5 L/dia para homens, e de 20 a 30% disso vem
+    da própria comida. Sobra perto de 1,6 e 2,0 L para beber. Dia de treino
+    soma a reposição do suor. É valor de referência, não necessidade exata. */
+ let agua=(p.sexo==='m'?2000:1600)+(treinou?500:0);
  const m=p.manual;
  if(m){if(m.kcal)kcal=m.kcal;if(m.prot)prot=m.prot;if(m.carb)carb=m.carb;if(m.gord)gord=m.gord;if(m.agua)agua=m.agua}
  return{tmb:Math.round(tmb),gasto:Math.round(gasto),kcal,prot,carb,gord,agua,manual:!!m};
@@ -2161,7 +2265,7 @@ function rotinaDoDia(d){
  const p=S.perfil,x=dia(d),m=metas(d),se=sessaoDe(d),vz=vozDoDia(d);
  const it=[];
  it.push({h:p.acordar||'07:00',n:'Acordar e beber 1 copo de água',ic:'sun',tipo:'agua',
-  ok:(x.agua||0)>=250,act:'agua',v:250,sub:'250 ml logo ao acordar acelera o metabolismo e tira a névoa do sono'});
+  ok:(x.agua||0)>=250,act:'agua',v:250,sub:'250 ml logo ao acordar repõem o que o corpo perdeu durante a noite'});
  const ph=progHig(d);
  it.push({h:somaMin(p.acordar||'07:00',5),n:'Higiene da manhã',ic:'sparkle',tipo:'hig',
   ok:ph.f>0,act:'go-sub',v:'cuidados|higiene',
@@ -2414,7 +2518,7 @@ function cardHabitos(){
    ic(i2,'font-size:16px;color:var(--ink-3)')+
    '<span class="grow" style="font-size:13.8px;font-weight:600;'+(x.hab[k]?'text-decoration:line-through;color:var(--ink-3)':'')+'">'+t+'</span></button>').join('')+'</div>'+
   '<hr class="sep"><div class="g3">'+
-   '<label class="fld">Sono (h)<input type="number" step="0.5" inputmode="decimal" data-a="dia-num" data-f="sono" value="'+(x.sono||'')+'" placeholder="0"></label>'+
+   '<label class="fld">Sono (h) '+selo('sono','7 h')+'<input type="number" step="0.5" inputmode="decimal" data-a="dia-num" data-f="sono" value="'+(x.sono||'')+'" placeholder="0"></label>'+
    '<label class="fld">Passos<input type="number" inputmode="numeric" data-a="dia-num" data-f="passos" value="'+(x.passos||'')+'" placeholder="0"></label>'+
    '<label class="fld">Energia<select data-a="dia-num" data-f="humor">'+
     ['—','Muito baixa','Baixa','Normal','Boa','Ótima'].map((t,i2)=>'<option value="'+i2+'"'+((x.humor||0)===i2?' selected':'')+'>'+t+'</option>').join('')+
@@ -2495,7 +2599,11 @@ function stHoje(){
    '<div class="row wrap" style="gap:6px;margin-top:11px">'+
     '<span class="tag '+se.s.cor+'">'+esc(se.fase.reg)+'</span>'+
     '<button class="tag p" data-a="go-sub" data-tab="treino" data-st="plano">'+
-     ic(trilha().ic)+' trilha '+esc(trilha().n.toLowerCase())+'</button></div></div>'+
+     ic(trilha().ic)+' trilha '+esc(trilha().n.toLowerCase())+'</button>'+
+    '<button class="tag n" data-a="trocar-sessao" data-d="'+d+'">'+ic('redo')+' trocar o treino de hoje</button></div>'+
+   (se.noLugarDe?'<p class="xtiny muted" style="margin-top:9px">No lugar de <b>'+esc(W[se.noLugarDe].nome)+'</b>. '+
+    '<button class="btn gh xs" data-a="destrocar-sessao" data-d="'+d+'">voltar ao do plano</button></p>':'')+
+   '</div>'+
   lista('Aquecimento',se.s.aquec,'flame')+
   '<div class="card">'+chTtl(se.s.tipo==='off'?'moon':'dumb',se.s.tipo==='off'?'Checklist do descanso':'Treino',
     '<span class="tag p">'+esc(L[1])+'</span>')+
@@ -2798,7 +2906,7 @@ function sheetEx(nome){
   '<span class="tag p">'+esc(grupoDe(nome))+'</span>'+
   '<hr class="sep"><p class="tiny muted">Quando você fechar todas as séries previstas com folga em dois treinos seguidos, '+
   'suba 2,5 kg nos exercícios de braço, peito e ombro, ou 5 kg nos de perna e costas. Em calistenia, o equivalente é '+
-  'passar para a progressão mais difícil do mesmo movimento.</p>'+
+  'passar para a progressão mais difícil do mesmo movimento. '+selo('progressao','Por que subir')+'</p>'+
   (reg.length?'<div class="lbl" style="margin:13px 0 7px">Histórico</div><div class="stack" style="gap:0">'+
    reg.slice().reverse().slice(0,12).map(r=>'<div class="li"><div class="grow"><div class="ttl num">'+r.kg+' kg</div>'+
    '<div class="sub">'+fmtData(r.d)+(r.reps?' · '+r.reps+' reps':'')+'</div></div>'+
@@ -2880,7 +2988,8 @@ function stVolume(){
   (ord.length?hBars(ord.map(g=>({x:g,y:vol[g]})),'var(--blue)'):
    vazio('chart','Marque as séries durante o treino para o volume aparecer aqui.'))+
   (totalSets?'<p class="xtiny muted" style="margin-top:10px"><b class="num">'+totalSets+'</b> séries nos últimos 28 dias. '+
-   'Referência para hipertrofia: 10 a 20 séries por grupo por semana. Abaixo de 10 o estímulo costuma ser pequeno; acima de 22 a recuperação começa a pesar.</p>':'')+
+   'Referência para hipertrofia: 10 a 20 séries por grupo por semana. Abaixo de 10 o estímulo costuma ser pequeno; acima de 22 a recuperação começa a pesar. '+
+   selo('volume','De onde vem essa faixa')+'</p>':'')+
   '</div>'+
   (Object.keys(volSem).length?'<div class="card">'+chTtl('target','Esta semana')+
    '<div class="stack" style="gap:0">'+Object.keys(volSem).sort((a,b)=>volSem[b]-volSem[a]).map(g=>{
@@ -2918,7 +3027,9 @@ function blocoEnfase(){
    '<div class="row top" style="gap:9px">'+ic('check','color:var(--ok);font-size:14px;margin-top:3px')+
    '<span class="grow tiny" style="line-height:1.55">'+esc(t)+'</span></div>').join('')+'</div>'+
   '<p class="xtiny muted" style="margin-top:11px">Trocar de trilha no Perfil troca este ciclo inteiro, '+
-  'junto com a voz, a pele e o objetivo da dieta.</p></div>';
+  'junto com a voz, a pele e o objetivo da dieta. '+
+  (S.perfil.trilha==='bem'?selo('exerc_humor','Por que este formato'):selo('freq','Por que duas vezes por semana'))+
+  '</p></div>';
 }
 function stPlano(){
  const n=diaPlano();
@@ -2937,6 +3048,8 @@ function stPlano(){
    (atual?'<span class="tag a">você está aqui</span>':passou?'<span class="tag o">concluída</span>':'<span class="tag n">a seguir</span>')+'</div>'+
    '<p class="tiny muted">'+esc(f.obj)+'</p>'+
    '<p class="tiny" style="margin-top:8px"><b>'+esc(f.reg)+'</b></p>'+
+   '<div class="row wrap" style="gap:5px;margin-top:7px">'+selo('volume','As séries')+selo('descanso','O descanso')+
+   selo('falha','Até onde ir na série')+'</div>'+
    '<div class="stack" style="gap:0;margin-top:10px">'+cicloDa(f).map((k,i)=>{const s=W[k];
     return '<button class="li" data-a="ver-sessao" data-k="'+k+'">'+
      '<span class="idx" style="background:var(--surface-2);color:var(--ink-3)">'+(i+1)+'</span>'+
@@ -3432,7 +3545,9 @@ function stAgua(){
   '<div class="row wrap" style="gap:4px;margin-top:14px">'+Array.from({length:copos},(_,i)=>
    ic('drop','font-size:19px;'+(i<cheios?'color:var(--water);fill:var(--water)':'color:var(--line-2)'))).join('')+'</div>'+
   '<p class="tiny muted" style="margin-top:8px"><b class="num">'+cheios+'</b> de '+copos+' copos de 250 ml. '+
-   'Sua meta é 35 ml por quilo'+(treino?' mais 500 ml porque hoje é dia de treino.':'.')+'</p></div>'+
+   'A meta vem da referência europeia de ingestão adequada, já descontando a água que vem da comida'+
+   (treino?', mais 500 ml porque hoje é dia de treino.':'.')+' Sede e urina clara dizem mais que o número. '+
+   selo('agua','De onde vem a meta')+'</p></div>'+
   '<div class="card">'+chTtl('chart','Últimos 7 dias')+barChart(dias,m.agua,'var(--water)')+
    '<p class="xtiny muted" style="margin-top:7px">A linha tracejada é a meta diária em mililitros.</p></div>'+
   '<div class="card">'+chTtl('bell','Lembretes de hidratação',
@@ -3493,6 +3608,9 @@ function stVoz(){
     '<div style="font-weight:700;font-size:15px;margin-top:2px">'+esc(alvo.nome)+'</div>'+
     '<div class="tiny muted" style="margin-top:3px">Faixa alvo: <b class="num">'+esc(alvo.hz)+'</b><br>'+
     'Zona confortável: <b class="num">'+esc(alvo.conf)+'</b></div></div></div>'+
+   '<p class="xtiny muted" style="margin-top:11px;line-height:1.6">O treino muda a frequência da voz de verdade: '+
+   'a meta-análise sobre terapia vocal achou ganho médio de 25 a 39 Hz. Mas não existe protocolo padrão, e o número '+
+   'de sessões não previu o resultado — quem faz diferença é o fonoaudiólogo. '+selo('voz','O que a meta-análise achou')+'</p>'+
    '<button class="btn '+(x.voz.feito?'gh':'acc')+' bl" style="margin-top:12px" data-a="fim-voz">'+
     (x.voz.feito?'Treino de voz concluído — desfazer':'Concluir treino de voz')+'</button></div>'+
 
@@ -3559,7 +3677,8 @@ function sheetVozEx(id){
    '<div class="row top" style="gap:10px"><div class="idx">'+(i+1)+'</div>'+
    '<div class="grow tiny" style="line-height:1.55">'+esc(p)+'</div></div>').join('')+'</div>'+
   '<p class="tiny" style="background:var(--surface-2);border-radius:11px;padding:11px;margin-bottom:14px;line-height:1.5">'+
-   '<b>Por que funciona:</b> '+esc(e2.dica)+'</p>'+
+   '<b>Por que funciona:</b> '+esc(e2.dica)+
+   (e2.ev?'<br><span style="display:inline-block;margin-top:8px">'+selo(e2.ev,'Os estudos por trás disso')+'</span>':'')+'</p>'+
   '<a class="btn gh bl sm" href="'+esc(yt(e2.n+' exercício vocal fonoaudiologia'))+'" target="_blank" rel="noopener" style="margin-bottom:9px">'+
    ic('play')+' Ver no YouTube</a>'+
   '<button class="btn '+(ok?'gh':'acc')+' bl" data-a="voz-ex" data-id="'+id+'" data-close="1">'+
@@ -3603,7 +3722,10 @@ function stPele(){
    '<div class="row wrap" style="gap:5px">'+SKIN_TIPOS.map(([v,t])=>
     '<button class="chip '+(tp===v?'on':'')+'" data-a="skin-tipo" data-v="'+v+'">'+t+'</button>').join('')+'</div>'+
    '<p class="tiny muted" style="margin-top:11px">Os produtos sugeridos mudam conforme o tipo escolhido. '+
-   'São marcas comuns em farmácia no Brasil, indicadas pela função — não é propaganda nem prescrição.</p></div>'+
+   'São marcas comuns em farmácia no Brasil, indicadas pela função — não é propaganda nem prescrição.</p>'+
+   '<p class="xtiny muted" style="margin-top:9px;line-height:1.6">Dos passos desta rotina, dois têm ensaio randomizado atrás: '+
+   'filtro solar diário e retinoide para acne. O resto é cuidado razoável, com evidência bem mais fina. '+
+   selo('filtro','Filtro solar')+' '+selo('retinoide','Retinoide')+'</p></div>'+
   bloco('manha','Rotina da manhã','sun')+
   bloco('noite','Rotina da noite','moon')+
   '<div class="card">'+chTtl('cal','Uma vez por semana')+
@@ -3879,7 +4001,10 @@ function stHigiene(){
     ['Itens espaçados somem sozinhos','Cabelo, unhas e roupa de cama só reaparecem quando o intervalo passa, para a lista não ficar artificialmente grande.'],
     ['Dá para desligar o que não serve','Se algum item não faz sentido para você, desligue nas opções abaixo.']].map(([t2,dd])=>
    '<div class="li"><div class="grow"><div class="ttl">'+t2+'</div>'+
-   '<div class="sub" style="line-height:1.55">'+dd+'</div></div></div>').join('')+'</div></div>'+
+   '<div class="sub" style="line-height:1.55">'+dd+'</div></div></div>').join('')+'</div>'+
+   '<p class="xtiny muted" style="margin-top:10px;line-height:1.6">Esse desenho não é invenção: é ativação comportamental, '+
+   'a ideia de fazer a versão pequena da tarefa antes de esperar a vontade aparecer. Tem meta-análise com 26 ensaios atrás. '+
+   selo('ativacao','A meta-análise')+'</p></div>'+
   '<div class="card">'+chTtl('check','Itens da sua lista')+
    '<p class="tiny muted" style="margin-bottom:10px">Desmarque o que não se aplica a você.</p>'+
    '<div class="row wrap" style="gap:5px">'+HIG.map(t=>
@@ -4000,7 +4125,7 @@ function metasDoPeso(peso){
  let kcal=Math.round((p.obj==='perder'?gasto*.8:p.obj==='ganhar'?gasto*1.15:gasto)/10)*10;
  if(kcal<tmb*1.05)kcal=Math.round(tmb*1.05/10)*10;
  return{kcal,prot:Math.round(peso*(p.obj==='perder'?2.2:1.8)),
-  agua:Math.round(peso*35/50)*50,tmb:Math.round(tmb)};
+  agua:(p.sexo==='m'?2000:1600),tmb:Math.round(tmb)};
 }
 function blocoRecalculo(){
  const ps=S.pesos.slice().sort((a,b)=>a.d<b.d?-1:1);
@@ -4071,8 +4196,9 @@ function blocoGordura(){
    tile('Massa gorda',g.gordura,'kg')+
    tile('Massa magra',g.magra,'kg','var(--ok)')+'</div>'+
   '<p class="xtiny muted" style="margin-top:10px;line-height:1.6">Calculado pelas circunferências (método da Marinha americana). '+
-  'Tem margem de erro de alguns pontos, então o número solto importa pouco — o que vale é ele acompanhar a mesma direção '+
-  'ao longo dos meses, sempre medido do mesmo jeito.'+
+  'Comparado com exame de imagem, esse método erra para um lado só: subestima a gordura em cerca de 2,5 pontos em homens e '+
+  'superestima entre 1,3 e 2,3 pontos em mulheres. Então o número solto importa pouco — o que vale é ele acompanhar a mesma '+
+  'direção ao longo dos meses, sempre medido do mesmo jeito. '+selo('gordura','A margem de erro')+
   (S.perfil.trilha==='bem'?''
    :' Em hormonização, a composição corporal muda bastante no primeiro ano, e essa conta ajuda a ver '+
     'que o peso parado na balança pode ser gordura saindo e músculo entrando ao mesmo tempo.')+
@@ -4323,12 +4449,17 @@ function renderPerfil(){
     tile('Proteína',m.prot+'g','por dia','var(--blue)')+tile('Carboidrato',m.carb+'g','por dia','var(--ok)')+
     tile('Gordura',m.gord+'g','por dia','var(--warn)')+'</div>'+
    '<p class="xtiny muted" style="margin-top:10px;line-height:1.6">Fórmula de Mifflin-St Jeor para o gasto basal, multiplicada pelo nível de atividade. '+
+    'É a fórmula que mais acerta nas comparações, mas é estimativa: pode estar 10% acima ou abaixo do seu gasto real. '+
+    selo('tmb','Sobre a fórmula')+' '+
     (p.obj==='perder'?'Objetivo de perda: 20% abaixo do gasto, cerca de 0,5 kg por semana.':
      p.obj==='ganhar'?'Objetivo de ganho: 15% acima do gasto, para ganhar massa com o mínimo de gordura.':
      'Objetivo de manutenção: calorias iguais ao gasto.')+
-    ' Proteína em '+(p.obj==='perder'?'2,2':'1,8')+' g por quilo — meta-análises colocam o ponto em que o ganho '+
+    ' '+selo('deficit','Sobre esses percentuais')+
+    ' Proteína em '+(p.obj==='perder'?'2,2':'1,8')+' g por quilo — a meta-análise com 49 estudos coloca o ponto em que o ganho '+
     'para de crescer perto de 1,6 g/kg, e em déficit o valor sobe porque a proteína é o que protege a massa magra. '+
-    'Gordura em 0,9 g por quilo; o restante vira carboidrato. A meta nunca desce abaixo do seu gasto em repouso. '+
+    selo('prot','A meta-análise')+
+    ' Gordura em 0,9 g por quilo; o restante vira carboidrato. A meta nunca desce abaixo do seu gasto em repouso. '+
+    'Água pela ingestão adequada de referência da EFSA, já descontando a que vem da comida. '+selo('agua','Sobre a água')+' '+
     (S.perfil.thIni?'Como você registrou terapia hormonal: a composição corporal muda bastante no primeiro ano, '+
      'então vale refazer estas contas a cada dois ou três meses.':'')+'</p>'+
    '<hr class="sep"><div class="lbl" style="margin-bottom:8px">Ajustar na mão (opcional)</div>'+
@@ -4376,6 +4507,14 @@ function renderPerfil(){
     '<button class="btn gh sm" data-a="zerar-dia">Zerar o dia de hoje</button>'+
     '<button class="btn gh sm" data-a="onboard">Refazer a configuração</button></div></div>'+
 
+  '<div class="card">'+chTtl('book','Em que o app se baseia',
+    '<span class="tag n">'+EVID.length+' pontos</span>')+
+   '<p class="tiny muted">Séries, calorias, proteína, água, sono, pele, voz: cada número do app veio de algum estudo, '+
+   'e esta tela mostra qual, com o quanto aquele estudo é firme. Inclui os pontos em que a evidência é fraca '+
+   'e o ponto em que não existe estudo nenhum.</p>'+
+   '<button class="btn gh bl sm" style="margin-top:11px;width:100%" data-a="go" data-tab="ciencia">'+
+   ic('book')+' Abrir as fontes</button></div>'+
+
   '<div class="card">'+chTtl('info','Avisos')+
    '<p class="xtiny muted" style="line-height:1.65">Este app organiza treino, alimentação, voz e pele com base em orientações gerais. '+
    'Ele não substitui nutricionista, educador físico, fonoaudiólogo, dermatologista ou médico — e não orienta nada sobre doses ou uso de hormônios, '+
@@ -4388,14 +4527,203 @@ function temTH(d){const n=diffDias(d,hoje());if(n<0)return '—';
 /* =====================================================================
    RENDER GERAL
    ===================================================================== */
+
+/* =====================================================================
+   BASE CIENTÍFICA
+   Cada número e cada recomendação do app aponta para o estudo de onde
+   veio. Onde a evidência é fraca, está escrito que é fraca. Onde não
+   existe estudo, está escrito que não existe.
+   ===================================================================== */
+const FONTES={
+ schoenfeld16:{r:'Schoenfeld, Ogborn e Krieger. Effects of resistance training frequency on measures of muscle hypertrophy: a systematic review and meta-analysis. Sports Medicine, 2016',
+  q:'Schoenfeld resistance training frequency muscle hypertrophy systematic review meta-analysis 2016'},
+ bazvalle22:{r:'Baz-Valle e colegas. Revisão sistemática sobre volume de treino e hipertrofia. Journal of Human Kinetics, 2022',
+  q:'Baz-Valle resistance training volume hypertrophy systematic review 2022'},
+ pelland24:{r:'Pelland e colegas. Meta-regressão sobre a relação entre séries por semana e resultado, 2024',
+  q:'resistance training dose response meta-regression weekly set volume hypertrophy strength'},
+ singer24:{r:'Singer e colegas. Revisão sistemática com meta-análise sobre tempo de descanso entre séries, 2024',
+  q:'rest interval duration resistance training hypertrophy strength systematic review meta-analysis 2024'},
+ refalo23:{r:'Refalo e colegas. Influence of resistance training proximity-to-failure on skeletal muscle hypertrophy: a systematic review with meta-analysis. Sports Medicine, 2023',
+  u:'https://openrepository.aut.ac.nz/items/78679612-6ff4-4d00-95d1-7920d072a760'},
+ frankenfield05:{r:'Frankenfield, Roth-Yousey e Compher. Comparison of predictive equations for resting metabolic rate. Journal of the American Dietetic Association, 2005',
+  q:'Frankenfield comparison predictive equations resting metabolic rate healthy nonobese obese adults 2005'},
+ morton18:{r:'Morton e colegas. Effect of protein supplementation on resistance training-induced gains in muscle mass and strength: systematic review, meta-analysis and meta-regression. British Journal of Sports Medicine, 2018',
+  u:'https://bjsm.bmj.com/content/52/6/376'},
+ efsa10:{r:'EFSA, Painel de Nutrição. Scientific Opinion on Dietary Reference Values for water. EFSA Journal, 2010',
+  u:'https://www.efsa.europa.eu/en/efsajournal/pub/1459'},
+ marines22:{r:'Comparação do método militar de circunferências com DXA em militares da ativa. Frontiers in Physiology, 2022',
+  u:'https://www.frontiersin.org/articles/10.3389/fphys.2022.868627/full'},
+ schwarz23:{r:'Schwarz e colegas. Meta-análise de 16 estudos sobre terapia vocal em mulheres trans, 2023',
+  q:'voice therapy transgender women fundamental frequency meta-analysis 2023'},
+ kapsner15:{r:'Kapsner-Smith e colegas. Ensaio randomizado com exercícios de trato vocal semiocluído. Journal of Speech, Language, and Hearing Research, 2015',
+  q:'Kapsner-Smith randomized controlled trial flow phonation semi-occluded vocal tract exercises'},
+ stuart21:{r:'Stuart e colegas. Meta-análise em rede de tratamentos tópicos para acne: 40 ensaios, 18.089 participantes. British Journal of Dermatology, 2021',
+  q:'topical preparations mild moderate acne vulgaris systematic review network meta-analysis Stuart'},
+ adapaBpo24:{r:'Revisão sistemática de 8 ensaios randomizados, 4.596 participantes, sobre adapaleno com peróxido de benzoíla. Cureus, 2024',
+  u:'https://www.ncbi.nlm.nih.gov/pmc/articles/PMC11472206/'},
+ adapa96:{r:'Ensaio multicêntrico com 323 pacientes comparando adapaleno 0,1% com tretinoína 0,025% em 12 semanas, 1996',
+  u:'https://pubmed.ncbi.nlm.nih.gov/8609263/'},
+ nambour13:{r:'Ensaio randomizado de Nambour: uso diário de filtro solar e envelhecimento da pele em 4,5 anos. Annals of Internal Medicine, 2013',
+  q:'Hughes sunscreen and prevention of skin aging randomized trial Annals of Internal Medicine 2013'},
+ noetel24:{r:'Noetel e colegas. Effect of exercise for depression: systematic review and network meta-analysis of randomised controlled trials. BMJ, 2024 — 218 estudos, 14.170 participantes',
+  q:'Noetel effect of exercise for depression systematic review network meta-analysis BMJ 2024'},
+ ekers14:{r:'Ekers e colegas. Behavioural activation for depression: an update of meta-analysis of effectiveness and sub group analysis. PLoS One, 2014 — 26 ensaios randomizados',
+  u:'https://pubmed.ncbi.nlm.nih.gov/24936656/'},
+ aasm15:{r:'Consenso da American Academy of Sleep Medicine com a Sleep Research Society sobre duração de sono em adultos, 2015',
+  u:'https://aasm.org/seven-or-more-hours-of-sleep-per-night-a-health-necessity-for-adults/'},
+ luz11:{r:'Lieverse e colegas. Ensaio controlado por placebo de luz brilhante matinal em adultos acima de 60 anos com depressão não sazonal. Archives of General Psychiatry, 2011',
+  q:'Lieverse bright light treatment elderly patients non-seasonal major depressive disorder randomized placebo'}
+};
+function linkFonte(k){const f=FONTES[k];if(!f)return '#';
+ return f.u||'https://pubmed.ncbi.nlm.nih.gov/?term='+encodeURIComponent(f.q)}
+
+/* forca: 'forte' = várias revisões ou consenso de sociedade médica.
+          'media' = uma meta-análise, ou ensaios consistentes com ressalvas.
+          'fraca' = poucos estudos, amostras pequenas, ou certeza baixa.
+          'sem'   = não achei estudo que fixe esse número. Fica dito assim. */
+const FORCA={forte:['Evidência forte','o'],media:['Evidência moderada','b'],
+ fraca:['Evidência limitada','w'],sem:['Sem estudo que fixe o número','n']};
+
+const EVID=[
+ {id:'freq',area:'Treino',af:'Cada grupo muscular grande treina duas vezes por semana',forca:'forte',
+  por:'Uma meta-análise que comparou só a frequência, mantendo o volume semanal igual, achou mais hipertrofia quando o grupo era treinado duas vezes na semana em vez de uma. A conclusão vale para os grupos grandes: peito, costas, ombro, perna.',
+  no:'Todos os ciclos das três trilhas distribuem esses grupos em dois dias diferentes da semana. Foi por isso que entraram os treinos Pernas B e Superior Completo B: para o segundo dia não ser a repetição idêntica do primeiro.',
+  fontes:['schoenfeld16']},
+ {id:'volume',area:'Treino',af:'De 10 a 20 séries por grupo muscular por semana',forca:'forte',
+  por:'Duas revisões independentes chegam perto disso. Uma aponta a faixa de 12 a 20 séries semanais para quem já treina; a outra, uma meta-regressão, mostra que o ganho continua subindo com mais séries, mas cada vez menos depois de umas 11, e que 10 a 20 rende mais que 4 a 9.',
+  no:'As séries de cada fase foram contadas para ficar nessa faixa. A tela de volume da semana soma suas séries por grupo e avisa quando você está abaixo ou muito acima.',
+  fontes:['bazvalle22','pelland24']},
+ {id:'descanso',area:'Treino',af:'1 a 2 minutos de descanso entre séries, 2 a 3 quando o foco é força',forca:'media',
+  por:'A revisão com meta-análise sobre intervalos encontrou o melhor resultado de hipertrofia entre 1 e 2 minutos, e vantagem para intervalos acima de 2 a 3 minutos quando o objetivo é força máxima.',
+  no:'Cada exercício tem o descanso escrito do lado, e o cronômetro já abre com esse tempo. Nos exercícios pesados de 5 e 6 repetições o descanso sobe para 2 e 3 minutos.',
+  fontes:['singer24']},
+ {id:'falha',area:'Treino',af:'Pare 1 ou 2 repetições antes de não conseguir mais',forca:'media',
+  por:'A meta-análise sobre proximidade da falha não achou vantagem clara em levar a série até não conseguir mais: o efeito foi trivial com a definição mais ampla de falha e desapareceu com a definição estrita. Como a fadiga cobra mais caro, parar perto da falha entrega o mesmo por menos.',
+  no:'As observações dos exercícios dizem "até faltar 1" ou "até faltar 2" em vez de "até falhar". Onde o treino pede falha de propósito, é só na última série de um acessório leve.',
+  fontes:['refalo23']},
+ {id:'progressao',area:'Treino',af:'Subir a carga quando você fechar todas as séries com folga',forca:'forte',
+  por:'A relação entre estímulo e resultado é de dose: nas meta-regressões, mais trabalho rende mais, até um ponto. Carga parada por semanas significa dose parada.',
+  no:'Cada exercício guarda o histórico de carga e o 1RM estimado, então dá para ver num relance se a carga subiu ou ficou parada. As observações dos treinos dizem na cara quando subir: "suba a carga quando fechar as 4 séries com folga". A cada oito semanas entra uma semana mais leve, para a conta não virar só acúmulo.',
+  fontes:['pelland24','bazvalle22']},
+
+ {id:'tmb',area:'Comida',af:'Gasto em repouso pela fórmula de Mifflin-St Jeor',forca:'media',
+  por:'Na comparação entre as fórmulas de estimativa, Mifflin-St Jeor foi a que acertou dentro de 10% do valor medido na maior parte das pessoas, e a que menos erra sempre para o mesmo lado. É a mais recomendada para uso geral. Mesmo assim é estimativa: pode estar 10% acima ou abaixo do seu gasto real, e erra mais em quem tem obesidade.',
+  no:'É a conta que gera sua meta de calorias, e ela é refeita a cada pesagem nova. Depois de algumas semanas de registro o app passa a mostrar também o gasto estimado pelos seus próprios dados, que vale mais que a fórmula.',
+  fontes:['frankenfield05']},
+ {id:'prot',area:'Comida',af:'1,8 g de proteína por quilo, ou 2,2 g quando você está perdendo peso',forca:'forte',
+  por:'A meta-análise com 49 estudos e 1.863 pessoas encontrou o ponto em que a proteína extra para de render ganho perto de 1,6 g por quilo por dia. O intervalo de confiança é largo, então um alvo pouco acima tem margem. Em déficit calórico o valor sobe porque a proteína é o que segura a massa magra enquanto o peso cai.',
+  no:'A meta de proteína sai do seu peso atual e muda junto com ele. O diário mostra quanto falta e as receitas são ordenadas por densidade de proteína.',
+  fontes:['morton18']},
+ {id:'agua',area:'Comida',af:'Meta de água pela referência europeia de ingestão adequada',forca:'media',
+  por:'A conta de 35 ml por quilo circula em todo lugar, mas não achei recomendação oficial que a sustente. O que existe é a ingestão adequada da EFSA: 2,0 L por dia para mulheres e 2,5 L para homens, de água TOTAL — e de 20 a 30% disso vem da própria comida. Sobra perto de 1,6 e 2,0 L para beber. Nos dias de treino entra a reposição do suor.',
+  no:'Era aqui que o app estava errado: a meta antiga era 35 ml por quilo mais 500 ml, o que dava quase 3 litros de bebida para 70 kg. Agora parte da referência da EFSA e soma 500 ml só em dia de treino. É valor de referência, não necessidade exata: sede e urina clara dizem mais, e você pode ajustar a meta na mão.',
+  fontes:['efsa10']},
+ {id:'deficit',area:'Comida',af:'Déficit de 20% para perder e superávit de 15% para ganhar',forca:'sem',
+  por:'Esses dois percentuais são convenção de prática, não número saído de estudo. Não achei ensaio que fixe 20% ou 15% como o melhor. O que é bem estabelecido é a direção: para perder gordura é preciso comer menos que o gasto, e déficits muito agressivos custam massa magra.',
+  no:'Ficaram como ponto de partida, com dois cuidados: a meta nunca desce abaixo do seu gasto em repouso, e tudo pode ser ajustado na mão no Perfil. Se o peso não se mexer em três semanas, o número está errado para você — e aí o app usa seus próprios registros para corrigir.',
+  fontes:[]},
+
+ {id:'gordura',area:'Corpo e medidas',af:'Gordura corporal estimada pela fita, pelas circunferências',forca:'fraca',
+  por:'Comparado com DXA em militares da ativa, o método de circunferências subestimou a gordura dos homens em cerca de 2,5 pontos percentuais e superestimou a das mulheres entre 1,3 e 2,3 pontos. Os próprios autores dizem que serve para triagem, não para dado de pesquisa.',
+  no:'O número aparece como tendência, não como verdade: o que interessa é a direção ao longo dos meses, não o valor absoluto. A margem de erro de uns 3 pontos está escrita na própria tela.',
+  fontes:['marines22']},
+
+ {id:'voz',area:'Voz',af:'Treino vocal muda a frequência da voz de verdade',forca:'media',
+  por:'A meta-análise de 16 estudos em mulheres trans encontrou aumento médio de cerca de 27 Hz na vogal sustentada, 39 Hz na leitura e 25 Hz na fala espontânea, com satisfação alta. Dois detalhes importam: o número de sessões não previu o resultado, e não existe protocolo padronizado — o que mais pesa é a orientação de um fonoaudiólogo.',
+  no:'O ciclo de 7 dias existe para dar constância, não porque 7 seja número mágico. O app registra sua frequência em Hz e mostra o gráfico, que é o jeito de saber se está funcionando para você. E repete, nas telas de voz, que acompanhamento com fonoaudiólogo é o que faz diferença.',
+  fontes:['schwarz23']},
+ {id:'sovt',area:'Voz',af:'Canudo e vibração de lábio para aquecer a voz',forca:'fraca',
+  por:'Os exercícios de trato vocal semiocluído têm resultado de curto prazo demonstrado em ensaio randomizado e em estudos de programa, mas a evidência de efeito duradouro ainda é fina. Canudo e vibração de lábio rendem parecido entre si.',
+  no:'Entram como aquecimento antes dos exercícios de altura e ressonância, que é o uso com melhor respaldo. Não são apresentados como o que muda a voz.',
+  fontes:['kapsner15']},
+
+ {id:'retinoide',area:'Pele',af:'Adapaleno, sozinho ou com peróxido de benzoíla, para acne',forca:'forte',
+  por:'A meta-análise em rede com 40 ensaios e 18.089 participantes colocou adapaleno com peróxido de benzoíla como o tratamento tópico mais eficaz contra veículo, e adapaleno sozinho em terceiro. Uma revisão de 8 ensaios randomizados confirma a combinação como segura e eficaz, e um ensaio com 323 pacientes mostrou adapaleno melhor tolerado que tretinoína. Os autores da meta-análise em rede classificam a confiança geral como baixa, e o efeito indesejado mais comum é irritação.',
+  no:'É o ativo indicado para acne na rotina da noite, com a instrução de começar duas ou três vezes por semana e subir devagar. A evidência é de acne leve a moderada: acne nodular ou com cicatriz é caso de dermatologista.',
+  fontes:['stuart21','adapaBpo24','adapa96']},
+ {id:'filtro',area:'Pele',af:'Filtro solar todo dia, de manhã',forca:'forte',
+  por:'No ensaio randomizado de Nambour, quem usou filtro solar diariamente por 4,5 anos apresentou menos sinais de envelhecimento da pele que quem usava só às vezes. O mesmo grupo, seguido por mais oito anos, teve queda de quase 40% em carcinoma espinocelular. A ressalva é que quase toda essa evidência vem de uma população australiana de pele clara.',
+  no:'Filtro solar é o único passo que aparece na rotina da manhã em todas as trilhas e em todos os tipos de pele. É também o passo que o app cobra de volta se você usar ativo à noite.',
+  fontes:['nambour13']},
+
+ {id:'exerc_humor',area:'Humor e rotina',af:'Exercício reduz sintomas depressivos',forca:'media',
+  por:'A meta-análise em rede com 218 estudos e 14.170 participantes encontrou efeito moderado para caminhada e corrida, ioga, treino de força e exercício aeróbico misto, comparados a cuidado habitual. Caminhada e corrida lideraram, e força e ioga foram as modalidades que as pessoas mais conseguiram manter. O efeito foi proporcional à intensidade e valeu igual para quem tinha e para quem não tinha outras doenças. A confiança da análise é baixa para caminhada e muito baixa para o resto.',
+  no:'É a base da trilha de quem só quer melhorar: três sessões curtas por semana, força e caminhada, sem divisão avançada e sem escalar para cinco dias. É também o motivo de a caminhada ser sempre oferecida como troca em dia ruim, em qualquer trilha.',
+  fontes:['noetel24']},
+ {id:'ativacao',area:'Humor e rotina',af:'Fazer a tarefa pequena antes de esperar a vontade chegar',forca:'media',
+  por:'É o princípio da ativação comportamental. A meta-análise com 26 ensaios randomizados e 1.524 participantes achou vantagem moderada sobre os grupos de controle e resultado parecido com antidepressivo. Os autores ressalvam que a qualidade da maior parte dos estudos era baixa e o seguimento, curto.',
+  no:'É o desenho da área de higiene: cada tarefa tem três níveis, e o menor já conta como feito. Enxaguar a boca conta. Lavar o cabelo na pia conta. O modo "Hoje está difícil" reduz o dia à lista mínima em vez de zerar a sua sequência.',
+  fontes:['ekers14']},
+ {id:'sono',area:'Humor e rotina',af:'Sete horas de sono ou mais',forca:'forte',
+  por:'A declaração de consenso da American Academy of Sleep Medicine com a Sleep Research Society, feita por um painel de 15 especialistas, recomenda 7 horas ou mais por noite para adultos de 18 a 60 anos, e considera 6 horas ou menos insuficiente. O painel não fixou limite superior. A faixa de 7 a 9 horas vem de outro painel, não desse consenso.',
+  no:'O hábito de dormir só conta como feito a partir de 7 horas, não de 8, e o resumo de 30 dias mostra sua média por noite ao lado da adesão ao treino. Se a média estiver abaixo de 7, é o primeiro número a mexer antes de aumentar carga ou volume.',
+  fontes:['aasm15']},
+ {id:'luz',area:'Humor e rotina',af:'Luz da manhã para acertar o relógio biológico e o humor',forca:'fraca',
+  por:'Aqui a evidência é fina, e vale dizer. O ensaio controlado por placebo mais sólido que achei tinha 89 pessoas acima de 60 anos com depressão não sazonal: três semanas de luz brilhante pela manhã melhoraram humor e eficiência do sono. É um estudo pequeno, numa população específica. Os estudos em adultos saudáveis são observacionais ou ainda estão rodando.',
+  no:'Entra como sugestão de rotina, não como tratamento, e do tamanho que a evidência permite: alguns minutos de luz natural logo depois de acordar. Não existe no app nenhum aparelho a comprar nem dose em lux.',
+  fontes:['luz11']}
+];
+function evidDe(id){return EVID.find(z=>z.id===id)}
+
+/* Selo clicável que aparece ao lado de um número ou de uma orientação. */
+function selo(id,txt){const v=evidDe(id);if(!v)return '';
+ return '<button class="selo" data-a="evid" data-id="'+id+'" title="De onde vem este número">'+
+  ic('book')+esc(txt||FORCA[v.forca][0])+'</button>'}
+
+function blocoFonte(k){const f=FONTES[k];if(!f)return '';
+ return '<a class="fonte" href="'+esc(linkFonte(k))+'" target="_blank" rel="noopener">'+
+  '<span class="grow">'+esc(f.r)+'</span>'+ic('right','color:var(--ink-3);flex:none')+'</a>'}
+
+function fichaEvid(v,semTitulo){
+ const fc=FORCA[v.forca];
+ return '<div class="card" id="ev-'+v.id+'">'+
+  '<div class="row" style="gap:7px;align-items:flex-start;margin-bottom:9px">'+
+   '<span class="tag '+fc[1]+'" style="flex:none;margin-top:2px">'+esc(fc[0])+'</span>'+
+   (semTitulo?'':'<h3 style="font-size:15px;line-height:1.35;font-weight:700;margin:0">'+esc(v.af)+'</h3>')+'</div>'+
+  '<div class="lbl">O que os estudos dizem</div>'+
+  '<p class="tiny" style="line-height:1.65;margin:4px 0 11px">'+esc(v.por)+'</p>'+
+  '<div class="lbl">O que o app faz com isso</div>'+
+  '<p class="tiny" style="line-height:1.65;margin:4px 0 0">'+esc(v.no)+'</p>'+
+  (v.fontes.length
+   ?'<hr class="sep"><div class="lbl" style="margin-bottom:6px">'+(v.fontes.length>1?'Fontes':'Fonte')+'</div>'+
+     v.fontes.map(blocoFonte).join('')
+   :'<hr class="sep"><p class="xtiny muted">Sem fonte para listar: aqui o app usa convenção de prática, e isso está dito na própria tela.</p>')+
+  '</div>';
+}
+function sheetEvid(id){const v=evidDe(id);if(!v)return;
+ sheet(v.af,'<div class="stack" style="gap:10px">'+fichaEvid(v,true)+
+  '<button class="btn gh bl sm" data-a="go" data-tab="ciencia">'+ic('book')+' Ver tudo em que o app se baseia</button></div>',v.area);
+}
+function renderCiencia(){
+ const areas=[...new Set(EVID.map(v=>v.area))];
+ $('#cienciaBox').innerHTML=
+  '<button class="btn gh sm" data-a="go" data-tab="perfil" style="align-self:flex-start">'+ic('left')+' Perfil</button>'+
+  '<div class="card hero">'+chTtl('book','Em que o app se baseia')+
+   '<p class="tiny" style="line-height:1.7">Cada número daqui — séries, calorias, proteína, água, sono — veio de algum lugar. '+
+   'Esta tela diz de onde, e diz também o quanto aquele lugar é firme. Onde a evidência é fraca, está escrito que é fraca. '+
+   'Onde não achei estudo que sustentasse o número, está escrito que não achei.</p>'+
+   '<div class="row wrap" style="gap:5px;margin-top:12px">'+
+    Object.keys(FORCA).map(k=>'<span class="tag '+FORCA[k][1]+'">'+esc(FORCA[k][0])+'</span>').join('')+'</div>'+
+   '<p class="xtiny muted" style="margin-top:10px;line-height:1.6">Forte: várias revisões ou consenso de sociedade médica. '+
+   'Moderada: uma meta-análise, ou ensaios consistentes com ressalvas. Limitada: poucos estudos, amostras pequenas ou certeza baixa. '+
+   'Nada aqui substitui avaliação de profissional, e nenhum desses estudos foi feito pensando especificamente em você.</p></div>'+
+  areas.map(a=>'<div class="lbl" style="margin:16px 2px -4px">'+esc(a)+'</div>'+
+   EVID.filter(v=>v.area===a).map(fichaEvid).join('')).join('')+
+  '<div class="card"><p class="xtiny muted" style="line-height:1.7">Os links abrem a publicação original ou a busca por ela no PubMed. '+
+   'Se você encontrar estudo que contradiga alguma coisa daqui, ele vale mais que o que está escrito: este app foi feito para ser corrigido.</p></div>';
+}
+
 function render(){
  if(!S.perfil.inicio)S.perfil.inicio=hoje();
  renderHeader();
  const t=S.ui.tab;
- ['inicio','treino','nutri','cuidados','prog','perfil'].forEach(k=>{const el=$('#tab-'+k);if(el)el.hidden=(k!==t)});
- $$('#tabbar button').forEach(b=>b.classList.toggle('on',b.dataset.tab===t));
+ ['inicio','treino','nutri','cuidados','prog','perfil','ciencia'].forEach(k=>{const el=$('#tab-'+k);if(el)el.hidden=(k!==t)});
+ /* A tela de ciência não tem botão próprio na barra: ela se abre pelo Perfil
+    e pelos selos espalhados no app, e deixa o Perfil aceso enquanto está aberta. */
+ const tb=t==='ciencia'?'perfil':t;
+ $$('#tabbar button').forEach(b=>b.classList.toggle('on',b.dataset.tab===tb));
  ({inicio:renderInicio,treino:renderTreino,nutri:renderNutri,cuidados:renderCuidados,
-   prog:renderProg,perfil:renderPerfil}[t]||renderInicio)();
+   prog:renderProg,perfil:renderPerfil,ciencia:renderCiencia}[t]||renderInicio)();
  lsSave();
 }
 
@@ -4497,6 +4825,27 @@ document.addEventListener('click',ev=>{
   case 'go-sub':{const tb=d.tab,st=d.st||(d.v||'').split('|')[1];
    S.ui.tab=tb;if(st)S.ui.sub[tb]=st;window.scrollTo(0,0);render();break}
   case 'close':case 'close-ovl':closeSheet();break;
+  case 'evid':sheetEvid(d.id);break;
+  case 'trocar-sessao':{const dd=d.d||hj,se=sessaoDe(dd);
+   sheet('Trocar o treino de '+fmtCurto(dd),
+    '<p class="tiny muted" style="line-height:1.6;margin-bottom:12px">O plano continua o mesmo: só este dia muda. '+
+    'Serve para encurtar um dia pesado, para trocar por cardio, ou para adiantar um treino que você perdeu. '+
+    'Trocar não quebra sua sequência.</p>'+
+    '<div class="stack" style="gap:0">'+sessoesTrocaveis().map(k=>{
+     const w=W[k],atual=k===se.key;
+     return '<button class="li" data-a="trocar-sessao-ok" data-d="'+dd+'" data-k="'+k+'">'+
+      ic(w.tipo==='ativo'?'steps':'dumb','color:var(--ink-3)')+
+      '<div class="grow"><div class="ttl">'+esc(w.nome)+'</div>'+
+      '<div class="sub">'+esc(w.foco)+(w.dur?' · '+w.dur+' min':'')+'</div></div>'+
+      (atual?'<span class="tag o">de hoje</span>':ic('right','color:var(--ink-3)'))+'</button>';
+    }).join('')+'</div>','O plano do dia volta ao normal amanhã');
+   break}
+  case 'trocar-sessao-ok':{const dd=d.d||hj,se=sessaoDe(dd);
+   const x2=dia(dd);
+   if(d.k===(se.noLugarDe||se.key))delete x2.sess;else x2.sess=d.k;
+   save();closeSheet();render();toast('Treino do dia trocado');break}
+  case 'destrocar-sessao':{const x2=dia(d.d||hj);delete x2.sess;
+   save();render();toast('De volta ao treino do plano');break}
   case 'tema':S.ui.tema=d.v;aplicaTema();save('base');render();break;
 
   /* configuração */
@@ -4557,6 +4906,7 @@ document.addEventListener('click',ev=>{
    break}
   case 'hig-porque':{const t=HIG.find(z=>z.id===d.id);if(!t)return;
    sheet(t.n,'<p class="tiny muted" style="line-height:1.65">'+esc(t.porque)+'</p>'+
+    (t.ev?'<div style="margin-top:9px">'+selo(t.ev,'Os estudos por trás disso')+'</div>':'')+
     '<hr class="sep"><div class="lbl" style="margin-bottom:8px">Os níveis</div>'+
     '<div class="stack" style="gap:8px">'+t.niveis.map((l,i)=>
      '<div class="row top" style="gap:10px"><div class="idx">'+(i+1)+'</div>'+
