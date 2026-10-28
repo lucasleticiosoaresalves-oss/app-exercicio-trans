@@ -41,26 +41,6 @@ Os dados não somem ao fechar a aba, mas também não viajam sozinhos entre apar
 use **Copiar meus dados** e **Importar dados**, no Perfil. Limpar os dados do site no navegador apaga tudo,
 então vale exportar de vez em quando.
 
-## Mexer no app
-
-O app inteiro é o `index.html`: estilo, dados e código no mesmo arquivo. Edite e abra no navegador.
-
-Para conferir antes de publicar, sirva a pasta em vez de abrir o arquivo direto — alguns recursos
-não funcionam no `file://`:
-
-```
-npx serve .
-```
-
-Para publicar:
-
-```
-git add -A
-git commit -m "atualiza o app"
-git push
-```
-
-O GitHub Pages republica sozinho em um ou dois minutos.
 
 ## Usar como aplicativo no celular
 
