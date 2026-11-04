@@ -2262,7 +2262,7 @@ const DEF={
  ciclo:{regras:[],sintomas:{}},meds:[],notas:[],higMeus:[],exames:[],
  ui:{tab:'inicio',sub:{treino:'hoje',nutri:'diario',prog:'peso',cuidados:'corpo'},
    calMes:null,diaSel:null,tema:'auto',filtroRef:'todas',cardapio:null,skinTipo:null,
-   cienciaV:'fatos',fatoArea:'',calSaude:null,guiaAberto:'',dobras:[]}
+   cienciaV:'fatos',fatoArea:'',calSaude:null,guiaAberto:'',dobras:[],refTudo:false}
 };
 /* Medidas caseiras dos alimentos mais registrados, para não depender da balança.
    [rótulo, gramas equivalentes] */
@@ -4435,8 +4435,9 @@ function cardReceita(r,s){
 function stReceitas(){
  const f=S.ui.filtroRef||'todas',q=nrm(S.ui.buscaRef||'');
  let lista=RECIPES;
+ const REF_ESPECIAIS=['todas','favs','agora','poucos'];
  if(f==='favs')lista=lista.filter(r=>S.favs.includes(r.id));
- else if(f!=='todas')lista=lista.filter(r=>r.ref.includes(f));
+ else if(REF_ESPECIAIS.indexOf(f)<0)lista=lista.filter(r=>r.ref.includes(f));
  if(q)lista=lista.filter(r=>nrm(r.nome).includes(q)||r.ing.some(x=>nrm(x.n).includes(q)));
  /* Com a despensa preenchida, as receitas que você consegue fazer agora sobem.
     45% das pessoas que responderam não escolhem o que entra em casa — para elas,
@@ -4486,10 +4487,15 @@ function stReceitas(){
     ['favs',ic('star')+' Favoritas'],...MEALS.map(m=>[m.k,m.n])].map(([k,n])=>
    '<button class="chip xs '+(f===k?'on':'')+'" data-a="filtro-ref" data-v="'+k+'">'+n+'</button>').join('')+'</div></div>'+
   '<div class="card"><div class="stack" style="gap:8px">'+
-   (lista.length?lista.map(r=>cardReceita(r,pontuar(r))).join(''):vazio('search','Nenhuma receita encontrada.'))+
+   (lista.length
+    ?lista.slice(0,S.ui.refTudo?lista.length:8).map(r=>cardReceita(r,pontuar(r))).join('')+
+     (!S.ui.refTudo&&lista.length>8
+      ?'<button class="btn gh bl sm" style="margin-top:3px" data-a="ref-tudo">'+
+       'Ver as outras '+(lista.length-8)+'</button>':'')
+    :vazio('search','Nenhuma receita encontrada.'))+
   '</div></div>';
  const b=$('#buscaRef');
- if(b)b.addEventListener('input',ev=>{S.ui.buscaRef=ev.target.value;const p=ev.target.selectionStart;
+ if(b)b.addEventListener('input',ev=>{S.ui.buscaRef=ev.target.value;S.ui.refTudo=false;const p=ev.target.selectionStart;
   stReceitas();const n2=$('#buscaRef');if(n2){n2.focus();n2.setSelectionRange(p,p)}});
 }
 function sheetReceita(id){
@@ -5750,9 +5756,8 @@ function cardRitmo(){
  return '<div class="card">'+chTtl('clock','Começar mais devagar',on?'<span class="tag o">ligado</span>':'')+
   '<p class="tiny muted" style="line-height:1.7">Nas primeiras 4 semanas o app corta as séries pela metade e mantém só os exercícios principais. '+
   'Depois disso ele volta ao normal sozinho.</p>'+
-  '<p class="tiny muted" style="line-height:1.7;margin-top:9px">Isto não tem nada a ver com o seu peso. '+
-  'Tem gente gorda com fôlego de sobra e gente magra que não sobe um lance de escada — as duas coisas são independentes, '+
-  'e um app que trata peso como se fosse condicionamento erra com as duas.</p>'+
+  '<p class="tiny muted" style="line-height:1.7;margin-top:9px">Isto não tem a ver com o seu peso: '+
+  'peso e condicionamento são coisas independentes.</p>'+
   '<button class="btn '+(on?'acc':'gh bl')+' sm" style="margin-top:12px;width:100%" data-a="rampa">'+
    ic(on?'check':'clock')+' '+(on?'Rampa ligada nas 4 primeiras semanas':'Ligar a rampa de 4 semanas')+'</button></div>';
 }
@@ -6793,12 +6798,10 @@ function stPrivacidade(){
    'Mas leva o seu IP, como qualquer site leva. Se isso for um problema para você, uma rede com VPN resolve essa parte.</p></div>'+
 
   '<div class="card">'+chTtl('user','Seus direitos sobre esses dados')+
-   '<p class="tiny muted" style="line-height:1.7">Pela Lei Geral de Proteção de Dados, informação sobre saúde e sobre identidade de gênero é '+
-   '<b>dado pessoal sensível</b>, com proteção reforçada. A posição deste app é simples: '+
-   'ele não coleta, não armazena fora do seu aparelho, não compartilha e não vende nada. '+
-   'Não existe banco de dados com usuários — então não existe vazamento possível de uma coisa que não foi recolhida.</p>'+
-   '<p class="tiny muted" style="line-height:1.7;margin-top:10px">Como tudo está com você, os direitos de acesso, correção e eliminação '+
-   'você exerce sozinho, sem pedir para ninguém:</p>'+
+   '<p class="tiny muted" style="line-height:1.7">Pela LGPD, dado de saúde e de identidade de gênero é '+
+   '<b>dado pessoal sensível</b>. Este app não coleta, não armazena fora do seu aparelho, não compartilha e não vende nada: '+
+   'não existe banco de usuários, então não existe vazamento possível.</p>'+
+   '<p class="tiny muted" style="line-height:1.7;margin-top:10px">Acesso, correção e eliminação você exerce sozinho:</p>'+
    '<div class="row wrap" style="gap:7px;margin-top:11px">'+
     '<button class="btn gh sm" data-a="exportar">Baixar tudo que é seu</button>'+
     '<button class="btn gh sm" data-a="baixar-csv">Baixar como planilha</button>'+
@@ -6820,17 +6823,15 @@ function stPrivacidade(){
    }).join('')+'</div></div>'+
 
   '<div class="card">'+chTtl('info','Idade')+
-   '<p class="tiny muted" style="line-height:1.7">O app foi pensado para pessoas adultas. '+
-   'Se você tem menos de 18 anos, ele funciona, mas já começa com peso e percentual de gordura escondidos, '+
-   'porque déficit calórico e número de corpo na adolescência têm risco real de transtorno alimentar. '+
-   'O ideal nessa idade é fazer isso acompanhada ou acompanhado de alguém — profissional, responsável, ou os dois.</p></div>'+
+   '<p class="tiny muted" style="line-height:1.7">Abaixo de 18 anos o app funciona, mas começa com peso e percentual de gordura escondidos: '+
+   'déficit calórico e número de corpo na adolescência têm risco real de transtorno alimentar. '+
+   'Nessa idade, o ideal é fazer isso acompanhada ou acompanhado.</p></div>'+
 
   '<div class="card">'+chTtl('heart','Quem fez e com que responsabilidade')+
-   '<p class="tiny muted" style="line-height:1.7">Feito por uma pessoa só, de graça, sem anúncio e sem venda de dado. '+
-   'O código é aberto e pode ser conferido por qualquer um. '+
-   'As recomendações vêm de estudos, e cada uma mostra qual, com o quanto aquele estudo é firme — inclusive quando é fraco.</p>'+
-   '<p class="tiny muted" style="line-height:1.7;margin-top:10px">Como qualquer material de apoio, o uso é por sua conta: '+
-   'se alguma coisa aqui conflitar com o que um profissional te disse, <b>vale o que o profissional disse</b>.</p>'+
+   '<p class="tiny muted" style="line-height:1.7">Feito por uma pessoa só, de graça, sem anúncio e sem venda de dado, '+
+   'com o código aberto. Cada recomendação mostra o estudo de onde veio e o quanto ele é firme, inclusive quando é fraco.</p>'+
+   '<p class="tiny muted" style="line-height:1.7;margin-top:10px">Se alguma coisa aqui conflitar com o que um profissional te disse, '+
+   '<b>vale o que o profissional disse</b>.</p>'+
    '<div class="row wrap" style="gap:7px;margin-top:11px">'+
     '<a class="btn gh sm" href="https://github.com/lucasleticiosoaresalves-oss/app-exercicio-trans" target="_blank" rel="noopener">'+
     ic('book')+' Ver o código</a>'+
@@ -7831,10 +7832,9 @@ function pf_oQueE(){
 function pf_avisoFinal(){
  const p=S.perfil,m=metas();
  return   '<div class="card">'+chTtl('info','Avisos')+
-   '<p class="xtiny muted" style="line-height:1.65">Este app organiza treino, alimentação, voz e pele com base em orientações gerais. '+
-   'Ele não substitui nutricionista, educador físico, fonoaudiólogo, dermatologista ou médico — e não orienta nada sobre doses ou uso de hormônios, '+
-   'que é assunto exclusivo de acompanhamento médico. Dor articular, tontura ou falta de ar no treino, dor ou rouquidão persistente na voz, '+
-   'e irritação forte na pele são motivos para parar e procurar ajuda profissional.</p></div>';
+   '<p class="xtiny muted" style="line-height:1.65">Este app não substitui profissional, e não orienta nada sobre dose ou uso de hormônio. '+
+   'Pare e procure ajuda se aparecer dor articular, tontura ou falta de ar no treino, '+
+   'dor ou rouquidão que não passa, ou irritação forte na pele.</p></div>';
 }
 /* =====================================================================
    PERFIL
@@ -8254,10 +8254,9 @@ function viewFatos(){
  const lista=sel?FATOS.filter(f=>f.area===sel):FATOS;
  return '<div class="card hero">'+chTtl('book','Fatos, com o estudo atrás',
    '<span class="tag n">'+FATOS.length+' assuntos</span>')+
-  '<p class="tiny" style="line-height:1.7">Isto aqui não é sobre o app: é informação para você ter. '+
-  'São assuntos que aparecem muito em conversa e quase sempre chegam distorcidos. '+
-  'De cada um está escrito o que o estudo achou de verdade, de quantas pessoas, e o que ele não consegue provar. '+
-  'O texto é em português; o link vai para o original, que na maioria dos casos está em inglês.</p>'+
+  '<p class="tiny" style="line-height:1.7">Assuntos que chegam distorcidos na conversa. '+
+  'De cada um: o que o estudo achou, de quantas pessoas, e o que ele não prova. '+
+  'Texto em português, link para o original.</p>'+
   '<p class="xtiny muted" style="margin-top:10px;line-height:1.6">Onde a evidência é fraca, está escrito que é fraca. '+
   'Nenhum fato daqui é receita ou recomendação, e nenhum vale mais do que o que quem te acompanha disse.</p></div>'+
   '<div class="row wrap" style="gap:5px">'+
@@ -8747,6 +8746,7 @@ document.addEventListener('click',ev=>{
   case 'mes-saude':{const b=S.ui.calSaude||hj.slice(0,7)+'-01',dt=parseYmd(b);
    dt.setMonth(dt.getMonth()+Number(d.v));S.ui.calSaude=ymd(dt).slice(0,7)+'-01';render();break}
   case 'dia-saude':sheetDiaSaude(d.d);break;
+  case 'ref-tudo':{S.ui.refTudo=true;render();break}
   case 'cuid-ir':{S.ui.sub.cuidados=d.v;window.scrollTo(0,0);render();break}
   case 'cuid-hub':{S.ui.sub.cuidados=null;window.scrollTo(0,0);render();break}
   case 'dobra':{const L=S.ui.dobras=Array.isArray(S.ui.dobras)?S.ui.dobras:[];
@@ -8881,7 +8881,7 @@ document.addEventListener('click',ev=>{
   case 'repetir':{const ont=((diaRO(addDias(df,-1)).ref||{})[d.m]||[]);
    if(!ont.length)return toast('Nada registrado ontem');
    ont.forEach(z=>addItem(df,d.m,{...z},true));render();toast(ont.length+' itens copiados de ontem');break}
-  case 'filtro-ref':S.ui.filtroRef=d.v;render();break;
+  case 'filtro-ref':S.ui.refTudo=false;S.ui.filtroRef=d.v;render();break;
   case 'novo-cardapio':S.ui.cardapio=gerarCardapio(Math.floor(Math.random()*9999));render();toast('Novo cardápio');break;
   case 'trocar-ref':sheetTrocar(d.m);break;
   case 'escolher-ref':S.ui.cardapio.itens[d.m]=d.id;closeSheet();render();break;
