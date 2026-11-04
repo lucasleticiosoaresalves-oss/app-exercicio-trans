@@ -1271,6 +1271,23 @@ const ENFASE={
    [nome, kcal, proteína, carboidrato, gordura, categoria, porção padrão g]
    ===================================================================== */
 const FOODS=[
+/* ---------- Bebidas ----------
+   Valores por 100 ml. TACO 4a ed. para o que ela tem; USDA SR Legacy para
+   leite líquido, café, chá, vinho, destilado, energético e bebida vegetal,
+   que a TACO não traz. */
+['Água',0,0,0,0,'Bebidas',250],
+['Chá sem açúcar',1,0,0.3,0,'Bebidas',200],
+['Refrigerante zero',0,0,0,0,'Bebidas',350],
+['Água de coco',22,0,5.3,0,'Bebidas',200],
+['Bebida isotônica',26,0,6.4,0,'Bebidas',500],
+['Bebida de soja sem açúcar',34,2.6,3.9,0.9,'Bebidas',200],
+['Refrigerante de cola',34,0,8.7,0,'Bebidas',350],
+['Suco de laranja natural',39,1,11.5,0.1,'Bebidas',200],
+['Refrigerante de guaraná',39,0,10,0,'Bebidas',350],
+['Energético',47,0.5,11.3,0,'Bebidas',250],
+['Leite achocolatado',83,2.1,14.2,2.2,'Bebidas',200],
+['Vinho tinto',85,0.1,2.6,0,'Bebidas',150],
+['Destilado',231,0,0,0,'Bebidas',50],
 ['Ovo inteiro',143,12.6,0.7,9.5,'Proteína',50],
 ['Clara de ovo',52,10.9,0.7,0.2,'Proteína',35],
 ['Peito de frango grelhado',165,31,0,3.6,'Proteína',120],
@@ -1348,9 +1365,8 @@ const FOODS=[
 ['Mel',304,0.3,82,0,'Outro',10],
 ['Chocolate 70%',598,7.8,46,43,'Outro',20],
 ['Pipoca de panela',387,12,78,4,'Outro',30],
-['Café sem açúcar',2,0.1,0,0,'Outro',200],
-['Refrigerante',42,0,10.6,0,'Outro',350],
-['Cerveja',43,0.5,3.6,0,'Outro',350]
+['Café sem açúcar',2,0.1,0,0,'Bebidas',200],
+['Cerveja',43,0.5,3.6,0,'Bebidas',350]
 ].map(f=>({n:f[0],kcal:f[1],p:f[2],c:f[3],g:f[4],cat:f[5],d:f[6]}));
 
 /* =====================================================================
@@ -1749,7 +1765,107 @@ RECIPES.push(
   'Acrescente o tomate picado e cozinhe 8 minutos até virar molho.',
   'Salteie a abobrinha numa frigideira separada por 2 minutos apenas — mais que isso ela solta água e murcha.',
   'Sirva o molho sobre a abobrinha e finalize com manjericão.'],
- dica:'Jantar com 36 g de proteína e só 16 g de carboidrato: útil quando você treinou de manhã e quer fechar o dia mais leve.'}
+ dica:'Jantar com 36 g de proteína e só 16 g de carboidrato: útil quando você treinou de manhã e quer fechar o dia mais leve.'},
+
+/* ---------- acrescentadas depois: mais baratas, mais variadas
+   e com menos frango que as primeiras 45 ---------- */
+{id:'r46',nome:'Sardinha na torrada com tomate',ref:['lanche2','jantar'],t:7,kcal:336,p:24,c:25,g:14,rende:'2 torradas',
+ ing:[i('Sardinha em lata',80,'sardinha'),i('Pão integral (fatia)',50,'pão'),i('Tomate',60,'tomate'),i('Cebola',15,'cebola'),i('Azeite de oliva',3,'azeite')],
+ modo:['Escorra o óleo da sardinha e amasse com um garfo, tirando as espinhas maiores se preferir — as pequenas são moles e são cálcio.',
+  'Pique o tomate e a cebola bem miúdos e misture na sardinha com o azeite.',
+  'Torre as fatias de pão na frigideira seca ou na torradeira.',
+  'Cubra as torradas com a mistura e coma na hora, para o pão não murchar.'],
+ dica:'Sardinha em lata é a fonte mais barata de ômega-3 do mercado, e vem com o cálcio das espinhas.'},
+
+{id:'r47',nome:'Feijão preto com ovo e couve',ref:['almoco','jantar'],t:15,kcal:511,p:26,c:63,g:17,rende:'1 prato',
+ ing:[i('Feijão preto cozido',180,'feijão'),i('Arroz branco cozido',120,'arroz'),i('Ovo inteiro',100,'ovo'),i('Couve refogada',60,'couve'),i('Azeite de oliva',5,'azeite')],
+ modo:['Esquente o feijão preto numa panela pequena, com um fio de azeite e alho se tiver.',
+  'Corte a couve em tiras finas e refogue por 2 minutos, só até murchar e ficar verde-vivo.',
+  'Frite os ovos do jeito que você gosta, na mesma frigideira.',
+  'Monte o prato: arroz, feijão, couve e o ovo por cima.'],
+ dica:'Arroz com feijão é proteína completa: o que falta num, sobra no outro. É barato e já era certo antes de virar moda.'},
+
+{id:'r48',nome:'Grão-de-bico assado crocante',ref:['lanche2','ceia'],t:35,kcal:225,p:10,c:30,g:8,rende:'1 porção',
+ ing:[i('Grão-de-bico cozido',110,'grão-de-bico'),i('Azeite de oliva',5,'azeite')],
+ modo:['Escorra bem o grão-de-bico e seque com um pano ou papel-toalha — água é o que impede de ficar crocante.',
+  'Misture com o azeite, sal, páprica ou o tempero que tiver.',
+  'Espalhe numa assadeira em camada única, sem amontoar.',
+  'Asse a 200 °C por 30 a 35 minutos, sacudindo a assadeira na metade do tempo.'],
+ dica:'Substitui salgadinho de pacote com fibra e proteína no lugar de só amido e sal.'},
+
+{id:'r49',nome:'Escondidinho de mandioca com carne moída',ref:['almoco','jantar'],t:40,kcal:411,p:32,c:45,g:11,rende:'1 porção',
+ ing:[i('Mandioca cozida',130,'mandioca'),i('Patinho moído',90,'carne moída'),i('Cebola',25,'cebola'),i('Tomate',35,'tomate'),i('Leite desnatado',30,'leite'),i('Queijo mussarela',18,'queijo')],
+ modo:['Cozinhe a mandioca até desmanchar no garfo e amasse ainda quente com o leite, até virar um purê liso.',
+  'Refogue a cebola, junte a carne moída e deixe dourar de verdade antes de mexer muito.',
+  'Acrescente o tomate picado e cozinhe até secar o líquido.',
+  'Numa travessa, ponha a carne embaixo, o purê por cima e o queijo ralado por último.',
+  'Leve ao forno a 200 °C por 15 minutos, ou até o queijo dourar.'],
+ dica:'A mandioca precisa estar bem cozida: se ficar fibrosa, o purê não fica liso.'},
+
+{id:'r50',nome:'Cuscuz com sardinha e tomate',ref:['cafe','jantar'],t:12,kcal:390,p:23,c:42,g:14,rende:'1 porção',
+ ing:[i('Cuscuz de milho cozido',150,'cuscuz'),i('Sardinha em lata',80,'sardinha'),i('Tomate',60,'tomate'),i('Cebola',20,'cebola'),i('Azeite de oliva',4,'azeite')],
+ modo:['Hidrate a farinha de cuscuz com água e sal até ficar úmida, e deixe descansar 10 minutos.',
+  'Cozinhe na cuscuzeira por 5 minutos, ou no micro-ondas por 3.',
+  'Misture a sardinha amassada com tomate e cebola picados e o azeite.',
+  'Sirva o cuscuz com a mistura por cima, ainda quente.'],
+ dica:'Café da manhã do Nordeste que é mais barato e mais completo que pão com margarina.'},
+
+{id:'r51',nome:'Berinjela recheada com carne moída',ref:['jantar'],t:45,kcal:459,p:42,c:22,g:22,rende:'2 metades',
+ ing:[i('Berinjela assada',250,'berinjela'),i('Patinho moído',120,'carne moída'),i('Cebola',40,'cebola'),i('Tomate',70,'tomate'),i('Queijo mussarela',25,'queijo'),i('Azeite de oliva',5,'azeite')],
+ modo:['Corte a berinjela ao meio no comprimento e faça riscos na polpa com a faca, sem furar a casca.',
+  'Regue com azeite e asse a 200 °C por 20 minutos, até a polpa amolecer.',
+  'Tire parte da polpa com uma colher, pique e reserve.',
+  'Refogue cebola, carne e tomate, junte a polpa picada e cozinhe até secar.',
+  'Recheie as metades, cubra com queijo e volte ao forno por 10 minutos.'],
+ dica:'Salgar a berinjela e deixar 15 minutos antes de assar tira o amargo e o excesso de água.'},
+
+{id:'r52',nome:'Salada morna de lentilha com ovo',ref:['almoco','jantar'],t:15,kcal:439,p:30,c:45,g:16,rende:'1 prato',
+ ing:[i('Lentilha cozida',180,'lentilha'),i('Ovo inteiro',100,'ovo'),i('Cenoura crua',50,'cenoura'),i('Tomate',50,'tomate'),i('Alface',30,'alface'),i('Azeite de oliva',6,'azeite')],
+ modo:['Cozinhe os ovos por 9 minutos a partir da fervura, para a gema ficar firme mas não esfarelenta.',
+  'Esquente a lentilha cozida com um fio de azeite e sal.',
+  'Rale a cenoura e pique o tomate e a alface.',
+  'Misture tudo ainda morno e coroe com o ovo cortado ao meio.'],
+ dica:'Lentilha tem ferro, e o ferro vegetal é melhor absorvido com vitamina C — o tomate cru ali não é enfeite.'},
+
+{id:'r53',nome:'Panqueca de espinafre com ricota',ref:['almoco','jantar'],t:25,kcal:522,p:32,c:39,g:26,rende:'2 panquecas',
+ ing:[i('Ovo inteiro',100,'ovo'),i('Leite desnatado',100,'leite'),i('Aveia em flocos',40,'aveia'),i('Espinafre refogado',80,'espinafre'),i('Ricota',80,'ricota'),i('Azeite de oliva',5,'azeite')],
+ modo:['Bata o ovo, o leite e a aveia no liquidificador até virar uma massa lisa.',
+  'Faça as panquecas numa frigideira antiaderente untada, em fogo médio.',
+  'Refogue o espinafre com alho e misture com a ricota amassada.',
+  'Recheie, enrole e sirva. Dá para gratinar com um pouco de queijo se quiser.'],
+ dica:'Esprema o espinafre refogado antes de misturar: água no recheio desmancha a panqueca.'},
+
+{id:'r54',nome:'Arroz integral com brócolis e ovo',ref:['almoco','jantar'],t:18,kcal:436,p:20,c:51,g:18,rende:'1 prato',
+ ing:[i('Arroz integral cozido',150,'arroz integral'),i('Brócolis cozido',120,'brócolis'),i('Ovo inteiro',100,'ovo'),i('Azeite de oliva',6,'azeite'),i('Cebola',30,'cebola')],
+ modo:['Cozinhe o brócolis no vapor por 5 minutos — ele deve continuar verde e firme.',
+  'Doure a cebola no azeite, junte o arroz integral já cozido e mexa para soltar.',
+  'Acrescente o brócolis e misture rapidamente.',
+  'Faça os ovos mexidos à parte e junte no final, fora do fogo.'],
+ dica:'Brócolis cozido demais perde cor, textura e boa parte da vitamina C. Cinco minutos bastam.'},
+
+{id:'r55',nome:'Pasta de grão-de-bico com torrada',ref:['lanche1','lanche2'],t:10,kcal:364,p:15,c:50,g:12,rende:'1 porção',
+ ing:[i('Grão-de-bico cozido',100,'grão-de-bico'),i('Pão integral (fatia)',50,'pão'),i('Azeite de oliva',5,'azeite'),i('Pasta de amendoim',5,'pasta de amendoim')],
+ modo:['Bata o grão-de-bico cozido no processador ou amasse bem com o garfo.',
+  'Junte o azeite, a pasta de amendoim (no lugar do tahine), sal, alho e limão.',
+  'Bata até virar um creme; se ficar duro, pingue água gelada aos poucos.',
+  'Sirva com as torradas de pão integral.'],
+ dica:'É homus. O tahine tradicional é pasta de gergelim, mas pasta de amendoim resolve e custa um terço.'},
+
+{id:'r56',nome:'Tilápia com cuscuz e salada',ref:['almoco','jantar'],t:20,kcal:404,p:43,c:35,g:11,rende:'1 prato',
+ ing:[i('Tilápia grelhada',150,'tilápia'),i('Cuscuz de milho cozido',120,'cuscuz'),i('Tomate',60,'tomate'),i('Pepino',50,'pepino'),i('Alface',30,'alface'),i('Azeite de oliva',6,'azeite')],
+ modo:['Tempere a tilápia com sal, limão e pimenta e deixe 10 minutos.',
+  'Grelhe em frigideira bem quente, 3 minutos de cada lado, sem ficar mexendo.',
+  'Prepare o cuscuz hidratando a farinha e cozinhando por 5 minutos.',
+  'Monte com a salada de tomate, pepino e alface regada com azeite.'],
+ dica:'Peixe grelhado gruda quando a frigideira não está quente o bastante. Espere ela esquentar de verdade.'},
+
+{id:'r57',nome:'Vitamina de mamão com aveia e chia',ref:['cafe','lanche1'],t:5,kcal:321,p:13,c:56,g:6,rende:'1 copo grande',
+ ing:[i('Mamão',200,'mamão'),i('Leite desnatado',200,'leite'),i('Aveia em flocos',30,'aveia'),i('Chia',10,'chia')],
+ modo:['Ponha o mamão picado, o leite e a aveia no liquidificador.',
+  'Bata por 40 segundos, até não restar pedaço.',
+  'Junte a chia e mexa com a colher — batida, ela perde a textura.',
+  'Deixe 5 minutos descansando se quiser mais encorpado: a chia engrossa sozinha.'],
+ dica:'Mamão com aveia é a combinação mais barata que resolve intestino preso sem precisar de suplemento.'}
 );
 
 /* ---- grupos musculares, inferidos pelo nome do exercício (para o gráfico de volume) ---- */
@@ -2818,20 +2934,50 @@ function pontuar(r){
   if(des.some(d=>k.includes(d)||d.includes(k)||nm.includes(d)))tem++;else faltantes.push(ing.n)});
  return{tem,falta:r.ing.length-tem,pct:Math.round(tem/r.ing.length*100),faltantes};
 }
+/* Qual refeição cai antes e qual cai depois do treino de hoje. Usa a hora
+   de treino do perfil; sem ela, não dá para saber e o app não inventa. */
+function refeicoesDoTreino(d){
+ const se=sessaoDe(d||hoje());
+ if(!se.s||se.s.tipo!=='treino')return{treino:false,antes:'',depois:''};
+ const h=S.perfil.horaTreino;
+ if(!h)return{treino:true,antes:'',depois:''};
+ const min=t=>{const x=String(t).split(':');return Number(x[0])*60+Number(x[1]||0)};
+ const ht=min(h);
+ let antes='',depois='',dAntes=1e9,dDepois=1e9;
+ MEALS.forEach(function(r){
+  const dif=min(r.h)-ht;
+  if(dif<=0&&-dif<dAntes){dAntes=-dif;antes=r.k}
+  if(dif>0&&dif<dDepois){dDepois=dif;depois=r.k}
+ });
+ return{treino:true,antes:antes,depois:depois};
+}
 function gerarCardapio(semente){
  const m=metas(),out={};
  const sem=semente||Math.floor(Math.random()*9999);
+ const tr=refeicoesDoTreino();
+ /* ISSN: 0,25 g de proteína por quilo por refeição, ou 20 a 40 g. */
+ const pisoProt=Math.max(20,Math.min(40,Math.round(pesoAtual()*0.25)));
  MEALS.forEach((ref,ri)=>{
   const alvo=m.kcal*ref.pct;
   let cand=RECIPES.filter(r=>r.ref.includes(ref.k));
   if(!cand.length)cand=RECIPES;
+  const principal=ref.pct>=.20;
+  const perto=tr.treino&&(ref.k===tr.antes||ref.k===tr.depois);
   const scored=cand.map(r=>{const p=pontuar(r);
-   return{r,s:Math.abs(r.kcal-alvo)/alvo-(p?p.pct/260:0)-(S.favs.includes(r.id)?.15:0)}})
+   let s=Math.abs(r.kcal-alvo)/alvo-(p?p.pct/260:0)-(S.favs.includes(r.id)?.15:0);
+   /* refeição principal que bate o piso de proteína sobe na lista */
+   if(principal&&r.p>=pisoProt)s-=.12;
+   /* em volta do treino, carboidrato junto da proteína */
+   if(perto){
+    if(r.c>=30)s-=.14;
+    if(r.p>=pisoProt*.8)s-=.10;
+   }
+   return{r,s};})
    .sort((a,b)=>a.s-b.s);
   const janela=scored.slice(0,Math.min(4,scored.length));
   out[ref.k]=janela[(sem+ri*3)%janela.length].r.id;
  });
- return{sem,itens:out};
+ return{sem,itens:out,treino:tr};
 }
 
 /* =====================================================================
@@ -4378,6 +4524,21 @@ function stCardapio(){
    '<button class="btn gh xs" data-a="plano-semana">'+ic('cal')+' semana</button>'+
    '<button class="btn gh xs" data-a="novo-cardapio">'+ic('redo')+' outro</button></div>')+
    '<p class="tiny muted">Montado a partir das suas metas, das receitas favoritas e do que você marcou como disponível em casa.</p>'+
+   (function(){
+    const tr=c.treino||refeicoesDoTreino();
+    if(!tr.treino)return '<p class="xtiny muted" style="margin-top:8px;line-height:1.55">'+
+     'Hoje não tem treino, então o cardápio só segue as suas metas. '+selo('distribuicao','como escolhe')+'</p>';
+    const nm=k=>(MEALS.find(z=>z.k===k)||{}).n;
+    return '<p class="xtiny muted" style="margin-top:8px;line-height:1.55">'+
+     '<b>Hoje tem treino.</b> '+
+     (tr.antes||tr.depois
+      ?'A refeição antes'+(tr.antes?' ('+esc(nm(tr.antes))+')':'')+
+       ' e a depois'+(tr.depois?' ('+esc(nm(tr.depois))+')':'')+
+       ' foram escolhidas com carboidrato e proteína juntos.'
+      :'Preencha a hora do treino no Perfil e o app passa a escolher a refeição de antes e a de depois com carboidrato e proteína juntos.')+
+     ' O total de calorias não muda por treinar: isso já está no seu nível de atividade. '+
+     selo('distribuicao','de onde vem')+'</p>';
+   })()+
    (oculto('kcal')?''
     :'<div class="gauto" style="margin-top:11px">'+
      tile('Total',Math.round(tot.kcal),'de '+m.kcal+' kcal',Math.abs(tot.kcal-m.kcal)<m.kcal*.12?'var(--ok)':'var(--warn)')+
@@ -4538,6 +4699,85 @@ function stReceitas(){
  if(b)b.addEventListener('input',ev=>{S.ui.buscaRef=ev.target.value;S.ui.refTudo=false;const p=ev.target.selectionStart;
   stReceitas();const n2=$('#buscaRef');if(n2){n2.focus();n2.setSelectionRange(p,p)}});
 }
+/* Um vídeo por receita: [id do YouTube, título real, canal].
+   Cada id passou pelo oEmbed do YouTube antes de entrar aqui, então nenhum
+   deles é link morto. Título e canal são os que o YouTube devolveu, não
+   escritos à mão: se o vídeo sair do ar, o nome continua dizendo o que era. */
+const RECVID={
+ r1:['UP1Nn0Ok0-M','Omelete de Queijo com Tomate e Orégano','Vida Memorial'],
+ r2:['uPb6gDSjRFk','PANQUECA DE BANANA COM AVEIA FIT SEM AÇÚCAR SEM TRIGO SEM LEITE','Amor Pela Comida'],
+ r3:['8_XIICKUqfg','Torta de tapioca com frango desfiado','Amante de sabores'],
+ r4:['NHLaalmTUJE','Overnight Oats de banana e chocolate','Da Panela para o Coração'],
+ r5:['M9-eVN27reU','TORRADAS COM ABACATE E OVOS','Chefe João Paulo'],
+ r6:['zfWcHiALjeA','VITAMINA DE BANANA COM AVEIA','Chefe João Paulo'],
+ r7:['vnwFdazOzYY','CREPIOCA DE PRESUNTO E QUEIJO | LANCHE RÁPIDO, FÁCIL E ECONÔMICO','Nossa Cozinha'],
+ r8:['HZc93VGAZZ8','DESISTIR JAMAIS / EMAGRECER SEM SOFRER / MINGAU DE FARELO DE AVEIA COM PASTA DE AMENDOIM!','Claudia Carvalho'],
+ r9:['cYmIEPdF15U','Taça de Iogurte Grego com Morango, Amora e Granola #iogurtegrego #batavo #granola #saudável','Ateliê Doçuras Da Mamãe “VAMOS COZINHAR”'],
+ r10:['fdYQZDvoTT0','PATÊ DE OVO E PATÊ DE QUEIJO COTTAGE','Isaura nutri'],
+ r11:['mcTLa3GXp10','Frango com Brócolis Saudável e Saboroso | Receita Leve e Deliciosa!','Culinária Rústica • HannaH'],
+ r12:['NluObpKlq7w','Strogonoff light de frango com Iogurte','RECEITAS PRÁTICAS & FÁCEIS !!!'],
+ r13:['f_3q2Fr-WHA','Carne Moída com Abobrinha','Cristiane Silva Lima'],
+ r14:['HJ4NY6F1VR4','Filé de tilápia ao forno com purê de batata','DE MÃE PARA FILHAS'],
+ r15:['ehSk_XFBgqU','Macarrão com atum e tomate','O que tem na panela?'],
+ r16:['K-d2pvUNIYM','Escondidinho de Frango com Mandioquinha.','Receitas com Panda'],
+ r17:['E-OYlsOq_-g','omelete recheado com frango desfiado','RECEITAS DA LITA'],
+ r18:['X1t4KRD0yXo','COMO FAZER SALADA DE GRÃO-DE-BICO COM ATUM','ELIZABETE SABOIA'],
+ r19:['Ip1Z-d9cSGY','Risoto de Quinoa - Você Bonita (16/08/16)','Gazeta Lab'],
+ r20:['emkO90eqqPk','FRANGO XADREZ | Receitas rápidas e fáceis','Comida e Receitas'],
+ r21:['L9JKbeR_qW8','*SOPA LEGUMES COM FRANGO DESFIADO*','Menu Gourmand'],
+ r22:['bVPVkFrFtyQ','Hambúrguer Caseiro de PATINHO','Vinicius Piffardini'],
+ r23:['zZn-Skkvkt0','Wrap Integral de Frango Receita Fit Fácil, Saudável e Pronta em 15 Minutos','Cozinha Inteligente Fit'],
+ r24:['uc3EgG8ppIs','ALMOÇO DE HOJE !! BIFE ,ARROZ,FEIJÃO,BRÓCOLIS E SALADA','Angelica Angel'],
+ r25:['mHiKrMZkorE','MARMITA DO DIA | Preparando batata com cenoura cozida e frango refogado com ovo','Hikari Cooking'],
+ r26:['rpCj_bPUrCg','Sanduíche natural de atum.Receita rápida. #sanduíche #receitarapida','Cida Cruz'],
+ r27:['4CvEj0yS0Wc','Receita Saudável de Ovo Cozido Para Jantar','Canal Eduardo Cruz - Corpo Saudável'],
+ r28:['QF55m1e1pLg','Superfood de Iogurte Grego com Pasta Integral de Amendoim','Chef Renata Porto - Cozinha Fácil'],
+ r29:['XYz55KlrDy4','Bruschetta saudável com queijo cottage e shimeji trufado','Mauricio Dias Correa'],
+ r30:['CyAOJLJyLxo','Como fazer Suco Detox de Couve com Abacaxi? Receita simples e rápida','Quilinhos Off'],
+ r31:['prj6849jIBs','Como fazer pipoca na panela comum - Receitas em segundos | #0046','Receitas em Segundos'],
+ r32:['yhkRZBiQ6WE','OMELETE DE FORNO COM LEGUMES │POR BIA FREITAS','Cozinha comigo - Por Bia Freitas'],
+ r33:['s55PtI32QsA','Receita de panqueca fit com carne moida | COMPARTILHEM','Receita de Panqueca de Hoje'],
+ r34:['lVyvZRyvsQU','Receita: arroz de cúrcuma com frango ao curry | SEMPRE FELIZ','Rede Super de Televisão'],
+ r35:['Jly7t3p3DX0','COMO FAZER OMELETE DE ATUM ingredientes todo mundo tem fácil e barato e vale pena fazer','Canal Mucado de Trem'],
+ r36:['SRKFk-_zhPA','R$3,50 CADA ALMOÇO! MARMITA FIT PARA SEMANA! Batata e Frango | Receitas Fit Fáceis para Emagrecer!','Fast & Fit Brasil'],
+ r37:['Aqy-Jflog-4','ARROZ COM LENTILHA','Receitas da Catiene'],
+ r38:['sj-Hbc2tFis','PURÊ DE MANDIOCA COM BIFE ACEBOLADO','Esequiel Buíque'],
+ r39:['iH5Aj_q51BQ','MINHA RECEITA FAVORITA DE PEIXE ASSADO COM LEGUMES - Daniel Cady','Daniel Cady'],
+ r40:['pxTFrhPd8Tk','CUSCUZ NORDESTINO RECHEADO C/ QUEIJO!!!','Tárcia EC3'],
+ r41:['bHONigPH1UU','PANQUECA DE AVEIA COM FRANGO FITNESS','RECEITAS GOSTOSAS'],
+ r42:['Yx2oTmwhvkE','Creme de Abóbora com Frango Desfiado','Nessa por aí'],
+ r43:['0ZT7s0BxjzQ','Salpicão de Frango sem maionese com iogurte','Gleyce no Japão'],
+ r44:['5Dk63oW9Z6k','Bolinho de frango com batata doce Pré-treino [Na Cozinha com a Caloi]','Caloi'],
+ r45:['5dCsOblhe-w','ESPAGUETE DE ABOBRINHA E CENOURA COM MOLHO DE CARNE MOÍDA !!!','Receitinhas saudáveis da Néia'],
+ r46:['Y0eJV_wimhU','Com 2 latas de sardinha, nunca mais compro patê! Aperitivo caseiro pronto em 10 minutos','A Cozinha da Vovó'],
+ r47:['7yRoO-awK1w','Linguiça,ovos,couve e arroz feijão almoço de hj','Cantinho da Malu'],
+ r48:['jPvkttA6iMc','Grão-de-bico crocante | Receitas Guia da Cozinha','Guia da Cozinha'],
+ r49:['VeBO6ux4h1Q','Como fazer Escondidinho de Carne Moída Com Mandioca ! Vale a pena conferir!','Receitas Tube'],
+ r50:['xHe3fmrOlds','Cuscuz com sardinha. MUITO BOM','Receitas com Núbia'],
+ r51:['MFE1_vTg7k4','Receita de BERINJELA recheada com CARNE MOIDA e QUEIJO/Simples, FÁCIL, RAPIDA, ECONOMICA e DELICIOSA','Doce Sabor Mãe e Filha'],
+ r52:['_eBDIRuJ4TY','Receitas para o Ano Novo - Salada de Lentilha - Maionese com Maionese Caseira e Molho de Ervas','Nutri Fer'],
+ r53:['ywtlCVTJ-JY','panqueca fit recheio de espinafre com ricota','Receitinhas Da vovó ines'],
+ r54:['IlABYSq7uWA','Almoço Fitt grão de bico arroz integral com brócolis milho vinagrete aipim batata doce ovo','Talita receitas fitt'],
+ r55:['kegctC3zIPQ','ECONOMIZE FAZENDO SUA PASTA DE GRÃO DE BICO PROTEICA (HOMUS) E SAUDÁVEL EM CASA','Silvana Costa - Delícias da Sil'],
+ r56:['heS8mrmnwUU','Cuscuz com Tilápia Frita + Café | Janta da Noite | Seve Silva','Seve Silva'],
+ r57:['97N5eQhw4cM','Receita de vitamina de mamão com aveia, leite e mel rápida e fácil','LENHADOR']
+};
+/* O video da receita. Toca aqui dentro; se o canal nao deixar reproduzir
+   fora do YouTube, o link de baixo resolve em um toque. */
+function blocoVideoReceita(r){
+ const v=RECVID[r.id];
+ if(!v)return '<div class="lbl" style="margin-bottom:7px">Ver alguém fazendo</div>'+
+  '<div style="margin-bottom:15px">'+
+   vidLink(r.nome,r.nome+' receita como fazer','Buscar esta receita no YouTube')+'</div>';
+ return '<div class="lbl" style="margin-bottom:7px">Ver alguém fazendo</div>'+
+  '<div style="margin-bottom:15px">'+
+   cardVideo(v[1],v[0])+
+   '<p class="xtiny muted" style="margin-top:7px;line-height:1.5">Canal: '+esc(v[2])+'. '+
+   'Não é do app, e o app não ganha nada com ele. '+
+   '<a href="https://www.youtube.com/watch?v='+esc(v[0])+'" target="_blank" rel="noopener">abrir no YouTube</a>'+
+   ' · <a href="'+esc(yt(r.nome+' receita'))+'" target="_blank" rel="noopener">ver outras</a></p>'+
+  '</div>';
+}
 function sheetReceita(id){
  const r=RECIPES.find(x=>x.id===id);if(!r)return;
  const s=pontuar(r),fav=S.favs.includes(r.id);
@@ -4557,9 +4797,7 @@ function sheetReceita(id){
    '<div class="grow tiny" style="line-height:1.55">'+esc(p)+'</div></div>').join('')+'</div>'+
   '<p class="tiny" style="background:var(--surface-2);border-radius:11px;padding:11px;margin-bottom:15px;line-height:1.5">'+
    '<b>Dica:</b> '+esc(r.dica)+'</p>'+
-  '<div class="lbl" style="margin-bottom:7px">Ver alguém fazendo</div>'+
-  '<div style="margin-bottom:15px">'+
-   vidLink(r.nome,r.nome+' receita como fazer','Busca no YouTube por esta receita')+'</div>'+
+  blocoVideoReceita(r)+
   '<div class="row" style="gap:6px;margin-bottom:13px">'+
    '<button class="btn gh sm grow" data-a="fav" data-id="'+r.id+'">'+ic('star')+(fav?' Remover dos favoritos':' Favoritar')+'</button>'+
    (s&&s.falta?'<button class="btn gh sm" data-a="add-compras" data-v="'+esc(s.faltantes.join('|'))+'">'+ic('cart')+'</button>':'')+'</div>'+
@@ -4852,14 +5090,23 @@ const CAFEINA=[
  ['Chá de camomila, erva-doce, hortelã','1 xícara','não tem']
 ];
 const BEBIDAS=[
- {n:'Água',e:'ok',d:'Não tem caloria, não tem açúcar e é a única que o corpo pede de verdade. O resto é escolha.'},
- {n:'Café e chá sem açúcar',e:'ok',d:'Dentro do limite de cafeína, sem problema. Contam para a hidratação do dia, ao contrário do que se diz por aí.'},
- {n:'Leite e bebida vegetal',e:'ok',d:'Leite tem proteína de verdade. Bebida vegetal quase não tem, a não ser a de soja — leia o rótulo antes de trocar.'},
- {n:'Suco natural',e:'meio',d:'Tem vitamina, mas perde a fibra da fruta e o açúcar entra rápido. Comer a fruta inteira é melhor que beber ela.'},
- {n:'Suco de caixinha e refrigerante',e:'nao',d:'É açúcar líquido. Uma lata tem perto de 35 g, que é o dia inteiro de açúcar recomendado numa bebida só.'},
- {n:'Isotônico',e:'meio',d:'Feito para quem sua muito por mais de uma hora. Para treino normal de academia, é refrigerante com sal.'},
- {n:'Energético',e:'nao',d:'Cafeína em dose alta com muito açúcar. O problema não é a cafeína isolada — é a quantidade junto do resto do dia.'},
- {n:'Álcool',e:'meio',d:'Sete calorias por grama, que não saciam nada, e piora o sono mesmo quando dá sono. Não existe dose que melhore a saúde.'}
+ {n:'Água',e:'ok',d:'Zero caloria e zero açúcar. É a única que o corpo pede de verdade; o resto é escolha.'},
+ {n:'Café e chá sem açúcar',e:'ok',ev:'cafeina',
+  d:'Dentro do limite de cafeína, sem problema. Contam para a hidratação do dia, ao contrário do que se diz por aí.'},
+ {n:'Leite e bebida vegetal',e:'ok',
+  d:'Leite integral tem 61 kcal por 100 ml e proteína de verdade. Bebida de amêndoa quase não tem proteína; a de soja tem. Leia o rótulo antes de trocar.'},
+ {n:'Suco natural',e:'meio',ev:'suco',
+  d:'Perde a fibra da fruta, e o açúcar entra mais rápido. Em ensaio aleatorizado não aumentou peso; em coorte, aumentou. Comer a fruta inteira continua sendo melhor.'},
+ {n:'Refrigerante e suco de caixinha',e:'nao',ev:'acucar_liquido',
+  d:'Uma lata de cola tem cerca de 30 g de açúcar. Caloria líquida sacia pouco: o corpo não desconta no resto do dia.'},
+ {n:'Refrigerante zero e adoçante',e:'meio',ev:'adocante',
+  d:'Para a conta de caloria é melhor que a versão com açúcar. Como estratégia para emagrecer, a OMS desaconselha — mas com evidência que ela mesma classificou como de certeza baixa.'},
+ {n:'Isotônico',e:'meio',
+  d:'Feito para quem sua muito por mais de uma hora. Para treino comum de academia, é água com açúcar e sal.'},
+ {n:'Energético',e:'nao',ev:'cafeina',
+  d:'Cafeína alta junto de muito açúcar. O problema não é a cafeína isolada: é a dose somada ao resto do dia.'},
+ {n:'Álcool',e:'nao',ev:'alcool',
+  d:'Sete calorias por grama que não saciam, e piora a parte profunda do sono mesmo quando dá sono. Não se conhece dose livre de risco.'}
 ];
 function stBebidas(){
  const m=metas(),d=hoje(),x=dia(d),a=x.agua||0;
@@ -4872,8 +5119,13 @@ function stBebidas(){
    '<div class="g2" style="margin-top:12px">'+
     tile('Água hoje',(a/1000).toFixed(1)+'L','de '+(m.agua/1000).toFixed(1)+'L','var(--water)')+
     tile('Cafeína','até 400 mg','por dia, adulto')+'</div>'+
-   '<button class="btn gh bl sm" style="margin-top:11px" data-a="go-sub" data-tab="nutri" data-st="agua">'+
-   ic('drop')+' Registrar água</button></div>'+
+   '<div class="row" style="gap:6px;margin-top:11px">'+
+    '<button class="btn gh sm grow" data-a="go-sub" data-tab="nutri" data-st="agua">'+
+    ic('drop')+' Registrar água</button>'+
+    '<button class="btn sm grow" data-a="add-food" data-m="lanche2">'+
+    ic('plus')+' Registrar bebida</button></div>'+
+   '<p class="xtiny muted" style="margin-top:9px;line-height:1.55">As bebidas entram na conta do dia como qualquer alimento: '+
+   'busque pelo nome em qualquer refeição.</p></div>'+
 
   '<div class="card">'+chTtl('flame','Quanta cafeína tem em cada uma',selo('cafeina','de onde vem'))+
    '<p class="tiny muted" style="line-height:1.65;margin-bottom:11px">São faixas, não valores exatos: muda com o grão, '+
@@ -4893,15 +5145,18 @@ function stBebidas(){
    '<div class="stack" style="gap:10px">'+BEBIDAS.map(function(b){
     const sl=sel(b.e);
     return '<div class="row top" style="gap:9px">'+ic(sl[0],'color:'+sl[1]+';font-size:15px;margin-top:2px;flex:none')+
-     '<div class="grow"><div style="font-weight:700;font-size:13.5px">'+esc(b.n)+'</div>'+
+     '<div class="grow"><div style="font-weight:700;font-size:13.5px">'+esc(b.n)+
+      (b.ev?' '+selo(b.ev,'de onde vem'):'')+'</div>'+
      '<div class="tiny muted" style="line-height:1.55;margin-top:2px">'+esc(b.d)+'</div></div></div>';
    }).join('')+'</div></div>'+
 
   dobra('beb:alcool','Álcool, sem sermão','info',
    'o que ele faz com treino, sono e as contas do app',function(){
-   return '<div class="card"><p class="tiny muted" style="line-height:1.7">'+
-    'Álcool tem 7 kcal por grama e não sacia: uma noite comum passa fácil de 500 kcal sem nenhuma comida junto. '+
-    'Ele também atrapalha o sono — dá sono, mas quebra a parte profunda da noite, que é onde o corpo se recupera do treino.</p>'+
+   return '<div class="card">'+
+    '<p class="tiny muted" style="line-height:1.7">Álcool tem 7 kcal por grama e não sacia: uma noite comum passa fácil '+
+    'de 500 kcal sem nenhuma comida junto. Ele também quebra a parte profunda do sono, que é onde o corpo se recupera do treino.</p>'+
+    '<p class="tiny muted" style="line-height:1.7;margin-top:10px">Sobre risco: a OMS afirmou em 2023 que não se conhece '+
+    'dose livre de efeito, e que para câncer não existe nível seguro. '+selo('alcool','o que isso quer dizer')+'</p>'+
     '<p class="tiny muted" style="line-height:1.7;margin-top:10px">O app não registra álcool nem conta dose, e não vai te cobrar. '+
     'Se você faz terapia hormonal, fígado já é uma das coisas que o exame de rotina acompanha: '+
     'quem prescreve é quem deve saber do seu consumo, e isso é conversa de consulta, não de aplicativo.</p></div>';
@@ -8106,8 +8361,28 @@ const FONTES={
   q:'coffee consumption health umbrella review meta-analyses multiple health outcomes BMJ'},
  cafeina_fda:{r:'Limite de 400 mg de cafeína por dia para adultos saudáveis, e revisão das evidências sobre consumo excessivo',
   u:'https://odphp.health.gov/sites/default/files/2019-09/Appendix-E-2.40.pdf'},
+ issn_prot:{r:'Position stand da International Society of Sports Nutrition sobre proteína e exercício: total diário, dose por refeição e distribuição ao longo do dia',
+  u:'https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5477153/'},
+ issn_timing:{r:'Position stand da International Society of Sports Nutrition sobre momento de ingestão: carboidrato e proteína em volta do treino',
+  u:'https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5596471/'},
  cafeina_faixas:{r:'FDA, para consumidor: as faixas de cafeína por porção em café, chá, refrigerante e energético, e por que o rótulo não traz',
   u:'https://www.fda.gov/consumers/consumer-updates/spilling-beans-how-much-caffeine-too-much'},
+ ssb_ajcn22:{r:'Revisão sistemática e meta-análise de coortes prospectivas e ensaios aleatorizados sobre bebida açucarada e ganho de peso em crianças e adultos. American Journal of Clinical Nutrition, 2022',
+  u:'https://ajcn.nutrition.org/article/S0002-9165(22)10529-0/fulltext'},
+ ssb_oms:{r:'Comentário da OMS sobre açúcares livres, em boa parte vindos de bebida açucarada, e peso corporal em adultos',
+  u:'https://www.who.int/tools/elena/commentary/ssbs-adult-weight'},
+ suco_ajm25:{r:'Meta-análise de 14 coortes prospectivas sobre suco de fruta e diabetes tipo 2, separando suco 100% de néctar e refresco. American Journal of Medicine, 2025',
+  u:'https://www.amjmed.com/article/S0002-9343(25)00303-1/abstract'},
+ suco_guarda:{r:'Revisão guarda-chuva de revisões sistemáticas com meta-análise sobre os efeitos de beber suco 100% fruta. Nutrition Reviews',
+  u:'https://academic.oup.com/nutritionreviews/article/83/2/e722/7659479'},
+ adocante_oms:{r:'Diretriz da OMS de 2023 sobre adoçantes não calóricos: recomendação condicional, com certeza da evidência classificada como baixa',
+  u:'https://www.who.int/publications/i/item/9789240073616'},
+ adocante_critica:{r:'Crítica publicada à diretriz da OMS sobre adoçantes, argumentando que ela deu pouco peso aos ensaios aleatorizados',
+  u:'https://www.ncbi.nlm.nih.gov/pmc/articles/PMC10630128/'},
+ alcool_oms:{r:'Declaração da OMS de janeiro de 2023, publicada na Lancet Public Health: não se conhece dose de álcool livre de efeito sobre a saúde',
+  u:'https://www.who.int/europe/news/item/04-01-2023-no-level-of-alcohol-consumption-is-safe-for-our-health'},
+ alcool_cancer:{r:'Ficha da OMS sobre álcool e câncer, incluindo a parcela de casos que aparece em quem não bebe pesado',
+  u:'https://www.who.int/europe/news-room/fact-sheets/item/alcohol-and-cancer'},
  nature23:{r:'Revisão sistemática de 46 artigos sobre funcionamento psicossocial depois da hormonização afirmativa. Nature Human Behaviour, 2023',
   u:'https://www.nature.com/articles/s41562-023-01605-w'},
  jes21:{r:'Revisão sistemática sobre hormonização, saúde mental e qualidade de vida em pessoas trans. Journal of the Endocrine Society, 2021',
@@ -8242,6 +8517,31 @@ const EVID=[
   por:'A maior parte do que se diz sobre comida e humor vem de estudo observacional, que mostra as coisas andando juntas. O ensaio SMILES é diferente: ele sorteou pessoas com depressão moderada a grave entre uma intervenção alimentar de padrão mediterrâneo e um grupo de apoio social, por 12 semanas, e quem mudou a alimentação teve queda maior dos sintomas. É um ensaio pequeno, de doze semanas, com avaliação cega apenas parcial. No PREDIMED, que não foi desenhado para depressão, o grupo da dieta mediterrânea com castanhas teve risco menor, mas sem significância estatística. Uma meta-análise de 2025 reuniu as intervenções alimentares em depressão e ansiedade.',
   no:'É o motivo de o app não tratar comida só como caloria. O padrão que foi testado é o de sempre: mais legume, fruta, grão integral, feijão, peixe e azeite; menos ultraprocessado e doce. Nenhuma receita daqui promete tratar depressão, e isso está escrito — mas a direção do cardápio não é estética, é essa.',
   fontes:['smiles','predimed_dep','dieta_meta']},
+ {id:'distribuicao',area:'Comida',af:'O total do dia manda; onde a proteína cai no dia é ajuste fino',forca:'media',
+  por:'O position stand da ISSN sobre proteína coloca o total diário em 1,4 a 2,0 g por quilo como o que de fato constrói e mantém músculo, e trata a distribuição como fator secundário: cerca de 0,25 g por quilo por refeição, ou 20 a 40 g, a cada 3 ou 4 horas. O stand sobre momento de ingestão acrescenta que carboidrato com proteína em volta do treino ajuda força e composição corporal, e que proteína de boa qualidade até cerca de 2 horas depois do treino aumenta a síntese proteica.',
+  no:'O cardápio sugerido passa a olhar o seu treino do dia: a refeição antes e a depois preferem receita com carboidrato e proteína juntos, e as refeições principais preferem as que batem o piso de proteína por refeição. O total de calorias do dia não muda por causa do treino — isso já está no fator de atividade do perfil.',
+  masnao:'Os próprios stands dizem que o efeito da distribuição e do momento é MENOR que o do total diário. Se você bate a proteína do dia, a hora em que ela entrou muda pouco. Nada aqui justifica correr para tomar shake em trinta minutos: essa janela estreita não se sustentou nos estudos.',
+  fontes:['issn_prot','issn_timing']},
+ {id:'acucar_liquido',area:'Bebidas',af:'Caloria líquida com açúcar engorda mais que a mesma caloria mastigada',forca:'media',
+  por:'Uma revisão sistemática de 2022 juntou coortes prospectivas e ensaios aleatorizados, em crianças e adultos, e achou efeito sobre o peso de cerca de 0,83 kg, com dose-resposta: quanto mais, pior. Uma análise encomendada pela OMS chegou a 0,75 kg, com intervalo de confiança de 0,30 a 1,19 kg. Cada porção a mais por dia aparece associada a 0,07 kg/m² de IMC. A explicação mais aceita é que líquido sacia pouco e o corpo não desconta no resto do dia.',
+  no:'A tela de bebidas separa o que tem açúcar do que não tem, e diz quanto açúcar tem numa lata. O app não proíbe nada: só para de tratar bebida como se fosse água.',
+  masnao:'A parte da saciedade vem quase toda de estudo curto, de uma refeição só. Um protocolo registrado diz com todas as letras que não dá para extrapolar isso para ganho de peso no longo prazo. E falta dado mostrando que trocar por versão sem caloria evita o ganho.',
+  fontes:['ssb_ajcn22','ssb_oms']},
+ {id:'suco',area:'Bebidas',af:'Suco 100% fruta não é refrigerante, mas também não é fruta',forca:'fraca',
+  por:'Uma meta-análise de 2025 com 14 coortes não achou ligação significativa entre suco 100% fruta e diabetes tipo 2, enquanto o suco que não é 100% apareceu com risco maior (RR 1,15, intervalo de 1,03 a 1,28). Em ensaios aleatorizados, suco 100% não aumentou peso comparado a placebo. Em coortes, aumentou.',
+  no:'O app separa suco natural de suco de caixinha, em vez de jogar os dois no mesmo saco, e sugere comer a fruta inteira — que é onde está a fibra.',
+  masnao:'Coorte e ensaio discordam, e ninguém resolveu isso. Uma revisão guarda-chuva ainda achou associação desfavorável para suco 100% e diabetes (RR 1,07). É por isso que aqui está marcado como evidência limitada, e não como fato.',
+  fontes:['suco_ajm25','suco_guarda']},
+ {id:'adocante',area:'Bebidas',af:'Adoçante não é atalho para emagrecer — mas a evidência contra ele é fraca',forca:'fraca',
+  por:'A OMS recomendou em 2023 não usar adoçante não calórico para controle de peso. É importante ler o que essa recomendação é: ela é CONDICIONAL, e a própria OMS classificou a certeza da evidência como baixa. Ensaios curtos mostraram perda pequena de peso, que não se sustentou. Estudos observacionais longos ligaram consumo maior a ganho de peso.',
+  no:'O app não manda cortar nem manda usar. Refrigerante zero aparece como o que é: melhor que a versão com açúcar para a conta de caloria, e sem promessa de emagrecimento.',
+  masnao:'O achado observacional pode ser causalidade reversa: quem já engordou é quem troca açúcar por adoçante. Críticos publicados argumentam que a OMS deu pouco peso aos ensaios aleatorizados, que apontam para benefício quando o adoçante substitui o açúcar.',
+  fontes:['adocante_oms','adocante_critica']},
+ {id:'alcool',area:'Bebidas',af:'Não existe dose de álcool conhecida como livre de risco',forca:'media',
+  por:'Em janeiro de 2023 a OMS afirmou, em declaração na Lancet Public Health, que não se conhece quantidade de álcool livre de efeito sobre a saúde, e que para câncer não existe nível seguro. Cerca de metade dos cânceres atribuíveis ao álcool na Europa aparece em quem não bebe pesado.',
+  no:'A tela diz isso e para por aí. O app não registra dose, não conta e não cobra: cobrança não ajuda ninguém a beber menos.',
+  masnao:'O risco absoluto em consumo leve é pequeno, e há quem argumente que a qualidade de vida compensa. O que a OMS aponta é outra coisa: o suposto benefício cardiovascular depende de com quem você compara — "quem bebe moderado" costuma ser comparado com abstêmios que são ex-bebedores ou já estão doentes, o que faz a bebida leve parecer protetora.',
+  fontes:['alcool_oms','alcool_cancer']},
  {id:'cafeina',area:'Comida',af:'Até 400 mg de cafeína por dia, e longe da hora de dormir',forca:'media',
   por:'Quatrocentos miligramas por dia é o limite citado como consumo moderado para adulto saudável — mais ou menos quatro xícaras de café coado. Acima disso a evidência sobre o excesso é limitada, e não existe limite definido para adolescentes. Numa meta-análise de estudos controlados, a cafeína cortou cerca de 45 minutos do tempo total de sono. Em outra, de 2024, aumentou pontuações de ansiedade em pessoas saudáveis, com efeito bem mais forte em quem tem transtorno de pânico. Em ensaios aleatorizados, suplemento de cafeína subiu pouco a pressão: perto de 1,9 mmHg na sistólica. Sobre o café em si, uma revisão guarda-chuva de meta-análises concluiu que ele é seguro no consumo usual, com as maiores reduções de risco entre três e quatro xícaras — mas isso é associação, não causa.',
   no:'A tela de bebidas diz o limite e diz as duas coisas que mais aparecem na prática: cafeína à tarde tira sono de verdade, e quem tem ansiedade costuma sentir mais. Não existe recomendação de cortar café aqui — existe a conta para você decidir.',
@@ -8372,6 +8672,8 @@ function fichaEvid(v,semTitulo){
    (semTitulo?'':'<h3 style="font-size:15.5px;line-height:1.3;font-weight:700;margin:0">'+esc(v.af)+'</h3>')+'</div>'+
   '<div class="lbl">O que os estudos dizem</div>'+
   '<p class="tiny" style="line-height:1.65;margin:4px 0 11px">'+esc(v.por)+'</p>'+
+  (v.masnao?'<div class="lbl">O que isto não prova</div>'+
+    '<p class="tiny" style="line-height:1.65;margin:4px 0 11px;color:var(--ink-2)">'+esc(v.masnao)+'</p>':'')+
   '<div class="lbl">O que o app faz com isso</div>'+
   '<p class="tiny" style="line-height:1.65;margin:4px 0 0">'+esc(v.no)+'</p>'+
   (v.fontes.length
