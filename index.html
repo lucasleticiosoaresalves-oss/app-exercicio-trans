@@ -408,6 +408,12 @@ button.ex:active{transform:scale(.995)}
 .guia-h:hover{opacity:.75}
 /* Os blocos de Cuidados: a tela inicial da aba. Cada um e um tema inteiro,
    nao uma sub-aba solta. */
+/* A divisa entre o formulario e o texto do Perfil. */
+.pfsep{display:flex;align-items:center;gap:9px;margin:26px 2px 2px;color:var(--ink-3)}
+.pfsep .ic{font-size:16px;flex:none}
+.pfsep span{font-family:var(--f-d);font-weight:700;font-size:12px;letter-spacing:.04em;
+  text-transform:uppercase;white-space:nowrap}
+.pfsep::after{content:"";height:1px;background:var(--line);flex:1}
 .hubc{display:flex;align-items:center;gap:13px;width:100%;text-align:left;
   background:var(--surface);border:1px solid var(--line);border-radius:var(--r);
   padding:15px;box-shadow:var(--sh-1),var(--glow);
@@ -6019,9 +6025,8 @@ function cardDesligar(){
   ['Contador do topo',modoContador()==='off'?'desligado':(modoContador()==='mes'?'dias no mês':'dias seguidos')],
   ['Nome e cara do app',p.disfarce?'disfarçado de '+p.disfarce:'Norte, normal']
  ];
- return '<div class="card">'+chTtl('check','O que você não quer ver')+
-  '<p class="tiny muted" style="line-height:1.7">Quase tudo neste app pode ser desligado, e desligar não quebra nada: '+
-  'o registro continua acontecendo por baixo, só não volta para a tela. Isto aqui é o resumo do que está ligado agora.</p>'+
+ return '<div class="card">'+chTtl('check','Resumo do que está ligado')+
+  '<p class="tiny muted" style="line-height:1.7">Desligar não quebra nada: o registro continua por baixo, só não volta para a tela.</p>'+
   '<div class="stack" style="gap:0;margin-top:11px">'+linhas.map(function(l){
    return '<div class="li"><div class="grow"><div class="ttl">'+esc(l[0])+'</div></div>'+
     '<span class="tag n">'+esc(l[1])+'</span></div>';
@@ -6629,7 +6634,7 @@ function blocoAvisos(onde){
  return lista.map(cardAviso).join('');
 }
 
-const EMAIL_CONTATO='laise.soares321@gmail.com';
+const EMAIL_CONTATO='sendmenoflowers@duck.com';
 
 /* =====================================================================
    PROFISSIONAIS
@@ -7643,7 +7648,7 @@ function pf_tema(){
 }
 function pf_guardar(){
  const p=S.perfil,m=metas();
- return   '<div class="card">'+chTtl('info','Seus dados')+
+ return   '<div class="card">'+chTtl('info','Onde os seus dados ficam')+
    '<p class="tiny muted">Seus registros ficam neste navegador, neste aparelho. Não existe servidor nem conta, '+
     'e nada do que você registra é enviado para lugar nenhum. '+
     'Eles não somem ao fechar a aba, mas também não viajam sozinhos para outro celular: para isso use '+
@@ -7838,32 +7843,49 @@ function pf_avisoFinal(){
 }
 /* =====================================================================
    PERFIL
-   Eram 26 cartões e 18 telas de rolagem numa tela só — o app cresceu e
-   esta aqui foi a que mais sofreu. Agora são cinco seções, com a mesma
-   faixa de sub-abas que o resto do app usa, e cada uma cabe na mão.
-   O conteúdo é o mesmo: só parou de vir todo de uma vez.
+   Uma página só, na ordem de preencher.
+   Primeiro tudo que tem campo, escolha ou chave para marcar; depois o
+   texto. Era em cinco sub-abas, e isso escondia metade do formulário:
+   quem abria a primeira não tinha como saber que havia mais quatro.
    ===================================================================== */
-const PF_SECOES=[
- ['voce','Você','user','nome, pronome, identidade, aparência do app'],
- ['conta','Como calcula','target','referência da fórmula, metas e ajuste na mão'],
- ['treino','Treino','dumb','nível, ritmo, limitações e plano de profissional'],
- ['ver','O que você vê','face','números escondidos, contador, avisos e lembretes'],
- ['dados','Dados e senha','check','senha, exportar, privacidade e as fontes']
+/* Tem o que preencher: campo de digitar, escolha para tocar ou chave para
+   ligar. Esta é a ordem em que as coisas fazem sentido serem preenchidas. */
+const PF_FORM=[
+ pf_dados,      /* nome, idade, altura, peso, meta, atividade, horários */
+ pf_identidade, /* pronome e identidade */
+ pf_refCalc,    /* qual referência entra na conta */
+ pf_metas,      /* metas calculadas e ajuste na mão */
+ pf_metaCorpo,  /* que corpo você quer */
+ pf_transicao,  /* início da terapia hormonal */
+ pf_nivel,
+ pf_ritmo,
+ pf_limites,
+ pf_externo,
+ pf_diaCheio,
+ pf_ocultar,
+ pf_contador,
+ pf_lembAgua,
+ pf_lembretes,
+ pf_tema,
+ pf_disfarce,
+ pf_senha
 ];
-function pfSecao(){
- const s=S.ui.sub.perfil;
- return PF_SECOES.some(x=>x[0]===s)?s:'voce';
-}
+/* Não se preenche: é o que o app faz com o que você preencheu, e o que ele
+   avisa. Fica embaixo, fora do caminho de quem está montando o perfil. */
+const PF_LEITURA=[
+ pf_guardar,    /* exportar e apagar */
+ pf_avisosAqui,
+ pf_avisosDano,
+ pf_desligar,
+ pf_ciencia,
+ pf_oQueE,
+ pf_avisoFinal
+];
 function renderPerfil(){
- const s=pfSecao();
- const atual=PF_SECOES.find(x=>x[0]===s);
  $('#perfilBox').innerHTML=
-  '<div class="subtabs" style="margin-bottom:2px">'+PF_SECOES.map(function(x){
-   return '<button class="subtab'+(x[0]===s?' on':'')+'" data-a="go-sub" data-tab="perfil" data-st="'+x[0]+'">'+
-    esc(x[1])+'</button>';
-  }).join('')+'</div>'+
-  '<p class="xtiny muted" style="margin:-4px 2px 2px;line-height:1.5">'+esc(atual[3])+'</p>'+
-  ({voce:()=>pf_dados()+pf_tema()+pf_disfarce()+pf_identidade(), conta:()=>pf_metas()+pf_refCalc()+pf_metaCorpo(), treino:()=>pf_transicao()+pf_externo()+pf_ritmo()+pf_nivel()+pf_limites()+pf_diaCheio(), ver:()=>pf_lembAgua()+pf_avisosAqui()+pf_avisosDano()+pf_lembretes()+pf_ocultar()+pf_contador()+pf_desligar(), dados:()=>pf_guardar()+pf_ciencia()+pf_senha()+pf_oQueE()+pf_avisoFinal()})[s]();
+  PF_FORM.map(f=>f()).join('')+
+  '<div class="pfsep">'+ic('info')+'<span>Sobre o app</span></div>'+
+  PF_LEITURA.map(f=>f()).join('');
 }
 function temTH(d){const n=diffDias(d,hoje());if(n<0)return '—';
  const me=Math.floor(n/30.44);return me+' m '+(n-Math.round(me*30.44))+' d'}
