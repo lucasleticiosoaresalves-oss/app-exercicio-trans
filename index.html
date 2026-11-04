@@ -3936,13 +3936,15 @@ function bibliotecaMovimentos(){
    '<span class="movnome">'+esc(MOV[k].n)+'</span>'+
    '<span class="movmusc">'+esc(MOV[k].m)+'</span></button>';
  };
- return '<div class="card">'+chTtl('book','Biblioteca de movimentos','<span class="tag n">'+Object.keys(MOV).length+'</span>')+
-  '<p class="tiny muted" style="margin-bottom:11px">Os 18 movimentos que formam o plano inteiro. '+
-  'Toque para ver o vídeo, o passo a passo e os erros comuns.</p>'+
-  '<div class="g2">'+Object.keys(MOV).map(mini).join('')+'</div></div>'+
-  (L==='cal'?bloco('Calistenia','wave',VIDEOS.calistenia)+bloco('Musculação','dumb',VIDEOS.musculacao)
-   :L==='casa'?bloco('Treino em casa','home',VIDEOS.casa)+bloco('Calistenia','wave',VIDEOS.calistenia)
-   :bloco('Musculação','dumb',VIDEOS.musculacao)+bloco('Calistenia','wave',VIDEOS.calistenia));
+ /* biblioteca e videos sao consulta: abrem com um toque */
+ const dbloco=(t,icone,arr)=>dobra('plano:vid:'+t,t,icone,
+   arr.length+(arr.length===1?' vídeo':' vídeos'),()=>bloco(t,icone,arr));
+ return dobra('plano:biblio','Biblioteca de movimentos','book',
+   Object.keys(MOV).length+' movimentos, com vídeo, passo a passo e erros comuns',()=>
+   '<div class="card"><div class="g2">'+Object.keys(MOV).map(mini).join('')+'</div></div>')+
+  (L==='cal'?dbloco('Calistenia','wave',VIDEOS.calistenia)+dbloco('Musculação','dumb',VIDEOS.musculacao)
+   :L==='casa'?dbloco('Treino em casa','home',VIDEOS.casa)+dbloco('Calistenia','wave',VIDEOS.calistenia)
+   :dbloco('Musculação','dumb',VIDEOS.musculacao)+dbloco('Calistenia','wave',VIDEOS.calistenia));
 }
 /* O que realmente muda no treino de cada trilha. */
 function blocoEnfase(){
@@ -7581,9 +7583,13 @@ function pf_metas(){
    '<div class="g3" style="margin-top:9px">'+
     tile('Proteína',m.prot+'g','por dia','var(--blue)')+tile('Carboidrato',m.carb+'g','por dia','var(--ok)')+
     tile('Gordura',m.gord+'g','por dia','var(--warn)')+'</div>'+
-   '<p class="xtiny muted" style="margin-top:10px;line-height:1.6">Fórmula de Mifflin-St Jeor para o gasto basal, multiplicada pelo nível de atividade. '+
-    'É a fórmula que mais acerta nas comparações, mas é estimativa: pode estar 10% acima ou abaixo do seu gasto real. '+
-    selo('tmb','Sobre a fórmula')+' '+
+   '<p class="xtiny muted" style="margin-top:10px;line-height:1.6">Estimativa, não medida: pode estar 10% para cima ou para baixo. '+
+    'A meta nunca desce abaixo do seu gasto em repouso.</p></div>'+
+   dobra('conta:formula','De onde vêm estes números','info',
+    'a fórmula, os percentuais de cada objetivo e o estudo por trás de cada meta',()=>
+    '<div class="card"><p class="xtiny muted" style="line-height:1.6">'+
+    'Gasto basal pela fórmula de Mifflin-St Jeor, multiplicado pelo nível de atividade. '+
+    'É a que mais acerta nas comparações. '+selo('tmb','Sobre a fórmula')+' '+
     (p.obj==='perder'?'Objetivo de perda: 20% abaixo do gasto, cerca de 0,5 kg por semana.':
      p.obj==='ganhar'?'Objetivo de ganho: 15% acima do gasto, para ganhar massa com o mínimo de gordura.':
      'Objetivo de manutenção: calorias iguais ao gasto.')+
@@ -7591,11 +7597,11 @@ function pf_metas(){
     ' Proteína em '+(p.obj==='perder'?'2,2':'1,8')+' g por quilo — a meta-análise com 49 estudos coloca o ponto em que o ganho '+
     'para de crescer perto de 1,6 g/kg, e em déficit o valor sobe porque a proteína é o que protege a massa magra. '+
     selo('prot','A meta-análise')+
-    ' Gordura em 0,9 g por quilo; o restante vira carboidrato. A meta nunca desce abaixo do seu gasto em repouso. '+
+    ' Gordura em 0,9 g por quilo; o restante vira carboidrato. '+
     'Água pela ingestão adequada de referência da EFSA, já descontando a que vem da comida. '+selo('agua','Sobre a água')+' '+
     (S.perfil.thIni?'Como você registrou terapia hormonal: a composição corporal muda bastante no primeiro ano, '+
-     'então vale refazer estas contas a cada dois ou três meses.':'')+'</p>'+
-   '<hr class="sep"><div class="lbl" style="margin-bottom:8px">Ajustar na mão (opcional)</div>'+
+     'então vale refazer estas contas a cada dois ou três meses.':'')+'</p></div>')+
+   '<div class="card"><div class="lbl" style="margin-bottom:8px">Ajustar na mão (opcional)</div>'+
    '<div class="g2">'+
     '<label class="fld">Calorias<input type="number" id="mn_kcal" placeholder="'+m.kcal+'" value="'+((p.manual&&p.manual.kcal)||'')+'"></label>'+
     '<label class="fld">Proteína (g)<input type="number" id="mn_prot" placeholder="'+m.prot+'" value="'+((p.manual&&p.manual.prot)||'')+'"></label>'+
