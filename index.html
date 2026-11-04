@@ -426,6 +426,11 @@ button.ex:active{transform:scale(.995)}
 .hubc .ht{font-family:var(--f-d);font-weight:700;font-size:15.5px;letter-spacing:-.015em;
   display:block;line-height:1.3;color:var(--ink)}
 .hubc .hs{display:block;font-size:11.5px;color:var(--ink-2);margin-top:3px;line-height:1.45}
+/* o "ver este passo" dentro de um item da lista: menor que um vidLink inteiro */
+.vid-mini{margin-top:9px;padding:7px 9px;gap:7px;border-radius:11px;background:var(--surface-2);
+  border:1px solid var(--line)}
+.vid-mini .pl{width:24px;height:24px;font-size:12px;flex:none}
+.vid-mini:hover{border-color:var(--area)}
 .voltar{display:inline-flex;align-items:center;gap:5px;font-size:12.5px;font-weight:650;
   color:var(--area);padding:9px 15px 9px 11px;border-radius:999px;background:var(--area-soft);
   transition:filter .14s}
@@ -709,11 +714,13 @@ button.cday:active{transform:scale(.94)}
     <button class="subtab on" data-st="diario">O que comi</button>
     <button class="subtab" data-st="receitas">O que comer</button>
     <button class="subtab" data-st="agua">Água</button>
+    <button class="subtab" data-st="bebidas">Bebidas</button>
     <button class="subtab" data-st="compras">Compras</button>
    </div>
    <div id="st-diario" class="stack" style="gap:14px"></div>
    <div id="st-receitas" class="stack" style="gap:14px" hidden></div>
    <div id="st-agua" class="stack" style="gap:14px" hidden></div>
+   <div id="st-bebidas" class="stack" style="gap:14px" hidden></div>
    <div id="st-compras" class="stack" style="gap:14px" hidden></div>
   </div>
  </section>
@@ -4828,6 +4835,110 @@ function stAgua(){
    '<p class="xtiny muted" style="margin-top:9px">Teste prático: urina clara ao longo do dia significa hidratação em dia; urina escura indica que você está atrasado na meta.</p></div>';
 }
 
+/* =====================================================================
+   BEBIDAS
+   Metade do açúcar que entra no dia costuma entrar líquido, e líquido não
+   sacia: o corpo não desconta do que você come depois. Por isso bebida
+   tem tela própria, e não uma linha perdida na aba de água.
+   ===================================================================== */
+/* Faixas, não valores exatos: depende do grão, do tempo de infusão e da
+   marca. As faixas são as que a FDA publica para consumidor. */
+const CAFEINA=[
+ ['Café coado ou espresso','1 xícara (240 ml)','80 a 100 mg'],
+ ['Café solúvel','1 xícara (240 ml)','60 a 80 mg'],
+ ['Chá preto ou verde','1 xícara (240 ml)','30 a 50 mg'],
+ ['Refrigerante de cola','1 lata (350 ml)','30 a 40 mg'],
+ ['Energético','1 lata (250 ml)','80 mg ou mais'],
+ ['Chá de camomila, erva-doce, hortelã','1 xícara','não tem']
+];
+const BEBIDAS=[
+ {n:'Água',e:'ok',d:'Não tem caloria, não tem açúcar e é a única que o corpo pede de verdade. O resto é escolha.'},
+ {n:'Café e chá sem açúcar',e:'ok',d:'Dentro do limite de cafeína, sem problema. Contam para a hidratação do dia, ao contrário do que se diz por aí.'},
+ {n:'Leite e bebida vegetal',e:'ok',d:'Leite tem proteína de verdade. Bebida vegetal quase não tem, a não ser a de soja — leia o rótulo antes de trocar.'},
+ {n:'Suco natural',e:'meio',d:'Tem vitamina, mas perde a fibra da fruta e o açúcar entra rápido. Comer a fruta inteira é melhor que beber ela.'},
+ {n:'Suco de caixinha e refrigerante',e:'nao',d:'É açúcar líquido. Uma lata tem perto de 35 g, que é o dia inteiro de açúcar recomendado numa bebida só.'},
+ {n:'Isotônico',e:'meio',d:'Feito para quem sua muito por mais de uma hora. Para treino normal de academia, é refrigerante com sal.'},
+ {n:'Energético',e:'nao',d:'Cafeína em dose alta com muito açúcar. O problema não é a cafeína isolada — é a quantidade junto do resto do dia.'},
+ {n:'Álcool',e:'meio',d:'Sete calorias por grama, que não saciam nada, e piora o sono mesmo quando dá sono. Não existe dose que melhore a saúde.'}
+];
+function stBebidas(){
+ const m=metas(),d=hoje(),x=dia(d),a=x.agua||0;
+ const sel=e=>e==='ok'?['check','var(--ok)']:e==='meio'?['info','var(--warn)']:['x','var(--bad)'];
+ $('#st-bebidas').innerHTML=
+  blocoAvisos('bebidas')+
+  '<div class="card hero">'+chTtl('drop','O que você bebe conta')+
+   '<p class="tiny" style="line-height:1.7">Bebida com açúcar não sacia: o corpo não desconta do que você come depois. '+
+   'É por isso que ela aparece aqui separada da comida.</p>'+
+   '<div class="g2" style="margin-top:12px">'+
+    tile('Água hoje',(a/1000).toFixed(1)+'L','de '+(m.agua/1000).toFixed(1)+'L','var(--water)')+
+    tile('Cafeína','até 400 mg','por dia, adulto')+'</div>'+
+   '<button class="btn gh bl sm" style="margin-top:11px" data-a="go-sub" data-tab="nutri" data-st="agua">'+
+   ic('drop')+' Registrar água</button></div>'+
+
+  '<div class="card">'+chTtl('flame','Quanta cafeína tem em cada uma',selo('cafeina','de onde vem'))+
+   '<p class="tiny muted" style="line-height:1.65;margin-bottom:11px">São faixas, não valores exatos: muda com o grão, '+
+   'o tempo de infusão e a marca. Some o seu dia e compare com os 400 mg.</p>'+
+   '<div class="stack" style="gap:0">'+CAFEINA.map(function(c){
+    return '<div class="li"><div class="grow"><div class="ttl">'+esc(c[0])+'</div>'+
+     '<div class="sub">'+esc(c[1])+'</div></div>'+
+     '<div class="num tiny" style="font-weight:700;white-space:nowrap">'+esc(c[2])+'</div></div>';
+   }).join('')+'</div>'+
+   '<p class="xtiny muted" style="margin-top:11px;line-height:1.6">Duas coisas que aparecem muito na prática: '+
+   'cafeína à tarde tira sono de verdade, mesmo em quem jura que não; e quem tem ansiedade costuma sentir mais. '+
+   'Não existe recomendação de cortar café aqui — existe a conta para você decidir. '+
+   'Para adolescente não existe limite definido.</p>'+
+   blocoFonte('cafeina_faixas')+'</div>'+
+
+  '<div class="card">'+chTtl('info','O que cada bebida faz')+
+   '<div class="stack" style="gap:10px">'+BEBIDAS.map(function(b){
+    const sl=sel(b.e);
+    return '<div class="row top" style="gap:9px">'+ic(sl[0],'color:'+sl[1]+';font-size:15px;margin-top:2px;flex:none')+
+     '<div class="grow"><div style="font-weight:700;font-size:13.5px">'+esc(b.n)+'</div>'+
+     '<div class="tiny muted" style="line-height:1.55;margin-top:2px">'+esc(b.d)+'</div></div></div>';
+   }).join('')+'</div></div>'+
+
+  dobra('beb:alcool','Álcool, sem sermão','info',
+   'o que ele faz com treino, sono e as contas do app',function(){
+   return '<div class="card"><p class="tiny muted" style="line-height:1.7">'+
+    'Álcool tem 7 kcal por grama e não sacia: uma noite comum passa fácil de 500 kcal sem nenhuma comida junto. '+
+    'Ele também atrapalha o sono — dá sono, mas quebra a parte profunda da noite, que é onde o corpo se recupera do treino.</p>'+
+    '<p class="tiny muted" style="line-height:1.7;margin-top:10px">O app não registra álcool nem conta dose, e não vai te cobrar. '+
+    'Se você faz terapia hormonal, fígado já é uma das coisas que o exame de rotina acompanha: '+
+    'quem prescreve é quem deve saber do seu consumo, e isso é conversa de consulta, não de aplicativo.</p></div>';
+  })+
+
+  dobra('beb:receitas','Bebida que alimenta','pot',
+   'vitamina, smoothie, café gelado e água saborizada',function(){
+   const R=[
+    ['Vitamina de banana, aveia e whey','1 banana, 30 g de aveia, 1 scoop de whey, 250 ml de leite. Bate e bebe. Vira café da manhã quando não dá para sentar e comer.'],
+    ['Smoothie verde','1 fatia de abacaxi, 1 punhado de couve, 200 ml de água, gelo. Verdura que entra sem você perceber.'],
+    ['Café gelado proteico','Café frio, leite e meia dose de whey no liquidificador. Resolve o lanche da tarde e a vontade de doce.'],
+    ['Chá gelado de verdade','Faça o chá, deixe esfriar, gele com limão. Nada do pó de caixinha, que é açúcar com sabor de chá.'],
+    ['Água com fruta','Água, rodelas de limão ou laranja, hortelã, uma noite na geladeira. Para quem não consegue beber água pura.']
+   ];
+   return '<div class="card"><div class="stack" style="gap:0">'+R.map(function(r){
+    return '<div class="li"><div class="grow"><div class="ttl">'+esc(r[0])+'</div>'+
+     '<div class="sub" style="line-height:1.55">'+esc(r[1])+'</div></div></div>';
+   }).join('')+'</div>'+
+   '<button class="btn gh bl sm" style="margin-top:11px" data-a="go-sub" data-tab="nutri" data-st="receitas">'+
+   ic('book')+' As receitas completas, com gramagem</button></div>';
+  })+
+
+  blocoVideos('Ver as bebidas sendo feitas',[
+   ['Vitamina que substitui o café da manhã','vitamina de banana aveia whey receita café da manhã',
+    'Três ingredientes e dois minutos'],
+   ['Smoothie verde para quem não gosta de verdura','smoothie verde couve abacaxi receita sem acucar',
+    'A couve que você não sente'],
+   ['Café gelado em casa','como fazer cafe gelado cremoso em casa sem acucar',
+    'Sem xarope e sem a fila da cafeteria'],
+   ['Chá gelado sem açúcar','como fazer cha gelado natural sem acucar limao',
+    'O que vem de caixinha é outra coisa'],
+   ['Água saborizada','agua saborizada com frutas receita detox hortela',
+    'Para quem não consegue beber água pura'],
+   ['Quanto açúcar tem na sua bebida','quanto acucar tem no refrigerante suco de caixinha colheres',
+    'Em colheres de chá, que é como dá para enxergar']
+  ],'As duas primeiras também estão escritas acima, com as quantidades.');
+}
 function stCompras(){
  const l=S.compras||[];
  const pend=l.filter(x=>!x.ok).length;
@@ -4850,8 +4961,8 @@ function stCompras(){
 function renderNutri(){
  const s=S.ui.sub.nutri;
  $$('#nutriTabs .subtab').forEach(b=>b.classList.toggle('on',b.dataset.st===s));
- ['diario','receitas','agua','compras'].forEach(k=>{const el=$('#st-'+k);if(el)el.hidden=(k!==s)});
- ({diario:stDiario,receitas:stReceitas,agua:stAgua,compras:stCompras}[s]||stDiario)();
+ ['diario','receitas','agua','bebidas','compras'].forEach(k=>{const el=$('#st-'+k);if(el)el.hidden=(k!==s)});
+ ({diario:stDiario,receitas:stReceitas,agua:stAgua,bebidas:stBebidas,compras:stCompras}[s]||stDiario)();
 }
 
 
@@ -6518,7 +6629,15 @@ function introAparencia(){
   'violência, discriminação e rejeição. Nenhuma maquiagem resolve isso, e não passar não é falha sua. '+selo('passar','O que o estudo diz')+'</p></div>';
 }
 
-function listaMaquiagem(itens,titulo,sub){
+/* A busca de cada passo leva a direcao junto: "sombra de barba" para quem
+   cobre e para quem desenha sao duas coisas opostas. */
+function maqBusca(nome,dir){
+ const ctx=dir==='masc'?'maquiagem masculinizante transmasculino'
+   :dir==='fem'?'maquiagem feminilizante trans'
+   :'maquiagem';
+ return nome+' '+ctx+' como fazer passo a passo';
+}
+function listaMaquiagem(itens,titulo,sub,dir){
  return '<div class="card">'+chTtl('sparkle',titulo,'<span class="tag n">'+itens.length+' passos</span>')+
   '<p class="tiny muted" style="margin-bottom:12px;line-height:1.6">'+sub+'</p>'+
   '<div class="stack" style="gap:9px">'+itens.map(function(m,i){
@@ -6528,6 +6647,10 @@ function listaMaquiagem(itens,titulo,sub){
     '<div class="meta">'+esc(m.o)+'</div>'+
     '<div class="obs" style="margin-top:6px">'+esc(m.c)+'</div>'+
     '<div class="obs" style="margin-top:6px;color:var(--warn)"><b>Erro comum:</b> '+esc(m.e)+'</div>'+
+    '<a class="vid vid-mini" href="'+esc(yt(maqBusca(m.n,dir)))+'" target="_blank" rel="noopener">'+
+     '<span class="pl">'+ic('play')+'</span>'+
+     '<span class="grow" style="min-width:0;font-size:12px;font-weight:600;color:var(--ink-2)">ver este passo</span>'+
+     ic('right','color:var(--ink-3);flex:none')+'</a>'+
     '</div></div></div>';
   }).join('')+'</div></div>';
 }
@@ -6547,32 +6670,60 @@ function stAparencia(){
  let h=blocoAvisos('aparencia')+introAparencia();
  if(t==='fem'){
   h+=listaMaquiagem(MAQ_FEM,'Maquiagem do zero',
-   'Na ordem. Se for fazer só três coisas na vida, faça a 1, a 4 e a 6: pele preparada, sobrancelha e cílios.');
+   'Na ordem. Se for fazer só três coisas na vida, faça a 1, a 4 e a 6: pele preparada, sobrancelha e cílios.','fem');
   h+=dobra('ap:moda','Roupa: o que muda a silhueta','ruler',
    MODA_FEM.length+' peças e o efeito de cada uma',()=>listaModa(MODA_FEM,'Roupa: o que muda a silhueta'));
  }else if(t==='masc'){
   h+=listaMaquiagem(MAQ_MASC,'Maquiagem para masculinizar',
-   'Muita gente não imagina que maquiagem funcione nesta direção. Funciona, e o princípio é o inverso: tirar contraste e brilho, engrossar sobrancelha, marcar ângulo.');
+   'Muita gente não imagina que maquiagem funcione nesta direção. Funciona, e o princípio é o inverso: tirar contraste e brilho, engrossar sobrancelha, marcar ângulo.','masc');
   h+=dobra('ap:moda','Roupa: o que muda a silhueta','ruler',
    MODA_MASC.length+' peças e o efeito de cada uma',()=>listaModa(MODA_MASC,'Roupa: o que muda a silhueta'));
  }else{
-  h+=listaMaquiagem(MAQ_FEM,'Maquiagem do zero','Na ordem, para quem nunca passou nada no rosto.');
-  h+=listaMaquiagem(MAQ_MASC,'Maquiagem para masculinizar','O mesmo rosto, na direção oposta.');
+  h+=listaMaquiagem(MAQ_FEM,'Maquiagem do zero','Na ordem, para quem nunca passou nada no rosto.','fem');
+  h+=listaMaquiagem(MAQ_MASC,'Maquiagem para masculinizar','O mesmo rosto, na direção oposta.','masc');
   h+=dobra('ap:moda-f','Roupa: silhueta mais feminina','ruler',
    MODA_FEM.length+' peças e o efeito de cada uma',()=>listaModa(MODA_FEM,'Roupa: silhueta mais feminina'));
   h+=dobra('ap:moda-m','Roupa: silhueta mais masculina','ruler',
    MODA_MASC.length+' peças e o efeito de cada uma',()=>listaModa(MODA_MASC,'Roupa: silhueta mais masculina'));
  }
- h+='<div class="card">'+chTtl('play','Ver alguém fazendo')+
-  '<p class="tiny muted" style="margin-bottom:11px">Texto só vai até certo ponto: maquiagem se aprende vendo a mão.</p>'+
-  [[t==='masc'?'Maquiagem masculinizante':'Maquiagem para iniciante total',
-    t==='masc'?'maquiagem masculinizante transmasculino contorno barba falsa':'maquiagem básica iniciante passo a passo do zero'],
-   [t==='masc'?'Barba falsa com sombra':'Cobrir sombra de barba',
-    t==='masc'?'como fazer barba falsa maquiagem stubble':'corretivo laranja cobrir sombra de barba maquiagem trans'],
-   ['Sobrancelha '+(t==='masc'?'mais cheia':'com arco'),
-    t==='masc'?'como preencher sobrancelha masculina lapis':'sobrancelha arco feminino como preencher'],
-   ['Roupa e silhueta',t==='masc'?'moda transmasculina silhueta ombro camadas':'moda trans feminina silhueta cintura']
-  ].map(function(v){return vidLink(v[0],v[1],'')}).join('')+'</div>';
+ /* a rotina inteira, do rosto limpo ao fixador, em vez de quatro links soltos */
+ const VID_MASC=[
+  ['Maquiagem masculinizante do zero','maquiagem masculinizante transmasculino rotina completa iniciante',
+   'A rotina inteira, para quem nunca passou nada'],
+  ['Barba falsa com sombra','como fazer barba falsa maquiagem stubble transmasculino',
+   'O truque que mais muda a leitura do rosto'],
+  ['Baixar o contraste da pele','maquiagem masculinizar pele matificar tirar brilho',
+   'Menos brilho, menos rosa: a base de tudo'],
+  ['Sobrancelha mais cheia e reta','como preencher sobrancelha masculina lapis mais reta',
+   'Tirar o arco sem parecer desenhada'],
+  ['Quadrar a mandíbula','contorno masculinizar mandibula queixo maquiagem',
+   'Onde entra o contorno para marcar ângulo'],
+  ['Disfarçar sem parecer maquiado','maquiagem masculina natural corretivo discreto homem',
+   'O ponto em que produto demais entrega'],
+  ['Roupa e silhueta','moda transmasculina silhueta ombro camadas',
+   'O que a roupa faz pelo corpo, de graça']
+ ];
+ const VID_FEM=[
+  ['Maquiagem do zero para iniciante','maquiagem basica iniciante passo a passo do zero trans',
+   'A rotina inteira, na ordem'],
+  ['Cobrir a sombra de barba','corretivo laranja cobrir sombra de barba maquiagem trans',
+   'Corretivo cor de laranja: por que funciona'],
+  ['Base: tom certo e cobertura','como escolher tom de base e aplicar cobertura alta',
+   'O erro de tom que aparece na luz do dia'],
+  ['Sobrancelha com arco','sobrancelha arco feminino como preencher e desenhar',
+   'Onde fica o arco e como não exagerar'],
+  ['Suavizar a mandíbula','contorno feminilizar mandibula maquiagem trans',
+   'Contorno para arredondar, não para esculpir'],
+  ['Olhos e cílios','delineado basico e cilios postiços iniciante passo a passo',
+   'O delineado que não precisa de mão firme'],
+  ['Fazer durar o dia inteiro','como fixar maquiagem durar o dia todo pele oleosa',
+   'Primer, pó e fixador: o que cada um faz'],
+  ['Roupa e silhueta','moda trans feminina silhueta cintura',
+   'O que a roupa faz pelo corpo, de graça']
+ ];
+ const lista=t==='masc'?VID_MASC:t==='fem'?VID_FEM:VID_FEM.concat(VID_MASC);
+ h+=blocoVideos('Ver a maquiagem sendo feita',lista,
+  'Maquiagem é a parte do app que menos se aprende lendo. Cada passo da lista acima também tem o vídeo dele.');
  $('#st-aparencia').innerHTML=h;
 }
 
@@ -7955,6 +8106,8 @@ const FONTES={
   q:'coffee consumption health umbrella review meta-analyses multiple health outcomes BMJ'},
  cafeina_fda:{r:'Limite de 400 mg de cafeína por dia para adultos saudáveis, e revisão das evidências sobre consumo excessivo',
   u:'https://odphp.health.gov/sites/default/files/2019-09/Appendix-E-2.40.pdf'},
+ cafeina_faixas:{r:'FDA, para consumidor: as faixas de cafeína por porção em café, chá, refrigerante e energético, e por que o rótulo não traz',
+  u:'https://www.fda.gov/consumers/consumer-updates/spilling-beans-how-much-caffeine-too-much'},
  nature23:{r:'Revisão sistemática de 46 artigos sobre funcionamento psicossocial depois da hormonização afirmativa. Nature Human Behaviour, 2023',
   u:'https://www.nature.com/articles/s41562-023-01605-w'},
  jes21:{r:'Revisão sistemática sobre hormonização, saúde mental e qualidade de vida em pessoas trans. Journal of the Endocrine Society, 2021',
