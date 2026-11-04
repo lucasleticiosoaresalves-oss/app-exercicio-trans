@@ -4492,6 +4492,33 @@ function stReceitas(){
    [['todas','Todas'],['agora',ic('check')+' Dá pra fazer agora'],['poucos','Até 5 ingredientes'],
     ['favs',ic('star')+' Favoritas'],...MEALS.map(m=>[m.k,m.n])].map(([k,n])=>
    '<button class="chip xs '+(f===k?'on':'')+'" data-a="filtro-ref" data-v="'+k+'">'+n+'</button>').join('')+'</div></div>'+
+  blocoVideos('Técnicas que fazem a comida dar certo',[
+   ['Marmita da semana: como montar e guardar',
+    'marmita saudavel semana meal prep como montar congelar',
+    'Montar cinco refeições de uma vez e guardar sem estragar'],
+   ['Frango que não fica seco',
+    'como fazer frango grelhado suculento nao ressecar frigideira',
+    'O erro que resseca o peito de frango, e como evitar'],
+   ['Ovo de todo jeito',
+    'omelete ovo mexido cozido ponto certo tecnica basica',
+    'Mexido, omelete e cozido no ponto — a proteína mais barata'],
+   ['Arroz e feijão bem feitos',
+    'como fazer arroz soltinho e feijao temperado do zero',
+    'A base da comida brasileira, que já é barata e equilibrada'],
+   ['Legume assado que fica bom',
+    'como assar legumes no forno temperatura tempo ficar douradinho',
+    'Forno, sal e azeite: o jeito mais simples de comer verdura'],
+   ['Batata-doce e carboidrato de verdade',
+    'como cozinhar batata doce forno panela de pressao pratico',
+    'Cozinhar de uma vez e deixar pronta na geladeira'],
+   ['Vitamina e smoothie sem açúcar',
+    'vitamina de banana aveia smoothie sem acucar receita saudavel',
+    'Bebida que alimenta, no lugar do refrigerante'],
+   ['Panqueca de banana e aveia',
+    'panqueca de banana com aveia receita 3 ingredientes',
+    'Três ingredientes, e é café da manhã ou lanche']
+  ],'As receitas do app estão todas escritas, com gramagem e modo de preparo. '+
+    'Isto aqui é para quando ver a mão fazendo ajuda mais que ler.')+
   '<div class="card"><div class="stack" style="gap:8px">'+
    (lista.length
     ?lista.slice(0,S.ui.refTudo?lista.length:8).map(r=>cardReceita(r,pontuar(r))).join('')+
@@ -4523,6 +4550,9 @@ function sheetReceita(id){
    '<div class="grow tiny" style="line-height:1.55">'+esc(p)+'</div></div>').join('')+'</div>'+
   '<p class="tiny" style="background:var(--surface-2);border-radius:11px;padding:11px;margin-bottom:15px;line-height:1.5">'+
    '<b>Dica:</b> '+esc(r.dica)+'</p>'+
+  '<div class="lbl" style="margin-bottom:7px">Ver alguém fazendo</div>'+
+  '<div style="margin-bottom:15px">'+
+   vidLink(r.nome,r.nome+' receita como fazer','Busca no YouTube por esta receita')+'</div>'+
   '<div class="row" style="gap:6px;margin-bottom:13px">'+
    '<button class="btn gh sm grow" data-a="fav" data-id="'+r.id+'">'+ic('star')+(fav?' Remover dos favoritos':' Favoritar')+'</button>'+
    (s&&s.falta?'<button class="btn gh sm" data-a="add-compras" data-v="'+esc(s.faltantes.join('|'))+'">'+ic('cart')+'</button>':'')+'</div>'+
