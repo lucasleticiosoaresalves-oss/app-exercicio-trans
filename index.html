@@ -406,6 +406,25 @@ button.ex:active{transform:scale(.995)}
 /* o cabeçalho do guia é a área toda, não só a linha do texto */
 .guia-h{width:100%;gap:10px;text-align:left;padding:4px 0;min-height:38px;transition:opacity .14s}
 .guia-h:hover{opacity:.75}
+/* Os blocos de Cuidados: a tela inicial da aba. Cada um e um tema inteiro,
+   nao uma sub-aba solta. */
+.hubc{display:flex;align-items:center;gap:13px;width:100%;text-align:left;
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--r);
+  padding:15px;box-shadow:var(--sh-1),var(--glow);
+  transition:border-color .16s,transform .14s,box-shadow .16s}
+.hubc:hover{border-color:var(--area);transform:translateY(-1px);box-shadow:var(--sh-2)}
+.hubc:active{transform:scale(.99)}
+.hubc .hi{width:44px;height:44px;border-radius:14px;background:var(--area-soft);color:var(--area);
+  display:grid;place-items:center;flex:none}
+.hubc .hi .ic{font-size:22px}
+.hubc .ht{font-family:var(--f-d);font-weight:700;font-size:15.5px;letter-spacing:-.015em;
+  display:block;line-height:1.3;color:var(--ink)}
+.hubc .hs{display:block;font-size:11.5px;color:var(--ink-2);margin-top:3px;line-height:1.45}
+.voltar{display:inline-flex;align-items:center;gap:5px;font-size:12.5px;font-weight:650;
+  color:var(--area);padding:9px 15px 9px 11px;border-radius:999px;background:var(--area-soft);
+  transition:filter .14s}
+.voltar:hover{filter:brightness(.96)}
+.voltar .ic{font-size:17px}
 .dobra{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);
   box-shadow:var(--sh-1),var(--glow);overflow:hidden}
 .dobra>.dh{display:flex;align-items:center;gap:var(--s2);width:100%;padding:var(--s4);text-align:left;
@@ -695,16 +714,16 @@ button.cday:active{transform:scale(.94)}
 
  <section id="tab-cuidados" hidden>
   <div class="stack" style="gap:14px">
-   <div class="subtabs" id="cuidTabs">
-   </div>
-   <div id="st-higiene" class="stack" style="gap:14px"></div>
-   <div id="st-corpo" class="stack" style="gap:14px" hidden></div>
+   <div id="cuidTopo"></div>
+   <div id="cuidHub" class="stack" style="gap:12px" hidden></div>
    <div id="st-voz" class="stack" style="gap:14px" hidden></div>
-   <div id="st-ciclo" class="stack" style="gap:14px" hidden></div>
-   <div id="st-aparencia" class="stack" style="gap:14px" hidden></div>
    <div id="st-pele" class="stack" style="gap:14px" hidden></div>
-   <div id="st-profissionais" class="stack" style="gap:14px" hidden></div>
+   <div id="st-aparencia" class="stack" style="gap:14px" hidden></div>
+   <div id="st-corpo" class="stack" style="gap:14px" hidden></div>
+   <div id="st-higiene" class="stack" style="gap:14px" hidden></div>
+   <div id="st-ciclo" class="stack" style="gap:14px" hidden></div>
    <div id="st-guias" class="stack" style="gap:14px" hidden></div>
+   <div id="st-profissionais" class="stack" style="gap:14px" hidden></div>
   </div>
  </section>
 
@@ -2196,16 +2215,16 @@ const HIG=[
   porque:'A fronha sozinha já ajuda a pele do rosto e o cheiro da cama. É a versão mínima que vale.'},
  {id:'quarto',n:'Arrumar um canto',ic:'check',freq:1,per:'qualquer',
   niveis:['Tirar a louça e o lixo de perto da cama','Juntar a roupa do chão','Arrumar o quarto inteiro'],
-  porque:'Pedido na pesquisa. Quarto bagunçado alimenta a sensação de descontrole, e arrumar tudo é grande demais '+
-   'para um dia ruim. Um canto é o tamanho certo: dá para ver o resultado e ele não desfaz em uma hora.'},
+  porque:'Quarto bagunçado alimenta a sensação de descontrole, e arrumar tudo é grande demais para um dia ruim. '+
+   'Um canto é o tamanho certo: dá para ver o resultado e ele não desfaz em uma hora.'},
  {id:'sair',n:'Sair de casa',ic:'sun',freq:1,per:'qualquer',
   niveis:['Chegar até a porta ou a varanda','Dar uma volta no quarteirão','Ir a algum lugar que eu precisava ir'],
-  porque:'Também veio da pesquisa, junto com "ou só abrir as janelas". Sair tem peso próprio quando a rua é hostil ou '+
-   'quando o corpo não está do jeito que você queria. Chegar à porta conta: é a parte difícil.'},
+  porque:'Sair tem peso próprio quando a rua é hostil ou quando o corpo não está do jeito que você queria. '+
+   'Chegar à porta conta: é a parte difícil.'},
  {id:'postura',n:'Checar a postura',ic:'ruler',freq:1,per:'qualquer',
   niveis:['Encostar as costas na parede e respirar 3 vezes','Abrir o peito e girar os ombros 10 vezes','Fazer a série curta de postura'],
-  porque:'Veio da pesquisa com estas palavras: muita gente trans, inclusive homem trans, mantém a postura curvada para '+
-   'esconder o peito, e isso vira dor e encurtamento. Trinta segundos encostado na parede já lembram o corpo de onde é o lugar do ombro.'},
+  porque:'Postura curvada para esconder o peito vira dor e encurtamento. '+
+   'Trinta segundos encostado na parede já lembram o corpo de onde é o lugar do ombro.'},
  {id:'remedio',n:'Medicação',ic:'bell',freq:1,per:'qualquer',ess:true,
   niveis:['Tomei'],
   porque:'Se você usa alguma medicação contínua, este é o item que não tem versão reduzida. '+
@@ -4439,8 +4458,8 @@ function stReceitas(){
  };
  $('#st-receitas').innerHTML=
   '<div class="card hero">'+chTtl('leaf','Não é você que escolhe o que vem?')+
-   '<p class="tiny muted" style="line-height:1.7">Quase metade das pessoas que responderam à pesquisa não decide o que entra em casa. '+
-   'Se é o seu caso, receita e lista de compras ajudam pouco. O que ajuda é montar o prato com o que já está na mesa.</p>'+
+   '<p class="tiny muted" style="line-height:1.7">Se não é você que decide o que entra em casa, receita e lista de compras ajudam pouco. '+
+   'O que ajuda é montar o prato com o que já está na mesa.</p>'+
    '<button class="btn acc bl" style="margin-top:12px" data-a="prato-abrir" data-m="almoco">'+
    ic('plus')+' Registrar um prato que já veio pronto</button></div>'+
   dobra('nutri:prato','Como montar o prato com o que tem','check',
@@ -5065,20 +5084,24 @@ function stPele(){
    selo('filtro','Filtro solar')+' '+selo('retinoide','Retinoide')+'</p></div>'+
   bloco('manha','Rotina da manhã','sun')+
   bloco('noite','Rotina da noite','moon')+
-  '<div class="card">'+chTtl('cal','Uma vez por semana')+
-   '<div class="stack" style="gap:0">'+SKIN_SEMANAL.map(s=>
+  dobra('pele:semanal','Uma vez por semana','cal',
+   SKIN_SEMANAL.length+' cuidados, com a frequência de cada um',()=>
+   '<div class="card"><div class="stack" style="gap:0">'+SKIN_SEMANAL.map(s=>
     '<div class="li"><div class="grow"><div class="ttl">'+esc(s.n)+' <span class="tag n">'+esc(s.freq)+'</span></div>'+
-    '<div class="sub">'+esc(s.como)+'</div></div></div>').join('')+'</div></div>'+
-  '<div class="card">'+chTtl('info','Situações específicas')+
-   '<div class="stack" style="gap:0">'+notasPele().map(([t,dd])=>
+    '<div class="sub">'+esc(s.como)+'</div></div></div>').join('')+'</div></div>')+
+  dobra('pele:situacoes','Situações específicas','info',
+   'barba, depilação, pelo encravado e pele irritada',()=>
+   '<div class="card"><div class="stack" style="gap:0">'+notasPele().map(([t,dd])=>
     '<div class="li"><div class="grow"><div class="ttl">'+esc(t)+'</div>'+
-    '<div class="sub" style="line-height:1.55">'+esc(dd)+'</div></div></div>').join('')+'</div></div>'+
-  '<div class="card">'+chTtl('bell','Antes de começar')+
-   '<p class="tiny muted" style="line-height:1.65">Entre um produto novo e outro, espere duas semanas: assim você sabe o que funcionou '+
-   'e o que irritou. Faça teste no antebraço antes de passar no rosto. Retinoides causam descamação e piora aparente nas primeiras '+
-   'semanas — isso é esperado, mas ardência forte não é. Qualquer tratamento oral para acne, assim como tretinoína, exige receita '+
-   'e acompanhamento de dermatologista.</p></div>'+
-  stProdutos();
+    '<div class="sub" style="line-height:1.55">'+esc(dd)+'</div></div></div>').join('')+'</div></div>')+
+  dobra('pele:antes','Antes de começar','bell',
+   'um produto por vez, teste no antebraço, o que exige receita',()=>
+   '<div class="card"><p class="tiny muted" style="line-height:1.65">Entre um produto novo e outro, espere duas semanas: '+
+   'assim você sabe o que funcionou e o que irritou. Faça teste no antebraço antes de passar no rosto. '+
+   'Retinoides causam descamação e piora aparente nas primeiras semanas — isso é esperado, mas ardência forte não é. '+
+   'Qualquer tratamento oral para acne, assim como tretinoína, exige receita e acompanhamento de dermatologista.</p></div>')+
+  dobra('pele:produtos','Lista de produtos e o que cada ativo faz','cart',
+   'montada pelo seu tipo de pele, com o que entra de manhã e à noite',stProdutos);
 }
 function stProdutos(){
  const tp=peleTipo();
@@ -5232,9 +5255,8 @@ function stCorpoAndro(){
   dobra('corpo:postura','Postura','ruler',
    'por que ela trava, e a série curta que solta',blocoPostura)+
   '<div class="card hero">'+chTtl('target','Corpo na trilha androginia')+
-   '<p class="tiny muted" style="line-height:1.7">Esta trilha existe porque ela foi pedida. '+
-   'Nas respostas da pesquisa, a frase que mais apareceu de pessoas não binárias foi querer exercício que deixasse o corpo '+
-   'mais andrógino — e um app com três trilhas binárias não serve para isso.</p>'+
+   '<p class="tiny muted" style="line-height:1.7">Treino para deixar o corpo mais andrógino, '+
+   'que é o que um app só de trilhas binárias não dá conta de fazer.</p>'+
    '<p class="tiny muted" style="line-height:1.7;margin-top:10px">O plano não é mais leve nem mais curto que os outros. '+
    'É a mesma estrutura, com a ênfase tirada em vez de posta.</p></div>'+
   lista('Como esta trilha pensa o corpo','target',CORPO_ANDRO,
@@ -5583,7 +5605,7 @@ function cardSenha(){
  const tem=temSenha();
  return '<div class="card">'+chTtl('check','Senha para abrir',
    tem?'<span class="tag o">ligada</span>':'')+
-  '<p class="tiny muted" style="line-height:1.7">Pedida na pesquisa. Uma tela na frente do app, '+
+  '<p class="tiny muted" style="line-height:1.7">Uma tela na frente do app, '+
   'para quem pegar seu celular não cair direto no seu histórico.</p>'+
   '<p class="tiny muted" style="line-height:1.7;margin-top:9px"><b>O que ela não é:</b> criptografia. '+
   'Quem souber abrir o armazenamento do navegador passa por cima dela. Contra olhar por cima do ombro, funciona; '+
@@ -5627,8 +5649,8 @@ function stExames(){
  $('#st-exames').innerHTML=
   '<div class="card hero">'+chTtl('chart','Resultados de exame',
     ex.length?'<span class="tag n">'+ex.length+' registros</span>':'')+
-   '<p class="tiny" style="line-height:1.7">Pedido na pesquisa, junto com o calendário de hormônios. '+
-   'Aqui você guarda o que veio no papel, do jeito que veio, para levar na próxima consulta sem procurar exame velho na gaveta.</p>'+
+   '<p class="tiny" style="line-height:1.7">Guarde o que veio no papel, do jeito que veio, '+
+   'para levar na próxima consulta sem procurar exame velho na gaveta.</p>'+
    '<p class="tiny muted" style="line-height:1.7;margin-top:10px"><b>O app não interpreta.</b> '+
    'Ele não diz se o valor está bom, alto ou baixo, e não existe faixa de referência aqui — '+
    'ela muda de laboratório para laboratório e de pessoa para pessoa. Quem lê exame é quem te acompanha.</p>'+
@@ -5686,8 +5708,7 @@ function cardIdentidade(){
    const on=p.identidade===x;
    return '<button class="chip xs'+(on?' on':'')+'" data-a="identidade" data-v="'+esc(x)+'">'+esc(x)+'</button>';
   }).join('')+'</div>'+
-  '<p class="xtiny muted" style="margin-top:9px;line-height:1.6">A lista veio da pesquisa, inclusive o pedido de pôr o guarda-chuva inteiro '+
-  'em vez de só três caixas. Falta alguma? '+
+  '<p class="xtiny muted" style="margin-top:9px;line-height:1.6">Falta alguma? '+
   '<a href="mailto:'+EMAIL_CONTATO+'">me diga qual</a> e eu acrescento.</p></div>';
 }
 
@@ -5752,10 +5773,9 @@ function blocoPostura(){
  /* a linha do binder só aparece para quem o assunto alcança: numa trilha
     feminilizar ela é conteúdo endereçado a outra pessoa */
  const itens=POSTURA.filter(x=>!x[2]||x[2].indexOf(S.perfil.trilha)>=0);
- return '<div class="card">'+chTtl('ruler','Postura',
-   '<span class="tag n">pedido na pesquisa</span>')+
-  '<p class="tiny muted" style="line-height:1.7;margin-bottom:11px">Veio de quem respondeu, com estas palavras: é algo que incomoda, '+
-  'inclusive homens trans que ficam curvados para esconder o peito. Não é vaidade — vira dor de pescoço, de lombar e falta de ar.</p>'+
+ return '<div class="card">'+chTtl('ruler','Postura')+
+  '<p class="tiny muted" style="line-height:1.7;margin-bottom:11px">Ficar curvado para esconder o peito não é vaidade: '+
+  'vira dor de pescoço, de lombar e falta de ar.</p>'+
   '<div class="stack" style="gap:0">'+itens.map(x=>
    '<div class="li"><div class="grow"><div class="ttl">'+esc(x[0])+'</div>'+
    '<div class="sub" style="line-height:1.55">'+esc(x[1])+'</div></div></div>').join('')+'</div>'+
@@ -5874,13 +5894,10 @@ const APOIO=[
 function stGuias(){
  const ab=S.ui.guiaAberto||'';
  $('#st-guias').innerHTML=
-  '<div class="card hero">'+chTtl('book','Por onde começar',
-   '<span class="tag n">pedido na pesquisa</span>')+
-   '<p class="tiny" style="line-height:1.7">Isto foi o pedido mais repetido de quem respondeu à pesquisa: ninguém explica por onde se começa. '+
-   'Aqui está o caminho de cada processo, com a norma que o sustenta e o link do texto oficial.</p>'+
-   '<p class="xtiny muted" style="margin-top:10px;line-height:1.6">Duas ressalvas honestas. '+
-   'A primeira: estas regras mudam, e um app não é fonte legal — confira sempre no link oficial antes de ir. '+
-   'A segunda: nada aqui é orientação jurídica nem médica. É mapa, não é receita.</p></div>'+
+  '<div class="card hero">'+chTtl('book','Por onde começar')+
+   '<p class="tiny" style="line-height:1.7">O caminho de cada processo, com a norma que o sustenta e o link do texto oficial.</p>'+
+   '<p class="xtiny muted" style="margin-top:10px;line-height:1.6">As regras mudam e um app não é fonte legal: '+
+   'confira no link oficial antes de ir. Nada aqui é orientação jurídica nem médica.</p></div>'+
   GUIAS.map(function(g){
    const on=ab===g.id;
    return '<div class="card">'+
@@ -5902,8 +5919,8 @@ function stGuias(){
     :'')+'</div>';
   }).join('')+
   '<div class="card">'+chTtl('heart','Onde pedir ajuda')+
-   '<p class="tiny muted" style="line-height:1.65;margin-bottom:11px">Também veio da pesquisa. '+
-   'São canais públicos e gratuitos: o app não indica clínica nem profissional nesta tela, e não ganha nada com nenhum deles.</p>'+
+   '<p class="tiny muted" style="line-height:1.65;margin-bottom:11px">Canais públicos e gratuitos. '+
+   'O app não indica clínica nem profissional aqui, e não ganha nada com nenhum deles.</p>'+
    '<div class="stack" style="gap:0">'+APOIO.map(function(x){
     return '<div class="li"><div class="grow"><div class="ttl">'+esc(x[0])+'</div>'+
      '<div class="sub" style="line-height:1.55">'+esc(x[1])+'</div></div></div>';
@@ -5970,8 +5987,8 @@ function modoContador(){
 function cardContador(){
  const m=modoContador();
  return '<div class="card">'+chTtl('flame','O contador do topo')+
-  '<p class="tiny muted" style="line-height:1.7">Pedido direto da pesquisa: ninguém deveria abrir um app de saúde por medo de perder uma sequência. '+
-  'Por isso o padrão aqui conta dias ativos no mês, que nunca zera — e desligar é uma opção de verdade, não um castigo.</p>'+
+  '<p class="tiny muted" style="line-height:1.7">Ninguém deveria abrir um app de saúde por medo de perder uma sequência. '+
+  'O padrão conta dias ativos no mês, que nunca zera, e desligar é uma opção de verdade.</p>'+
   '<div class="stack" style="gap:7px;margin-top:12px">'+CONTADORES.map(function(c){
    const on=m===c[0];
    return '<button class="ex'+(on?' done':'')+'" data-a="contador" data-v="'+c[0]+'" style="width:100%;text-align:left">'+
@@ -6489,16 +6506,20 @@ function stAparencia(){
  if(t==='fem'){
   h+=listaMaquiagem(MAQ_FEM,'Maquiagem do zero',
    'Na ordem. Se for fazer só três coisas na vida, faça a 1, a 4 e a 6: pele preparada, sobrancelha e cílios.');
-  h+=listaModa(MODA_FEM,'Roupa: o que muda a silhueta');
+  h+=dobra('ap:moda','Roupa: o que muda a silhueta','ruler',
+   MODA_FEM.length+' peças e o efeito de cada uma',()=>listaModa(MODA_FEM,'Roupa: o que muda a silhueta'));
  }else if(t==='masc'){
   h+=listaMaquiagem(MAQ_MASC,'Maquiagem para masculinizar',
    'Muita gente não imagina que maquiagem funcione nesta direção. Funciona, e o princípio é o inverso: tirar contraste e brilho, engrossar sobrancelha, marcar ângulo.');
-  h+=listaModa(MODA_MASC,'Roupa: o que muda a silhueta');
+  h+=dobra('ap:moda','Roupa: o que muda a silhueta','ruler',
+   MODA_MASC.length+' peças e o efeito de cada uma',()=>listaModa(MODA_MASC,'Roupa: o que muda a silhueta'));
  }else{
   h+=listaMaquiagem(MAQ_FEM,'Maquiagem do zero','Na ordem, para quem nunca passou nada no rosto.');
   h+=listaMaquiagem(MAQ_MASC,'Maquiagem para masculinizar','O mesmo rosto, na direção oposta.');
-  h+=listaModa(MODA_FEM,'Roupa: silhueta mais feminina');
-  h+=listaModa(MODA_MASC,'Roupa: silhueta mais masculina');
+  h+=dobra('ap:moda-f','Roupa: silhueta mais feminina','ruler',
+   MODA_FEM.length+' peças e o efeito de cada uma',()=>listaModa(MODA_FEM,'Roupa: silhueta mais feminina'));
+  h+=dobra('ap:moda-m','Roupa: silhueta mais masculina','ruler',
+   MODA_MASC.length+' peças e o efeito de cada uma',()=>listaModa(MODA_MASC,'Roupa: silhueta mais masculina'));
  }
  h+='<div class="card">'+chTtl('play','Ver alguém fazendo')+
   '<p class="tiny muted" style="margin-bottom:11px">Texto só vai até certo ponto: maquiagem se aprende vendo a mão.</p>'+
@@ -6634,8 +6655,7 @@ function stProfissionais(){
   blocoAvisos('profissionais')+
 
   '<div class="card hero">'+chTtl('user','Profissionais')+
-   '<p class="tiny muted" style="line-height:1.7">Foi o segundo item mais pedido na pesquisa, com 36% no Brasil: '+
-   'achar profissional que atenda pessoas trans sem constrangimento.</p>'+
+   '<p class="tiny muted" style="line-height:1.7">Profissional que atende pessoas trans sem constrangimento.</p>'+
    '<p class="tiny muted" style="line-height:1.7;margin-top:10px">Quem quiser aparecer pede por e-mail, '+
    'e <b>cada pedido é conferido um por um antes de entrar</b> — registro no conselho da categoria, principalmente. '+
    'Nada é publicado automático.</p>'+
@@ -6740,8 +6760,7 @@ function stPrivacidade(){
    'porque não existe servidor nem conta. Mas o app não é uma ilha — algumas coisas saem, e estão listadas abaixo.</p></div>'+
 
   '<div class="card" style="border-color:var(--ok)">'+chTtl('heart','A promessa')+
-   '<p class="tiny" style="line-height:1.75">Isto foi pedido com estas palavras na pesquisa: a promessa de nunca pegar dado, e de nunca vender nem compartilhar. '+
-   'Então está escrito aqui, em primeira pessoa e sem rodeio:</p>'+
+   '<p class="tiny" style="line-height:1.75">Em primeira pessoa e sem rodeio:</p>'+
    '<div class="stack" style="gap:0;margin-top:11px">'+
    [['Eu não recebo nada do que você escreve','Não existe conta, não existe login, não existe servidor deste app. Nada do que você registra chega a mim, nem por engano, nem se eu quisesse.'],
     ['Não vendo e não compartilho','Não existe anúncio, não existe rastreador, não existe parceiro, não existe analytics. Não há o que vender porque não há o que coletar.'],
@@ -6971,27 +6990,60 @@ function sheetPratoPronto(meal){
   'Sem balança, sem culpa');
 }
 
-function abasCuidados(){
+/* Os seis blocos. O ultimo campo diz quais secoes entram no bloco: e por isso
+   que "Pele e maquiagem" mostra duas de uma vez. */
+const CU_BLOCOS=[
+ ['voz',      'Voz',                 'mic',    'treino diário, medir a frequência e segurança vocal', ['voz']],
+ ['pele',     'Pele e maquiagem',    'sparkle','rotina de pele, produtos, maquiagem e roupa',         ['pele','aparencia']],
+ ['corpo',    'Corpo',               'ruler',  'binder, tucking e postura, com os limites de uso',    ['corpo']],
+ ['higiene',  'Higiene',             'drop',   'a sua lista, editável, e a versão de dia ruim',       ['higiene']],
+ ['ciclo',    'Ciclo e hormônios',   'cal',    'calendário, remédios e o que esperar de cada fase',   ['ciclo']],
+ ['servicos', 'Direitos e serviços', 'book',   'SUS, retificação, cirurgias e profissionais',         ['guias','profissionais']]
+];
+const CU_SECOES_TODAS=['voz','pele','aparencia','corpo','higiene','ciclo','guias','profissionais'];
+const CU_RENDER={higiene:stHigiene,corpo:stCorpo,ciclo:stCiclo,voz:stVoz,aparencia:stAparencia,
+  pele:stPele,profissionais:stProfissionais,guias:stGuias};
+
+/* Androginia e bem-estar nao tem binder nem treino de voz obrigatorio: o bloco
+   simplesmente nao aparece, em vez de abrir vazio. */
+function cuBlocos(){
  const t=trilha();
- const abas=[['higiene','Higiene']];
- if(t.corpo)abas.push(['corpo','Corpo']);
- abas.push(['ciclo',S.perfil.trilha==='fem'?'Ciclo':'Ciclo menstrual']);
- if(t.voz!=='off')abas.push(['voz','Voz']);
- abas.push(['aparencia','Aparência']);
- abas.push(['pele','Pele e produtos']);
- abas.push(['profissionais','Profissionais']);
- abas.push(['guias','Por onde começar']);
- return abas;
+ return CU_BLOCOS.filter(function(b){
+  if(b[0]==='voz')return t.voz!=='off';
+  if(b[0]==='corpo')return !!t.corpo;
+  return true;
+ });
+}
+/* Aceita tanto o id do bloco quanto o id antigo de secao, para os links que
+   ja existem pelo app continuarem caindo no lugar certo. */
+function cuBloco(id){
+ const bs=cuBlocos();
+ let b=bs.find(x=>x[0]===id);
+ if(!b)b=bs.find(x=>x[4].indexOf(id)>=0);
+ return b||null;
 }
 function renderCuidados(){
- const abas=abasCuidados(),chaves=abas.map(a=>a[0]);
- let s=S.ui.sub.cuidados;
- if(chaves.indexOf(s)<0){s=chaves[0];S.ui.sub.cuidados=s}
- $('#cuidTabs').innerHTML=abas.map(([k,n])=>
-  '<button class="subtab '+(k===s?'on':'')+'" data-st="'+k+'">'+n+'</button>').join('');
- ['higiene','corpo','ciclo','voz','aparencia','pele','profissionais','guias'].forEach(k=>{const el=$('#st-'+k);if(el)el.hidden=(k!==s)});
- ({higiene:stHigiene,corpo:stCorpo,ciclo:stCiclo,voz:stVoz,aparencia:stAparencia,
-   pele:stPele,profissionais:stProfissionais,guias:stGuias}[s]||stHigiene)();
+ const b=cuBloco(S.ui.sub.cuidados||'');
+ const dentro=CU_SECOES_TODAS.filter(k=>b&&b[4].indexOf(k)>=0);
+ CU_SECOES_TODAS.forEach(function(k){
+  const el=$('#st-'+k); if(el)el.hidden=(dentro.indexOf(k)<0);
+ });
+ $('#cuidHub').hidden=!!b;
+ if(!b){
+  S.ui.sub.cuidados=null;
+  $('#cuidTopo').innerHTML='';
+  $('#cuidHub').innerHTML=cuBlocos().map(function(x){
+   return '<button class="hubc" data-a="cuid-ir" data-v="'+x[0]+'">'+
+    '<span class="hi">'+ic(x[2])+'</span>'+
+    '<span class="grow" style="min-width:0"><span class="ht">'+esc(x[1])+'</span>'+
+    '<span class="hs">'+esc(x[3])+'</span></span>'+
+    ic('right','color:var(--ink-3);flex:none')+'</button>';
+  }).join('');
+  return;
+ }
+ S.ui.sub.cuidados=b[0];
+ $('#cuidTopo').innerHTML='<button class="voltar" data-a="cuid-hub">'+ic('left')+'Cuidados</button>';
+ dentro.forEach(k=>CU_RENDER[k]());
 }
 
 /* =====================================================================
@@ -8689,6 +8741,8 @@ document.addEventListener('click',ev=>{
   case 'mes-saude':{const b=S.ui.calSaude||hj.slice(0,7)+'-01',dt=parseYmd(b);
    dt.setMonth(dt.getMonth()+Number(d.v));S.ui.calSaude=ymd(dt).slice(0,7)+'-01';render();break}
   case 'dia-saude':sheetDiaSaude(d.d);break;
+  case 'cuid-ir':{S.ui.sub.cuidados=d.v;window.scrollTo(0,0);render();break}
+  case 'cuid-hub':{S.ui.sub.cuidados=null;window.scrollTo(0,0);render();break}
   case 'dobra':{const L=S.ui.dobras=Array.isArray(S.ui.dobras)?S.ui.dobras:[];
    const i=L.indexOf(d.id); if(i>=0)L.splice(i,1); else L.push(d.id);
    save();render();break}
@@ -8919,7 +8973,7 @@ document.addEventListener('change',ev=>{
 });
 document.addEventListener('click',ev=>{
  const b=ev.target.closest('.subtab[data-st]');if(!b)return;
- const mapa={treinoTabs:'treino',nutriTabs:'nutri',progTabs:'prog',cuidTabs:'cuidados'};
+ const mapa={treinoTabs:'treino',nutriTabs:'nutri',progTabs:'prog'};
  const g=mapa[(b.parentElement||{}).id];
  if(g){S.ui.sub[g]=b.dataset.st;window.scrollTo(0,0);render()}
 });
