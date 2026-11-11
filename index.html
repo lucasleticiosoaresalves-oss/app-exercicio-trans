@@ -293,12 +293,15 @@ hr.sep{border:0;border-top:1px solid var(--line);margin:var(--s3) 0}
 .btn.acc{background:var(--pink)}.btn.wtr{background:var(--water)}.btn.dark{background:var(--ink);color:var(--bg)}
 .btn.gh{background:var(--surface-2);color:var(--ink);border:1px solid var(--line);box-shadow:none;font-weight:600}
 .btn.gh:hover{background:var(--surface-3);border-color:var(--line-2);filter:none;box-shadow:none}
-.btn.sm{padding:10px 15px;font-size:13px;border-radius:13px}
-.btn.xs{padding:6px 12px;font-size:11.5px;border-radius:11px;font-weight:600;min-height:30px}
+/* Alvo de toque: a WCAG 2.2 AA pede 24 px, mas Apple e Google recomendam
+   44. Os botões pequenos estavam em 30 a 37, o que erra no dedo. Subi o
+   piso sem mudar o tamanho visual do texto. */
+.btn.sm{padding:10px 15px;font-size:13px;border-radius:13px;min-height:40px}
+.btn.xs{padding:6px 12px;font-size:11.5px;border-radius:11px;font-weight:600;min-height:36px}
 .btn.bl{width:100%}
 .btn[disabled]{opacity:.45;pointer-events:none}
 .chip{display:inline-flex;align-items:center;gap:6px;background:var(--surface-2);border:1px solid var(--line);
-  border-radius:999px;padding:7px 13px;font-size:12.5px;font-weight:500;color:var(--ink);
+  border-radius:999px;padding:8px 13px;font-size:12.5px;font-weight:500;color:var(--ink);min-height:38px;
   transition:background .14s,border-color .14s,color .14s,transform .12s}
 .chip:hover{border-color:var(--line-2);background:var(--surface-3)}
 .chip:active{transform:scale(.96)}
@@ -323,8 +326,8 @@ button.tag:active{transform:scale(.96)}
 .tag.b{background:var(--water-soft);color:var(--water)}
 .tag.n{background:var(--surface-2);color:var(--ink-3)}
 .selo{display:inline-flex;align-items:center;gap:4px;vertical-align:middle;border:1px solid var(--line);
- background:var(--surface-2);color:var(--ink-2);border-radius:999px;padding:3px 9px 3px 7px;
- font-size:10.5px;font-weight:700;line-height:1.5;white-space:nowrap;cursor:pointer;min-height:26px;
+ background:var(--surface-2);color:var(--ink-2);border-radius:999px;padding:6px 10px 6px 8px;
+ font-size:10.5px;font-weight:700;line-height:1.5;white-space:nowrap;cursor:pointer;min-height:32px;
  transition:border-color .14s,color .14s,background .14s}
 .selo .ic{font-size:12px}
 .selo:hover{border-color:var(--area);color:var(--area);background:var(--area-soft)}
@@ -334,7 +337,7 @@ button.tag:active{transform:scale(.96)}
 .fonte:hover{color:var(--blue)}
 .fonte .ic{margin-top:2px}
 .seg{display:flex;background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:3px;gap:3px}
-.seg button{flex:1;text-align:center;padding:8px 7px;border-radius:9px;font-size:12.5px;font-weight:600;
+.seg button{flex:1;text-align:center;padding:10px 7px;border-radius:9px;font-size:12.5px;font-weight:600;min-height:40px;
   color:var(--ink-2);transition:background .16s,color .16s,box-shadow .16s}
 .seg button:hover{color:var(--ink)}
 .seg button.on{background:var(--surface);color:var(--area);box-shadow:var(--sh-1);font-weight:700}
@@ -384,7 +387,8 @@ textarea{min-height:66px;resize:vertical}
 .li .ttl{font-size:14px;font-weight:600;line-height:1.4}
 .li .sub{font-size:11.8px;color:var(--ink-2);margin-top:2px;line-height:1.55}
 button.li{transition:opacity .14s}button.li:hover{opacity:.78}
-.chk{width:22px;height:22px;border-radius:8px;border:2px solid var(--line-2);flex:none;display:grid;place-items:center;
+/* 22x22 ficava abaixo do mínimo de 24x24 da WCAG 2.2 AA */
+.chk{width:26px;height:26px;border-radius:9px;border:2px solid var(--line-2);flex:none;display:grid;place-items:center;
   color:transparent;transition:background .18s,border-color .18s,color .18s,transform .14s}
 .chk .ic{font-size:12px;stroke-width:3}
 .chk.on{background:var(--ok);border-color:var(--ok);color:var(--on-fill);transform:scale(1.06);
@@ -514,8 +518,8 @@ button.ex:active{transform:scale(.995)}
   -webkit-mask-image:linear-gradient(90deg,#000 0,#000 calc(100% - 26px),transparent 100%);
   mask-image:linear-gradient(90deg,#000 0,#000 calc(100% - 26px),transparent 100%)}
 .subtabs::-webkit-scrollbar{display:none}
-.subtab{white-space:nowrap;padding:8px 14px;border-radius:999px;font-size:12.5px;font-weight:600;color:var(--ink-2);
-  background:var(--surface);border:1px solid var(--line);flex:none;
+.subtab{white-space:nowrap;padding:10px 14px;border-radius:999px;font-size:12.5px;font-weight:600;color:var(--ink-2);
+  min-height:40px;background:var(--surface);border:1px solid var(--line);flex:none;
   transition:background .16s,color .16s,border-color .16s,box-shadow .16s}
 .subtab:hover{color:var(--ink);border-color:var(--line-2)}
 .subtab.on{background:var(--area);color:var(--on-fill);border-color:transparent;
@@ -2024,63 +2028,68 @@ W.ATIVO.cal=W.ATIVO.home;
 W.OFF.cal=W.OFF.home;
 
 /* =====================================================================
-   VÍDEOS — abrem a busca do YouTube no termo indicado
+   VÍDEOS — tocam dentro do app
+   Cada item é [id do YouTube, título real do vídeo, canal, por que está
+   aqui]. Um quinto item, quando existe, limita o vídeo a certas trilhas.
+   Todo id foi conferido no oEmbed do YouTube antes de entrar aqui: é o
+   único jeito de saber que o vídeo existe e é público, e id morto dentro
+   de um player vira "vídeo indisponível" na cara da pessoa.
    ===================================================================== */
 const VIDEOS={
  musculacao:[
-  {t:'Como executar o supino reto',q:'execução correta supino reto barra iniciante',d:'Pegada, trajetória da barra e erros que machucam o ombro'},
-  {t:'Agachamento livre do zero',q:'agachamento livre execução correta erros comuns',d:'Profundidade, posição dos pés e o que fazer quando o joelho entra'},
-  {t:'Levantamento terra com segurança',q:'levantamento terra execução correta coluna neutra',d:'O movimento que mais exige técnica — vale assistir antes de tentar'},
-  {t:'Puxada e remada para costas largas',q:'puxada alta e remada execução correta costas largura',d:'Como puxar com o cotovelo e sentir o dorsal em vez do bíceps'},
-  {t:'Ombro: elevação lateral certa',q:'elevação lateral execução correta deltoide lateral erros',d:'O exercício mais feito errado da academia'},
-  {t:'Como progredir carga sem se machucar',q:'como progredir carga hipertrofia sobrecarga progressiva',d:'Quando subir o peso e quando segurar'},
-  {t:'Aquecimento antes do treino',q:'aquecimento antes do treino de musculação articular',d:'5 a 8 minutos que reduzem muito o risco de lesão'},
-  {t:'Primeira vez na academia',q:'primeiro dia na academia o que fazer iniciante guia',d:'Como montar o primeiro treino e usar os aparelhos sem medo'}
+ ['08JcM5fBcOM','SUPINO RETO BARRA - Saúde Em Foco','SAÚDE EM FOCO {Personal Trainer}','Pegada, trajetória da barra e erros que machucam o ombro'],
+ ['BLTAbSHNA_4','NUNCA MAIS AGACHE ERRADO | COMO FAZER O AGACHAMENTO PERFEITO','Mauricio Medeiros MTOR | Treinador de Treinadores','Profundidade, posição dos pés e o joelho que entra'],
+ ['OQIL_Vh0-r8','Como um iniciante deve fazer o Terra pela 1ª vez - Utilizando a Técnica Corretamente (COMPROVADO!)','BoraBuscar','O movimento que mais exige técnica — assista antes de tentar'],
+ ['ckZYkMCzXew','Remada Curvada com Halteres Pronada | Treino de Costas','XSTEAM','Como puxar com o cotovelo e sentir o dorsal, não o bíceps'],
+ ['ZIADnVZM-Ys','Um detalhe que faz TOTAL diferença - *elevação lateral jeito certo','Mantoani | Personal Trainer','O exercício mais feito errado da academia'],
+ ['odnL0Ft2nf8','SEGREDOS DA PERIODIZAÇÃO NA MUSCULAÇÃO - PROGRESSÃO DE CARGAS E SOBRECARGA PROGRESSIVA.','DeniFitnessPro - Denilson Amorim','Quando subir o peso e quando segurar'],
+ ['CZ9hrvQeAZ0','TREINO AQUECIMENTO .:. Para realizar antes dos seus treinos!','Oh My Core','5 a 8 minutos que reduzem muito o risco de lesão'],
+ ['76S4s8s6BKc','COMO É O PRIMEIRO DIA NA ACADEMIA- TREINAMENTO PARA INICIANTES','Jenny Amorim','Como montar o primeiro treino e usar os aparelhos sem medo']
  ],
  calistenia:[
-  {t:'Calistenia do zero',q:'calistenia para iniciantes do zero treino completo',d:'O que é, por onde começar e qual a sequência de progressões'},
-  {t:'Sua primeira barra fixa',q:'progressão barra fixa do zero como fazer a primeira',d:'Negativas, australiana e dead hang até a primeira repetição completa'},
-  {t:'Sua primeira flexão',q:'como fazer a primeira flexão de braço progressão',d:'Da flexão na parede até o chão'},
-  {t:'Parada de mão (handstand)',q:'parada de mão iniciante progressão na parede',d:'Começa na parede e leva meses — é normal'},
-  {t:'Pistol squat passo a passo',q:'progressão pistol squat agachamento unilateral',d:'Mobilidade de tornozelo, apoio e força unilateral'},
-  {t:'Front lever: progressões',q:'front lever progressão tuck advanced tuck',d:'A isometria que mais constrói dorsal na calistenia'},
-  {t:'Treino de calistenia em casa',q:'treino calistenia em casa sem equipamento completo',d:'Sem barra, sem paralela, sem desculpa'},
-  {t:'Dips e paralelas',q:'mergulho paralelas dips execução correta progressão',d:'Como proteger o ombro e progredir com segurança'}
+ ['ruqw5jDUfTc','Calistenia Para Iniciantes | Rotina De Corpo Inteiro (passo a passo)','Nec Strong','O que é, por onde começar e a sequência de progressões'],
+ ['KLglcOT4g7o','Como melhorar a força na barra fixa','Leandro Twin','Negativas, australiana e dead hang até a primeira completa'],
+ ['_rHcw19YeeE','Como Fazer Sua Primeira Flexão de Braço (Do Zero) | Calistenia','Gabriel Repinaldo | Calilogos','Da flexão na parede até o chão'],
+ ['knjlQR0TaAo','Parada de mão (calistenia)','Márcio Léo de Sousa','Começa na parede e leva meses — é normal'],
+ ['ddNyXOlIFhk','Vamos de Progressões do Pistol Squat ou Agachamento Pistola','Guerreiros da Calistenia','Mobilidade de tornozelo, apoio e força unilateral'],
+ ['VOQ4k1cUt70','COMO FAZER FRONT LEVER | APRENDA DO ZERO','SHAFFAX FITNESS乡','A isometria que mais constrói dorsal na calistenia'],
+ ['cP1FmnyVuug','Treino de Calistenia em Casa: 30 Minutos para Ganhar Força (Sem Equipamentos)','MBP Gym','Sem barra, sem paralela, sem desculpa'],
+ ['b4wUMJvmZL4','Barras Paralelas','Renato Fenasc [EXERCÍCIOS]','Como proteger o ombro e progredir com segurança']
  ],
  casa:[
-  {t:'Treino em casa sem equipamento',q:'treino em casa sem equipamento iniciante corpo todo',d:'Sessões curtas de corpo inteiro'},
-  {t:'Treino com elástico',q:'treino com elástico extensor em casa corpo todo',d:'O acessório mais barato que mais rende em casa'},
-  {t:'HIIT de 20 minutos',q:'HIIT 20 minutos em casa sem pular iniciante',d:'Versões sem impacto para não incomodar o vizinho'},
-  {t:'Alongamento e mobilidade',q:'alongamento e mobilidade pós treino 10 minutos',d:'Para fazer nos dias de descanso ativo'}
+ ['YbQghaqU-uk','Treino para o CORPO TODO - Ganhar Massa Muscular e Definir em casa','Olena Starodubets','Sessões curtas de corpo inteiro'],
+ ['H-qllUh9Fy4','15 Exercícios com Elástico Extensor | Treino COMPLETO','Yangfit Brasil','O acessório mais barato que mais rende em casa'],
+ ['61bKx0ew0qM','20 min CARDIO HIIT para iniciantes sem equipamentos - em casa- (Carol Borba','Carol Borba','Versões sem impacto para não incomodar o vizinho'],
+ ['--d8jRZPaqA','ALONGAMENTO DINÂMICO | Exercícios de Mobilidade para Prevenir DOR no Corpo | Aurélio Alfieri','Aurélio Alfieri','Para fazer nos dias de descanso ativo']
  ],
  voz_fem:[
-  {t:'Feminização vocal: por onde começar',q:'feminização vocal exercícios fonoaudiologia trans iniciante',d:'Altura, ressonância e peso vocal explicados por fonoaudiólogo'},
-  {t:'Ressonância — o que mais importa',q:'ressonância vocal feminina exercícios trans',d:'Mais determinante que a altura da voz para como você é percebida'},
-  {t:'Exercícios diários de voz',q:'exercícios diários feminização vocal treino de voz trans',d:'Rotinas curtas para repetir todo dia'},
-  {t:'Em inglês: voice feminization',q:'voice feminization exercises beginner resonance pitch',d:'Há muito material bom em inglês, com exemplos de áudio'},
-  {t:'Entonação e melodia da fala',q:'entonação melodia da fala feminina exercício fonoaudiologia',d:'A variação de altura ao longo da frase'}
+ ['tD0MT50Ufos','Vocal Feminization: How to Project Using Twang','Olivia Flanigan','Altura, ressonância e peso vocal explicados por fonoaudiólogo'],
+ ['II4nPEacP3I','10 VOCAL EXERCISES To Improve Your RESONANCE','Derrik Rockne','Mais determinante que a altura para como a voz é percebida'],
+ ['GhsDAEF-_Xo','How to Feminize Your Voice! | MtF Voice Training','Zoe Sinns','Rotinas curtas para repetir todo dia'],
+ ['NTFPP8nvrzw','The Best Ways to Raise Your Larynx for Voice Feminization','Jordan Ross Communication','Material em inglês, com exemplos de áudio'],
+ ['7oRr6E_Eslo','Speech Tips: Vary Your Voice Pitch (Range, Intonation & Modulation) For Engaging Speaking','Steady State - Jimmy Cannon Coach','A variação de altura ao longo da frase']
  ],
  voz_masc:[
-  {t:'Masculinização vocal',q:'masculinização vocal exercícios fonoaudiologia trans',d:'Ressonância grave e peso vocal, com ou sem testosterona'},
-  {t:'Voz durante a hormonização',q:'mudança de voz testosterona trans o que esperar',d:'O que a T faz sozinha e o que exige treino'},
-  {t:'Como projetar sem forçar',q:'projeção vocal grave exercício sem forçar a garganta',d:'Evitar o aperto na garganta é o ponto principal'},
-  {t:'Em inglês: voice masculinization',q:'voice masculinization exercises resonance weight',d:'Material complementar com exemplos de áudio'}
+ ['v8Ca0RciBC8','The fastest voice masculinization trick #transvoiceteacher #transmasc #transvoice','Isabella Ferrari','Ressonância grave e peso vocal, com ou sem testosterona'],
+ ['YUjFcMgdvdU','VOICE AFTER 1 YEAR ON TESTOSTERONE','G Tucker','O que a testosterona faz sozinha e o que exige treino'],
+ ['','Como projetar sem forçar','projeção vocal grave exercício sem forçar a garganta','Evitar o aperto na garganta é o ponto principal'],
+ ['1flFUYqsCUw','Lowering Your Larynx: Tube Breathing for Voice Masculinization','Renée Yoxon, Gender-Affirming Voice Teacher','Material em inglês, com exemplos de áudio']
  ],
  voz_base:[
-  {t:'Aquecimento vocal',q:'aquecimento vocal exercícios fonoaudióloga 5 minutos',d:'Sempre antes de qualquer treino de voz'},
-  {t:'Respiração diafragmática',q:'respiração diafragmática exercício voz canto',d:'A base de tudo: sem apoio de ar não há controle'},
-  {t:'Exercício do canudo',q:'straw phonation exercício canudo voz fonoaudiologia',d:'Um dos exercícios mais seguros e eficazes que existem'},
-  {t:'Vibração de lábios e língua',q:'vibração de lábios exercício vocal lip trill',d:'Solta a musculatura sem esforçar as pregas vocais'},
-  {t:'Saúde vocal: o que evitar',q:'saúde vocal cuidados o que evita rouquidão fonoaudiologia',d:'Cochichar, pigarrear e gritar são os três maiores vilões'}
+ ['FOZfptHbKs4','Professor: 6 dicas para cuidar da sua voz e exercícios para aquecimento vocal','Professor Ideal','Sempre antes de qualquer treino de voz'],
+ ['AOCN8PofbRE','‍ A respiração com o diafragma é fundamental para controlar a dor nas costas','Dr. Alexandre Mota','A base de tudo: sem apoio de ar não há controle'],
+ ['PaxiRRnVc7o','Adeus voz presa e cansada- Conheça o exercício do CANUDO','Manu Cavalaro','Um dos exercícios mais seguros e eficazes que existem'],
+ ['','Vibração de lábios','vibração de lábios exercício vocal lip trill','Solta a musculatura sem esforçar as pregas vocais'],
+ ['1hBrgq5TLJY','Saúde em Prática | Cuidados com a voz','TV Unesp','Cochichar, pigarrear e gritar são os três maiores vilões']
  ],
  pele:[
-  {t:'Ordem dos produtos',q:'ordem dos produtos de skincare qual usar primeiro dermatologista',d:'Do mais fluido ao mais denso — e onde entra o protetor'},
-  {t:'Rotina para pele oleosa e acne',q:'rotina skincare pele oleosa acne dermatologista',d:'Limpeza, ativo e hidratação sem piorar a oleosidade'},
-  {t:'Rotina para pele seca',q:'rotina skincare pele seca ceramidas dermatologista',d:'Barreira cutânea, ceramidas e quando o creme é melhor que o sérum'},
-  {t:'Como usar adapaleno',q:'como usar adapaleno corretamente retinoide acne',d:'Frequência, quantidade e o período de piora inicial'},
-  {t:'Protetor solar na prática',q:'protetor solar rosto quantidade correta reaplicação',d:'Quantidade certa, reaplicação e qual textura escolher'},
-  {t:'Pele e hormonização',q:'cuidados com a pele hormonização trans acne testosterona',d:'O que muda na pele com T e com estrogênio',tr:['masc','fem']},
-  {t:'Barba, foliculite e pelos encravados',q:'foliculite barba pelos encravados como evitar cuidados',d:'Importa para quem faz a barba e para quem faz depilação'}
+ ['Rfk7IEDDh5g','Qual a ordem correta do skincare? | Dica de Esteticista','Talita Rodrigues','Do mais fluido ao mais denso — e onde entra o protetor'],
+ ['52pwr1sUtmc','SKINCARE - 5 PASSOS PARA CUIDAR DA PELE OLEOSA E ACNEICA','ESTETICLASS ONLINE | Dra. Ilana Lopes','Limpeza, ativo e hidratação sem piorar a oleosidade'],
+ ['-zqMUghs5PA','Rotina de Skincare para Pele Seca: Manhã e Noite','Dra. Marina Hayashida','Barreira cutânea, ceramidas e quando o creme vence o sérum'],
+ ['Fy0rqyB68ZM','Adapaleno para Combater Acne Funciona?','Project M London','Frequência, quantidade e o período de piora inicial'],
+ ['IDMzB3sSPHo','Como retocar protetor solar com maquiagem? Vanessa Rozan dá a dica','Universa','Como reaplicar durante o dia, inclusive por cima da maquiagem'],
+ ['hx5mgpV6ibQ','Como os Hormônios Feminilizam a Pele? Entenda as Mudanças Reais na Transição de Gênero','Dr. Thiago Caetano','O que muda na pele com testosterona e com estrogênio',['masc','fem']],
+ ['33JWuCLn6V0','Pelo encravado (Foliculite): o que NÃO fazer?','Luciana Villas Bôas Clínica Dermatológica','Importa para quem faz a barba e para quem faz depilação']
  ]
 };
 
@@ -2821,7 +2830,19 @@ function metaSegura(){
 /* Números que a pessoa escolheu não ver. Ela continua registrando tudo — as metas
    seguem sendo calculadas —, o app é que para de devolver o número na tela.
    Existe porque ver peso e percentual de gordura todo dia faz mal a muita gente. */
-function oculto(k){return (S.perfil.ocultar||[]).indexOf(k)>=0}
+/* Números de corpo e de caloria. Nascem desligados e não voltam sozinhos:
+   para quem tem histórico de transtorno alimentar, ver estes números todo
+   dia é o próprio gatilho. Religar exige a senha de NUM_SENHA. */
+const NUM_TRAVADOS=['peso','gordura','medidas','kcal'];
+/* Não é segurança: está no fonte, que é público, e quem souber abrir acha.
+   É um degrau, para o religar não acontecer no impulso de um dia ruim. */
+const SENHA_NUMEROS='norte-7412';
+function numLiberado(){return S.perfil.numLiberado===true}
+function travado(k){return NUM_TRAVADOS.indexOf(k)>=0&&!numLiberado()}
+function oculto(k){
+ if(travado(k))return true;
+ return (S.perfil.ocultar||[]).indexOf(k)>=0;
+}
 const OCULTAVEIS=[['peso','Peso na balança'],['gordura','Percentual de gordura'],
  ['medidas','Medidas do corpo'],['kcal','Calorias e macros'],
  ['graficos','Gráficos e números de treino']];
@@ -3634,7 +3655,8 @@ function stHoje(){
    '<div class="row top" style="gap:9px"><div class="grow">'+
    '<div class="nm" style="font-size:13.5px">'+esc(ex.n)+'</div><div class="meta">'+esc(ex.s)+' × '+esc(ex.r)+'</div>'+
    (ex.o?'<div class="obs">'+esc(ex.o)+'</div>':'')+'</div>'+
-   '<button class="btn gh xs" data-a="ex-info" data-n="'+esc(ex.n)+'">'+ic('play')+'</button>'+
+   '<button class="btn gh xs" data-a="ex-info" data-n="'+esc(ex.n)+'" '+
+   'aria-label="Como fazer: '+esc(ex.n)+'">'+ic('play')+'</button>'+
    '</div></div>').join('')+'</div></div>':'';
  $('#st-hoje').innerHTML=
   (tirados.length?'<div class="card" style="border-color:var(--ok)">'+
@@ -3824,7 +3846,15 @@ const MOV_MAP=[
  ['prancha',['prancha']],
  ['abdominal',['abdominal','canivete','hollow','bicicleta','elevação de pernas','superman','l-sit','core','toque no ombro']],
  ['mergulho',['mergulho','paralela','dips']],
- ['remada',['remada','australiana','pullover','face pull','encolhimento','crucifixo invertido','cavalinho']],
+ ['encolhimento',['encolhimento','shrug','trapézio']],
+ ['crucifixoinv',['face pull','crucifixo invertido','crucifixo inverso','posterior de ombro']],
+ ['abdutora',['abdutora','abdução','glúteo médio']],
+ ['extensora',['extensora']],
+ ['flexora',['flexora']],
+ ['legpress',['leg press','leg-press']],
+ ['pallof',['pallof','anti-rotação','antirrotação']],
+ ['serratil',['serrátil','escapular push','push-up plus']],
+ ['remada',['remada','australiana','pullover','cavalinho']],
  ['puxada',['puxada','barra fixa','chin-up','scapular','dead hang','front lever','pendurar']],
  ['supino',['supino','crucifixo','peck']],
  ['desenvolvimento',['desenvolvimento','militar','pike','parada de mão','handstand']],
@@ -3840,6 +3870,75 @@ const MOV_MAP=[
  ['cardio',['caminhada','corrida','hiit','burpee','polichinelo','bike','esteira','skater','mountain','salto','explosiva']],
  ['along',['alongamento','mobilidade','gato','rotação','circundução','postura','respiração','elástico — rotação']]
 ];
+/* ---------- movimentos acrescentados depois ----------
+   Os oito que faltavam, escolhidos pelo que muda a leitura do corpo:
+   quadril, trapézio, cintura e postura. */
+Object.assign(MOV,{
+ abdutora:{n:'Abdução de quadril',m:'Glúteo médio — o que alarga a linha do quadril',
+  passos:['Na cadeira abdutora: sente com a coluna apoiada e os joelhos na altura das almofadas.',
+   'Abra as pernas devagar, em 2 segundos, até sentir o lado do quadril trabalhar.',
+   'Volte em 3 segundos, controlando — não deixe o peso bater.',
+   'Com elástico: deite de lado, joelhos dobrados, e abra o joelho de cima sem rolar o quadril para trás.'],
+  erros:['Jogar o tronco para trás para abrir mais — tira o glúteo médio do movimento',
+   'Peso alto com amplitude pequena',
+   'Rolar o quadril para trás na versão com elástico']},
+ extensora:{n:'Cadeira extensora',m:'Quadríceps, com ênfase na parte de cima do joelho',
+  passos:['Ajuste o encosto para o joelho ficar alinhado com o eixo da máquina.',
+   'Suba em 1 ou 2 segundos até quase esticar o joelho, sem travar.',
+   'Segure meio segundo no topo, com a coxa contraída.',
+   'Desça em 3 segundos, controlando o peso até o fim.'],
+  erros:['Travar o joelho no topo com carga alta',
+   'Soltar o peso na descida, que é onde o músculo mais trabalha',
+   'Levantar o quadril do banco para ajudar']},
+ flexora:{n:'Mesa flexora',m:'Posterior de coxa, isolado',
+  passos:['Deite de barriga para baixo com o rolo logo acima do tendão de Aquiles.',
+   'Flexione o joelho levando o calcanhar na direção do glúteo, em 2 segundos.',
+   'Aperte no topo sem levantar o quadril do banco.',
+   'Volte em 3 segundos, sem deixar o peso cair.'],
+  erros:['Levantar o quadril para ganhar amplitude',
+   'Amplitude curta, parando no meio do caminho',
+   'Rolo na altura errada, pressionando a panturrilha']},
+ crucifixoinv:{n:'Crucifixo inverso e face pull',m:'Posterior do ombro e parte alta das costas — postura',
+  passos:['Com halteres: tronco inclinado para a frente, braços soltos, cotovelo levemente dobrado.',
+   'Abra os braços para o lado pensando em juntar as escápulas, não em levantar o peso.',
+   'No face pull: puxe a corda na direção do rosto, com os cotovelos ALTOS e abrindo para fora.',
+   'Segure um instante no fim e volte devagar.'],
+  erros:['Usar peso demais e virar remada',
+   'Cotovelo baixo no face pull — vira puxada de costas',
+   'Encolher o ombro na direção da orelha durante o movimento']},
+ encolhimento:{n:'Encolhimento de ombro',m:'Trapézio superior',
+  passos:['Em pé, peso nas mãos ao lado do corpo, braços esticados e soltos.',
+   'Levante só o ombro na direção da orelha, sem dobrar o cotovelo.',
+   'Segure um segundo no topo.',
+   'Desça devagar, deixando o ombro voltar ao lugar por inteiro.'],
+  erros:['Girar o ombro em círculo, que não aumenta o trabalho e incomoda a articulação',
+   'Dobrar o cotovelo e transformar em remada',
+   'Inclinar a cabeça para a frente durante a subida']},
+ pallof:{n:'Anti-rotação (Pallof)',m:'Core profundo, sem engrossar a cintura',
+  passos:['Em pé, de lado para o ponto onde o elástico está preso, na altura do peito.',
+   'Segure a alça com as duas mãos, juntas, na frente do esterno.',
+   'Estique os braços para a frente e SEGURE: o elástico vai tentar girar você, e o trabalho é não girar.',
+   'Volte as mãos ao peito e repita. Depois troque de lado.'],
+  erros:['Girar o tronco junto com o elástico',
+   'Prender a respiração — respire normalmente durante a sustentação',
+   'Ficar com o quadril para fora do alinhamento']},
+ serratil:{n:'Serrátil e escápula',m:'Estabilidade da escápula — postura de quem usa binder',
+  passos:['Na posição de prancha alta, com os braços esticados, deixe o peito afundar entre as escápulas.',
+   'Agora empurre o chão para longe, afastando as escápulas, sem dobrar o cotovelo.',
+   'Esse empurrar é o movimento inteiro. Faça devagar, 2 segundos para cada lado.',
+   'Em pé com elástico: empurre os braços para a frente e deixe a escápula acompanhar.'],
+  erros:['Dobrar o cotovelo e virar flexão',
+   'Fazer rápido demais — a amplitude é pequena e precisa ser sentida',
+   'Deixar o quadril cair na versão em prancha']},
+ legpress:{n:'Leg press',m:'Quadríceps, glúteo e posterior, com a coluna apoiada',
+  passos:['Pés na plataforma na largura do ombro. Mais alto pega mais glúteo, mais baixo pega mais quadríceps.',
+   'Desça em 3 segundos até o joelho formar um ângulo próximo de 90 graus.',
+   'Pare antes de a lombar descolar do encosto — esse é o seu limite de amplitude, não o da máquina.',
+   'Empurre com o meio do pé, sem travar o joelho no topo.'],
+  erros:['Descer até a lombar sair do encosto, que é a lesão mais comum da máquina',
+   'Travar o joelho com a carga toda em cima',
+   'Joelho caindo para dentro na subida']}
+});
 Object.keys(MOV).forEach(k=>{MOV[k].k=k});
 function movDe(nome){
  const n=nrm(nome);
@@ -3847,6 +3946,18 @@ function movDe(nome){
  return MOV.along;
 }
 /* Vídeos de execução por movimento, tocados dentro da própria página. */
+const EXVID_NOVOS={
+ abdutora:[['FAÇA ESSA TÉCNICA PARA EXPLODIR O SEU GLÚTEO NA CADEIRA ABDUTORA','0dJnjYW7J6M'],
+  ['Guia de Execução para Abdução de Quadril com Miniband deitado com as pernas esticadas.','GgGb_0ESHdw']],
+ extensora:[['Quadriceps na ACADEMIA, como USAR a Cadeira EXTENSORA? - Carol Borba','OoQ9VX6zq0I']],
+ flexora:[['Treino de Perna, Posterior de coxa Mesa Flexora 5x12 com 10 segundos de descanso','8RtHGGtJRtc']],
+ crucifixoinv:[['Ombro Crucifixo Inverso','BL1jjcadP7Q'],
+  ['Face Pull: análise cinesiológica além da receita pronta','isFRYP0vk8Y']],
+ encolhimento:[['COMO FAZER ENCOLHIMENTO POR TRÁS BARRA - EXERCÍCIO TRAPÉZIO','S5ZgwO21sw8']],
+ pallof:[['Pallof Press','nFspBRHke4w']],
+ serratil:[['A importante função do Serrátil Anterior','egJMgz7cTgY']],
+ legpress:[['Leg. press - erros e acertos.','wvAefAG_XxI']]
+};
 const EXVID={
  agachamento:[['Agachamento livre com barra: como fazer corretamente','rM6SDUdl9fs'],
   ['Agachamento livre: execução e adaptações para quem está começando','bxq2eVZl9nY'],
@@ -3872,7 +3983,7 @@ const EXVID={
  elevacao:[['Elevação lateral com halteres: técnica correta e erros comuns','jannLx4RxKo'],
   ['Pare de fazer elevação lateral assim','Q1uUndDSj8M'],
   ['Como fazer a elevação lateral com halteres','gURBTU9VSJg']],
- rosca:[['Execução correta da rosca direta','2JsGfXV_sAM'],
+ rosca:[['Como fazer rosca direta: evite esses erros','AdIAdYVZ4Nw'],
   ['3 erros em uma rosca direta','OZ7cQ5NajKs'],
   ['Rosca direta sem erro: ative o bíceps de verdade','hXIDqCxgaaQ']],
  triceps:[['Tríceps na polia alta com corda: execução e postura','7le1JRUUagM'],
@@ -3881,7 +3992,7 @@ const EXVID={
   ['Mergulho nas paralelas: posição e execução','OPyI6B68tHw'],
   ['Paralelas na barra para tríceps (dips)','WDkgjWaPj5Y']],
  stiff:[['Como fazer stiff com barra ou halteres','po5ihi0-5rk'],
-  ['Como fazer stiff corretamente','bR9HJ20b9f8'],
+  ['Como fazer stiff com barra corretamente','Re5n7fMZw2g'],
   ['Como fazer stiff com barra corretamente','iN3O5U_Ujxc']],
  ponte:[['Elevação pélvica: passo a passo para fazer corretamente','kvmT_ZlgVI0'],
   ['Como fazer elevação pélvica ativando ao máximo o glúteo','hzSp2bDerCU']],
@@ -3900,7 +4011,10 @@ const EXVID={
  along:[['Alongamento para o corpo todo em 10 minutos','ALrxeixOMPg'],
   ['Alongamento e mobilidade em 10 minutos','2TMSxdzE0lU'],
   ['Alongamento pós-treino','w4LCsSxB-SQ']]
-};
+};/* os videos dos oito movimentos acrescentados depois entram aqui,
+   e nao antes: EXVID ainda nao existe la em cima */
+Object.assign(EXVID,EXVID_NOVOS);
+
 /* A demonstração de cada movimento é o vídeo de uma pessoa executando,
    tocado dentro da própria página. */
 function demoPrincipal(mov){
@@ -3929,6 +4043,19 @@ function videosDoMovimento(k,pular){
  return '<hr class="sep"><div class="lbl" style="margin-bottom:4px">Outros ângulos e explicações</div>'+
   '<p class="xtiny muted" style="margin-bottom:10px">Tocam aqui mesmo, sem sair do app.</p>'+
   '<div class="stack" style="gap:10px">'+v.map(([t,id])=>cardVideo(t,id)).join('')+'</div>';
+}
+/* Uma lista de vídeos que tocam aqui dentro. Cada item é
+     [id do YouTube, título real do vídeo, canal, por que está aqui]
+   e, quando não existe vídeo verificado para aquele assunto, o id vem
+   vazio e o item continua como link de busca: perder o conteúdo seria
+   pior que sair do app, e embutir id morto seria pior que as duas coisas. */
+function listaVideos(arr){
+ return '<div class="stack" style="gap:12px">'+arr.map(function(v){
+  if(!v[0])return vidLink(v[1],v[2],v[3]);
+  return '<div>'+cardVideo(v[1],v[0])+
+   '<p class="xtiny muted" style="margin-top:5px;line-height:1.5">'+esc(v[3])+
+   ' · canal <b>'+esc(v[2])+'</b></p></div>';
+ }).join('')+'</div>';
 }
 function cardVideo(t,id){
  return '<div class="vcard">'+
@@ -4015,9 +4142,9 @@ function stAgenda(){
  const mesNome=d0.toLocaleDateString('pt-BR',{month:'long',year:'numeric'});
  $('#st-agenda').innerHTML=
   '<div class="card"><div class="ch" style="align-items:center">'+
-   '<button class="btn gh xs" data-a="mes" data-v="-1">'+ic('left')+'</button>'+
+   '<button class="btn gh xs" data-a="mes" data-v="-1" aria-label="Mês anterior">'+ic('left')+'</button>'+
    '<h2 style="font-size:15.5px">'+mesNome.charAt(0).toUpperCase()+mesNome.slice(1)+'</h2>'+
-   '<button class="btn gh xs" data-a="mes" data-v="1">'+ic('right')+'</button></div>'+
+   '<button class="btn gh xs" data-a="mes" data-v="1" aria-label="Próximo mês">'+ic('right')+'</button></div>'+
    '<div class="cal" style="margin-bottom:6px">'+['D','S','T','Q','Q','S','S'].map(x=>'<div class="dow">'+x+'</div>').join('')+'</div>'+
    '<div class="cal">'+cells+'</div>'+
    '<div class="row wrap" style="gap:11px;margin-top:12px">'+
@@ -4084,8 +4211,7 @@ function stVolume(){
 }
 function bibliotecaMovimentos(){
  const L=S.perfil.local;
- const bloco=(t,icone,arr)=>'<div class="card">'+chTtl(icone,t)+'<div class="stack" style="gap:8px">'+
-  arr.map(v=>vidLink(v.t,v.q,v.d)).join('')+'</div></div>';
+ const bloco=(t,icone,arr)=>'<div class="card">'+chTtl(icone,t)+listaVideos(arr)+'</div>';
  const mini=k=>{
   const v=(EXVID[k]||[])[0];
   return '<button class="movcard" data-a="mov-info" data-k="'+k+'">'+
@@ -4603,7 +4729,9 @@ function cardReceita(r,s){
    (s&&s.faltantes.length?'<div class="obs">falta: '+esc(s.faltantes.join(', '))+'</div>':
     s?'<div class="obs" style="color:var(--ok)">você tem tudo</div>':'')+
   '</button>'+
-  '<button class="btn gh xs" data-a="fav" data-id="'+r.id+'" style="'+(fav?'color:var(--accent)':'')+'">'+ic('star')+'</button>'+
+  '<button class="btn gh xs" data-a="fav" data-id="'+r.id+'" style="'+(fav?'color:var(--accent)':'')+'" '+
+   'aria-pressed="'+(fav?'true':'false')+'" aria-label="'+(fav?'Remover ':'Marcar ')+esc(r.nome)+' como favorita">'+
+   ic('star')+'</button>'+
  '</div></div>';
 }
 function stReceitas(){
@@ -4655,37 +4783,22 @@ function stReceitas(){
   '<div class="card">'+chTtl('book','Receitas','<span class="tag n">'+RECIPES.length+'</span>')+
   '<p class="tiny muted">Todas com gramagem, modo de preparo e valores por porção. Toque para abrir e registrar no diário.</p>'+
   '<div class="srch" style="margin-top:11px">'+ic('search')+
-   '<input type="text" id="buscaRef" placeholder="Buscar por nome ou ingrediente" value="'+esc(S.ui.buscaRef||'')+'"></div>'+
+   '<input type="text" id="buscaRef" aria-label="Buscar receita por nome ou ingrediente" '+
+   'placeholder="Buscar por nome ou ingrediente" value="'+esc(S.ui.buscaRef||'')+'"></div>'+
   '<div class="row wrap" style="gap:5px;margin-top:9px">'+
    [['todas','Todas'],['agora',ic('check')+' Dá pra fazer agora'],['poucos','Até 5 ingredientes'],
     ['favs',ic('star')+' Favoritas'],...MEALS.map(m=>[m.k,m.n])].map(([k,n])=>
    '<button class="chip xs '+(f===k?'on':'')+'" data-a="filtro-ref" data-v="'+k+'">'+n+'</button>').join('')+'</div></div>'+
-  blocoVideos('Técnicas que fazem a comida dar certo',[
-   ['Marmita da semana: como montar e guardar',
-    'marmita saudavel semana meal prep como montar congelar',
-    'Montar cinco refeições de uma vez e guardar sem estragar'],
-   ['Frango que não fica seco',
-    'como fazer frango grelhado suculento nao ressecar frigideira',
-    'O erro que resseca o peito de frango, e como evitar'],
-   ['Ovo de todo jeito',
-    'omelete ovo mexido cozido ponto certo tecnica basica',
-    'Mexido, omelete e cozido no ponto — a proteína mais barata'],
-   ['Arroz e feijão bem feitos',
-    'como fazer arroz soltinho e feijao temperado do zero',
-    'A base da comida brasileira, que já é barata e equilibrada'],
-   ['Legume assado que fica bom',
-    'como assar legumes no forno temperatura tempo ficar douradinho',
-    'Forno, sal e azeite: o jeito mais simples de comer verdura'],
-   ['Batata-doce e carboidrato de verdade',
-    'como cozinhar batata doce forno panela de pressao pratico',
-    'Cozinhar de uma vez e deixar pronta na geladeira'],
-   ['Vitamina e smoothie sem açúcar',
-    'vitamina de banana aveia smoothie sem acucar receita saudavel',
-    'Bebida que alimenta, no lugar do refrigerante'],
-   ['Panqueca de banana e aveia',
-    'panqueca de banana com aveia receita 3 ingredientes',
-    'Três ingredientes, e é café da manhã ou lanche']
-  ],'As receitas do app estão todas escritas, com gramagem e modo de preparo. '+
+  blocoVideosTocam('Técnicas que fazem a comida dar certo',[
+ ['Buli-hyLfU4','MARMITAS FIT PRA SEMANA | CARDÁPIO COMPLETO, SIMPLES, FÁCIL E DELICIOSO','Menino Prendado','Montar as refeições de uma vez e guardar sem estragar'],
+ ['bCjwM-sI4Hk','BIFE DE FRANGO MACIO E SUCULENTO RECEITA DE RESTAURANTE','BRUNA CARVALHO TV','O erro que resseca o frango, e como evitar'],
+ ['OOOAHszJXeA','Como cozinhar ovo perfeito? OVO COZIDO EM VÁRIOS PONTOS DIFERENTES - TUDO O QUE VOCÊ PRECISA SABER','Guilherme Guzela','O ponto do ovo, que é a proteína mais barata'],
+ ['dbpFXtHmN_w','COMIDA BÁSICA: ARROZ FEIJÃO E CARNE','Receitinhas da Grá','A base da comida brasileira, que já é barata e equilibrada'],
+ ['_eS-Qi8MKXo','LEGUMES ASSADOS NO FORNO FÁCIL E MUITO SABOROSO','Angela Drulla Receitas','Forno, sal e azeite: o jeito mais simples de comer verdura'],
+ ['zadQ5rfUw90','Como cozinhar uma batata doce na panela de pressão por 2 minutos','Dicas da Betinha','Cozinhar de uma vez e deixar pronta na geladeira'],
+ ['ASuZ9bhTlDc','COMO FAZER VITAMINA DE BANANA COM MAÇÃ E AVEIA. FÁCIL E DELICIOSA','Receitas sem Blá Blá Blá','Bebida que alimenta, no lugar do refrigerante'],
+ ['iwNUttKM6AI','CREPIOCA CREMOSA COM QUEIJO IRRESISTÍVEL | Cook\'n Enjoy #488','Cook\'n Enjoy','Lanche de dois minutos com proteína de verdade']
+  ],'As receitas do app estão escritas, com gramagem e modo de preparo. '+
     'Isto aqui é para quando ver a mão fazendo ajuda mais que ler.')+
   '<div class="card"><div class="stack" style="gap:8px">'+
    (lista.length
@@ -4777,6 +4890,29 @@ function blocoVideoReceita(r){
    '<a href="https://www.youtube.com/watch?v='+esc(v[0])+'" target="_blank" rel="noopener">abrir no YouTube</a>'+
    ' · <a href="'+esc(yt(r.nome+' receita'))+'" target="_blank" rel="noopener">ver outras</a></p>'+
   '</div>';
+}
+/* A tela que explica a trava e recebe a senha. */
+function sheetDestravar(){
+ sheet('Números de corpo e caloria',
+  '<p class="tiny" style="line-height:1.7">Peso, percentual de gordura, medidas e caloria vêm <b>desligados</b>, '+
+  'e não voltam com um toque.</p>'+
+  '<p class="tiny muted" style="line-height:1.7;margin-top:10px">Para quem tem histórico de transtorno alimentar, '+
+  'ver estes números todo dia é o gatilho. O app continua registrando e calculando tudo por baixo: '+
+  'as porções, as receitas e o plano seguem certos. Ele só não devolve o número para a tela.</p>'+
+  '<p class="tiny muted" style="line-height:1.7;margin-top:10px">Se você quiser mesmo assim, peça a senha por e-mail. '+
+  'A demora da resposta é de propósito: num dia ruim, religar no impulso é o que a trava evita.</p>'+
+  '<a class="btn acc bl" style="margin-top:13px" href="mailto:'+EMAIL_CONTATO+
+   '?subject='+encodeURIComponent('Senha para ver os números no Norte')+
+   '&body='+encodeURIComponent('Oi. Quero a senha para religar peso, gordura, medidas e caloria no app.\n\n')+'">'+
+   ic('bell')+' Pedir a senha por e-mail</a>'+
+  '<hr class="sep">'+
+  '<label class="fld">Já tem a senha?<input type="text" id="senhaNum" autocomplete="off" '+
+   'placeholder="digite aqui" inputmode="text"></label>'+
+  '<button class="btn gh bl sm" style="margin-top:9px" data-a="destravar">Liberar os números</button>'+
+  '<p class="xtiny muted" style="margin-top:11px;line-height:1.6"><b>O que esta trava não é:</b> segurança. '+
+  'A senha está no código do app, que é aberto, e quem souber procurar acha. '+
+  'Ela existe para atrapalhar o impulso, não para ser impossível.</p>',
+  'o registro continua acontecendo');
 }
 function sheetReceita(id){
  const r=RECIPES.find(x=>x.id===id);if(!r)return;
@@ -5179,19 +5315,13 @@ function stBebidas(){
    ic('book')+' As receitas completas, com gramagem</button></div>';
   })+
 
-  blocoVideos('Ver as bebidas sendo feitas',[
-   ['Vitamina que substitui o café da manhã','vitamina de banana aveia whey receita café da manhã',
-    'Três ingredientes e dois minutos'],
-   ['Smoothie verde para quem não gosta de verdura','smoothie verde couve abacaxi receita sem acucar',
-    'A couve que você não sente'],
-   ['Café gelado em casa','como fazer cafe gelado cremoso em casa sem acucar',
-    'Sem xarope e sem a fila da cafeteria'],
-   ['Chá gelado sem açúcar','como fazer cha gelado natural sem acucar limao',
-    'O que vem de caixinha é outra coisa'],
-   ['Água saborizada','agua saborizada com frutas receita detox hortela',
-    'Para quem não consegue beber água pura'],
-   ['Quanto açúcar tem na sua bebida','quanto acucar tem no refrigerante suco de caixinha colheres',
-    'Em colheres de chá, que é como dá para enxergar']
+  blocoVideosTocam('Ver as bebidas sendo feitas',[
+ ['iTo2nORLobA','Vitamina de Banana, Maçã e Linhaça: Receita Saudável e Deliciosa!','Kero Saúde','Café da manhã líquido, em dois minutos'],
+ ['WoEwwS1eMzA','Como fazer suco verde de Couve | Receitas Naturais | Saúde Total','Saúde Total','A couve que você não sente'],
+ ['FN2kB-7rwRY','AQUELE CAFÉ FAMOSO: Como Fazer o Café Gelado Cremoso e Gostoso!','Criar no dia a dia','Sem xarope e sem a fila da cafeteria'],
+ ['X8SUP-HZiEw','CHÁ MATE GELADO COM LARANJA SUPER REFRESCANTE','Uma veterinária na cozinha','O que vem de caixinha é outra coisa'],
+ ['o6L1NEDtAdc','ÁGUA SABORIZADA | LIMÃO, LARANJA E HORTELÃ | por Cami Moura','As dicas da Cami','Para quem não consegue beber água pura'],
+ ['h8SeUXKU5ww','Quantidade de açúcar e gordura de alguns alimentos industrializados','Taís Miranda - Nutricionista Personal Diet','O açúcar da bebida, em colheres, que é como dá para enxergar']
   ],'As duas primeiras também estão escritas acima, com as quantidades.');
 }
 function stCompras(){
@@ -5201,8 +5331,9 @@ function stCompras(){
   '<div class="card">'+chTtl('cart','Lista de compras',
    l.length?'<button class="btn gh xs" data-a="compras-limpa">limpar marcados</button>':'')+
    '<div class="row" style="gap:7px;margin-bottom:11px">'+
-    '<input type="text" id="compIn" placeholder="ex.: 1 kg de frango" class="grow">'+
-    '<button class="btn sm" data-a="comp-add">'+ic('plus')+'</button></div>'+
+    '<input type="text" id="compIn" aria-label="Item para a lista de compras" '+
+    'placeholder="ex.: 1 kg de frango" class="grow">'+
+    '<button class="btn sm" data-a="comp-add" aria-label="Adicionar à lista de compras">'+ic('plus')+'</button></div>'+
    (l.length?'<div class="stack" style="gap:0">'+l.map((x,i)=>
     '<div class="li"><button class="chk '+(x.ok?'on':'')+'" data-a="comp-tog" data-i="'+i+'">'+ic('check')+'</button>'+
     '<div class="grow"><div class="ttl" style="'+(x.ok?'text-decoration:line-through;color:var(--ink-3)':'')+'">'+esc(x.t)+'</div></div>'+
@@ -5283,12 +5414,14 @@ function blocoVozElementos(){
    'não previu o resultado. Quem faz diferença é o fonoaudiólogo, não a quantidade. '+selo('voz','A meta-análise')+'</p></div>'+
   blocoVideos('Ver os três elementos na prática',
    alvo==='masc'
-   ?[['Entonação para voz masculina','entonacao voz masculina homem trans treino melodia fala','A melodia da frase, que é o terceiro elemento'],
-     ['Ressonância de peito','ressonancia peito voz grave homem trans exercicio','Onde o som vibra, e como mudar isso'],
-     ['Erros que machucam a voz','forcar voz grave erro homem trans rouquidao','O que não fazer, por quem já fez']]
-   :[['Entonação para voz feminina','entonacao voz feminina mulher trans melodia fala treino','A melodia da frase, que é o terceiro elemento'],
-     ['Ressonância na máscara','ressonancia mascara voz feminina mulher trans exercicio','Onde o som vibra, e como mudar isso'],
-     ['Falsete não é o caminho','falsete voz feminina mulher trans erro comum fonoaudiologia','Por que ele cansa e não sustenta conversa']],
+   ?[
+ ['aHiKnXf6q7k','How To Use Prosody/Intonation to IMPROVE Articulation | Articulation | Speech Therapy At Home','The Singing Speech Therapist','A melodia da frase, que é o terceiro elemento'],
+ ['WqhOj1FkJPc','Como Falar Bem: VOZ - Ressonância','VC I.A.','Onde o som vibra, e como mudar isso'],
+ ['VligPMKWBMo','Rouquidão, Pigarro e Voz Falhando: O Erro Que Muita Gente Ignora! - Denise Pimentel Fernando Beteti','Fernando Beteti','O que não fazer, por quem já fez']]
+   :[
+ ['P_D84VUsW5s','Let My Voice Dance | Feminine Intonation & Flow Training – FemVoice Studio','Melissa Tambs','A melodia da frase, que é o terceiro elemento'],
+ ['yA8026YeALc','USE TODAS AS RESSONÂNCIAS! ORAL, NASAL E FARÍNGEO!','Vivi Donner','Onde o som vibra, e como mudar isso'],
+ ['','Falsete não é o caminho','falsete voz feminina mulher trans erro comum fonoaudiologia','Por que o falsete cansa e não sustenta conversa']],
    'Vídeo ajuda a ouvir a diferença. Mas voz é a parte do app em que acompanhamento profissional mais muda o resultado.');
 }
 
@@ -5344,9 +5477,9 @@ function blocoAtivos(){
   '<p class="xtiny muted" style="margin-top:11px;line-height:1.6">Acne com nódulo, cicatriz ou que não melhora em três meses é caso de dermatologista, '+
   'não de ativo de farmácia. O mesmo vale para mancha que aparece sem motivo.</p></div>'+
  blocoVideos('Ver como se aplica',[
-  ['Como introduzir um retinoide sem descascar','como usar adapaleno iniciante descamacao pele','Começar devagar é o que faz dar certo'],
-  ['Ácido azelaico: para quem serve','acido azelaico pele acne mancha como usar','A alternativa de quem não aguenta retinoide'],
-  ['Rotina mínima que funciona','rotina skincare minima tres passos pele','Limpar, hidratar, proteger — o resto é opcional']
+ ['','Como introduzir um retinoide sem descascar','como usar adapaleno iniciante descamacao pele','Começar devagar é o que faz dar certo'],
+ ['QbYS77vjFpw','Ácido Azelaico para peles sensíveis com acne, melasma e manchas vermelhas','Ana Poli','A alternativa de quem não aguenta retinoide'],
+ ['wIAS3JhdtWc','ROTINA DE SKINCARE BÁSICA e Que dão um UP NA PELE','Tour da Beleza','Limpar, hidratar, proteger — o resto é opcional']
  ],'Rotina curta que você faz todo dia vale mais que rotina longa que você faz três vezes por mês.');
 }
 
@@ -5382,7 +5515,8 @@ function stVoz(){
    '<div class="stack" style="gap:9px">'+v.exs.map(e2=>{
     const ok=!!(x.voz.ex||{})[e2.id];
     return '<div class="ex '+(ok?'done':'')+'"><div class="row top" style="gap:10px">'+
-     '<button class="chk '+(ok?'on':'')+'" data-a="voz-ex" data-id="'+e2.id+'">'+ic('check')+'</button>'+
+     '<button class="chk '+(ok?'on':'')+'" data-a="voz-ex" data-id="'+e2.id+'" '+
+      'aria-pressed="'+(ok?'true':'false')+'" aria-label="'+(ok?'Desmarcar ':'Marcar ')+esc(e2.n)+'">'+ic('check')+'</button>'+
      '<button class="grow" data-a="voz-info" data-id="'+e2.id+'" style="min-width:0">'+
      '<div class="nm">'+esc(e2.n)+'</div>'+
      '<div class="meta">'+e2.min+' min · '+esc(e2.tipo)+'</div>'+
@@ -5395,8 +5529,10 @@ function stVoz(){
    '<p class="tiny muted">Baixe qualquer app de afinador (procure por "afinador" ou "tuner"), fale a vogal "a" '+
    'em tom normal de conversa e anote a frequência em Hz que aparecer.</p>'+
    '<div class="row" style="gap:7px;margin-top:11px">'+
-    '<input type="number" inputmode="numeric" id="hzIn" placeholder="'+(ult?ult.hz:'ex.: 165')+'" class="grow">'+
-    '<input type="number" inputmode="numeric" id="minIn" placeholder="min" style="width:76px">'+
+    '<input type="number" inputmode="numeric" id="hzIn" aria-label="Frequência da voz em hertz" '+
+    'placeholder="'+(ult?ult.hz:'ex.: 165')+'" class="grow">'+
+    '<input type="number" inputmode="numeric" id="minIn" aria-label="Minutos de treino de voz" '+
+    'placeholder="min" style="width:76px">'+
     '<button class="btn acc" data-a="add-voz">Salvar</button></div>'+
    (ult?'<div class="g3" style="margin-top:12px">'+
     tile('Última medição',ult.hz+' Hz',fmtCurto(ult.d))+
@@ -5453,10 +5589,10 @@ function stVozVideos(){
  const alvo=S.perfil.vozAlvo;
  const bloco=(t,icone,arr,sub)=>'<div class="card">'+chTtl(icone,t)+
   (sub?'<p class="tiny muted" style="margin-bottom:10px">'+esc(sub)+'</p>':'')+
-  '<div class="stack" style="gap:8px">'+arr.map(v=>vidLink(v.t,v.q,v.d)).join('')+'</div></div>';
+  listaVideos(arr)+'</div>';
  return ''+
   '<div class="card hero">'+chTtl('play','Vídeos de treino de voz')+
-   '<p class="tiny muted">Abrem a busca do YouTube numa aba nova. Prefira canais de fonoaudiólogos: '+
+   '<p class="tiny muted">Tocam aqui dentro. São de canais de fonoaudiólogos, que é o que importa: '+
    'treino de voz feito de ouvido, copiando imitação, costuma gerar aperto na garganta.</p></div>'+
   bloco('Base para qualquer objetivo','wave',VIDEOS.voz_base,'Aquecimento, respiração e saúde vocal — servem para todo mundo.')+
   (alvo==='masc'?bloco('Masculinização vocal','mic',VIDEOS.voz_masc):bloco('Feminilização vocal','mic',VIDEOS.voz_fem))+
@@ -5541,9 +5677,7 @@ function stProdutos(){
     '<div class="sub">'+esc(dd)+'</div>'+
     '<div class="xtiny" style="color:var(--blue);margin-top:2px">'+esc(q)+'</div></div></div>').join('')+'</div></div>'+
   '<div class="card">'+chTtl('play','Vídeos sobre pele')+
-   '<div class="stack" style="gap:8px">'+VIDEOS.pele
-    .filter(v=>!v.tr||v.tr.indexOf(S.perfil.trilha)>=0)
-    .map(v=>vidLink(v.t,v.q,v.d)).join('')+'</div></div>';
+   listaVideos(VIDEOS.pele.filter(v=>!v[4]||v[4].indexOf(S.perfil.trilha)>=0))+'</div>';
 }
 /* =====================================================================
    CUIDADOS — CORPO (masculinização)
@@ -5574,13 +5708,13 @@ const VFORM=[
  ['O número para acompanhar','Divida a medida do ombro pela da cintura. Entre 1,4 e 1,6 é a faixa que lê como masculina. Registre as duas medidas uma vez por mês em Progresso e acompanhe a relação subir.']
 ];
 const MASC_VIDEOS=[
- {t:'Usar binder com segurança',q:'como usar binder com segurança trans masculino dicas',d:'Tamanho, tempo de uso e o que nunca fazer'},
- {t:'Exercícios para a postura de quem usa binder',q:'alongamento peitoral e postura corcunda exercícios corrigir',d:'Compensa o encurtamento do uso diário'},
- {t:'Treino para ombros largos',q:'treino de ombro para ombros largos elevação lateral volume',d:'A base do formato em V'},
- {t:'Costas largas: puxada e barra',q:'treino de costas largura dorsal puxada aberta barra fixa',d:'O outro lado do V'},
- {t:'Barba na transição',q:'barba transmasculino testosterona crescimento cuidados',d:'O que esperar e em quanto tempo'},
- {t:'Ganho de massa para transmasculinos',q:'ganho de massa muscular transmasculino testosterona treino dieta',d:'Como a T muda a resposta ao treino'},
- {t:'Respiração diafragmática',q:'respiração diafragmática exercício diário 5 minutos',d:'Importante para quem usa binder e para o treino de voz'}
+ ['','Usar binder com segurança','como usar binder com segurança trans masculino dicas','Tamanho, tempo de uso e o que nunca fazer'],
+ ['UcK3oxMFFAQ','2 EXERCICIOS PARA ABRIR O PEITO E MELHORAR A POSTURA - Fisioprev com Guilherme Stellbrink','Guilherme Stellbrink I FisioPrev','Compensa o encurtamento do uso diário'],
+ ['ULrxd3hxjVE','COMO CONSTRUIR OMBROS LARGOS E ESTÉTICOS (rápido)','souzavdsr','A base do formato em V'],
+ ['BGDl7bDvRp8','Tipos de barra na PUXADA e diferentes RESULTADOS NAS COSTAS','Guilherme Ern','O outro lado do V'],
+ ['AeHootVyk4U','FTM talk about my beard growth!','Jamie Landon','O que esperar e em quanto tempo'],
+ ['','Ganho de massa para transmasculinos','ganho de massa muscular transmasculino testosterona treino dieta','Como a testosterona muda a resposta ao treino'],
+ ['yw296xUAjxw','Exercícios de RESPIRAÇÃO para Oratória','Giovana Pedroso','Importante para quem usa binder e para o treino de voz']
 ];
 /* Agenda de aplicação: o intervalo é o que VOCÊ configurar. O app só conta
    os dias e guarda o histórico — nada sobre dose, marca ou via. */
@@ -5631,12 +5765,12 @@ const PELOS_FEM=[
  ['Cabelo','O estrogênio costuma reduzir a queda e pode melhorar a densidade, mas o que já foi perdido não volta sozinho. Qualquer tratamento é assunto de dermatologista.']
 ];
 const FEM_VIDEOS=[
- {t:'Treino de glúteo e perna',q:'treino de glúteo e perna hipertrofia execução feminino',d:'A base do trabalho de proporção nesta trilha'},
- {t:'Core sem engrossar a cintura',q:'exercícios de core sem engrossar a cintura oblíquos',d:'Por que prancha e hollow em vez de abdominal com carga'},
- {t:'Treino de força na transição',q:'treino de força transfeminina preservar massa magra hormonização',d:'O que muda com estrogênio e antiandrógeno'},
- {t:'Depilação a laser e eletrólise',q:'laser ou eletrólise pelo facial diferença quantas sessões',d:'Como escolher e o que esperar'},
- {t:'Cuidados com o cabelo',q:'cuidados com o cabelo queda densidade dermatologista',d:'O que tem e o que não tem evidência'},
- {t:'Respiração diafragmática',q:'respiração diafragmática exercício diário 5 minutos',d:'Base para o treino de voz'}
+ ['lDvCFV6SUMs','COMO TREINAR GLÚTEO DA FORMA CORRETA - JÚLIO BALESTRIN','Ciência do Treino','A base do trabalho de proporção nesta trilha'],
+ ['','Core sem engrossar a cintura','exercícios de core sem engrossar a cintura oblíquos','Por que prancha e hollow em vez de abdominal com carga'],
+ ['g8n4nekxKbc','Interação Hormônio e Treino Para Pessoas Trans #lgbt','Bia Galletti','O que muda com estrogênio e antiandrógeno'],
+ ['IPVl87pj65s','CONSEQUÊNCIAS DA DEPILAÇÃO A LASER NO ROSTO | MINHA EXPERIÊNCIA','Júlia Sampaio','Relato de quem fez, com o que não contam antes'],
+ ['c5yppMm6SaU','O Minoxidil Não Faz Nascer Cabelo — Então Por Que Ele Funciona?','Sem Filtro | Borchardt','O que tem e o que não tem evidência'],
+ ['CR74KSArDjw','RESPIRAÇÃO FÁCIL PARA ANSIEDADE | Nível 1 | Exercício para acalmar | Exercícios para Idosos','Aurélio Alfieri','Base para o treino de voz']
 ];
 function stCorpo(){
  if(S.perfil.trilha==='andro')return stCorpoAndro();
@@ -5672,9 +5806,9 @@ function stCorpoAndro(){
   lista('Como esta trilha pensa o corpo','target',CORPO_ANDRO,
    '<span class="tag n">'+selo('rosto','os estudos de percepção')+'</span>')+
   blocoVideos('Ver alguém falando disso',[
-   ['Treino para corpo andrógino','treino corpo androgino nao binarie como montar','Relato de quem treina com esse objetivo'],
-   ['Roupa e proporção','roupa androgina caimento proporcao ombro quadril','O que o corte faz com a silhueta'],
-   ['Ser não binárie na academia','pessoa nao binaria academia vestiario relato','Como outras pessoas lidam com o espaço']
+ ['','Treino para corpo andrógino','treino corpo androgino nao binarie como montar','Relato de quem treina com esse objetivo'],
+ ['','Roupa e proporção','roupa androgina caimento proporcao ombro quadril','O que o corte faz com a silhueta'],
+ ['','Ser não binárie na academia','pessoa nao binaria academia vestiario relato','Como outras pessoas lidam com o espaço']
   ],'Nada disso é regra. É o que outras pessoas acharam que funcionou para elas.');
 }
 function stCorpoFem(){
@@ -5707,7 +5841,7 @@ function stCorpoFem(){
    'Aqui tudo vem de treino — altura, ressonância, peso vocal e entonação.</p>'+
    '<button class="btn bl sm" style="margin-top:11px" data-a="go-sub" data-tab="cuidados" data-st="voz">Abrir o treino de voz</button></div>'+
   '<div class="card">'+chTtl('play','Vídeos')+
-   '<div class="stack" style="gap:8px">'+FEM_VIDEOS.map(v=>vidLink(v.t,v.q,v.d)).join('')+'</div></div>'+
+   listaVideos(FEM_VIDEOS)+'</div>'+
   blocoTH()+
   '<div class="card">'+chTtl('info','Hormonização')+
    '<p class="tiny muted" style="line-height:1.65">Este app não orienta nada sobre doses, marcas, vias de aplicação ou como começar — '+
@@ -5741,10 +5875,10 @@ function stCorpoMasc(){
   lista('O formato em V','dumb',VFORM)+
   lista('Binder com segurança','heart',BINDER,'<span class="tag w">leia antes de treinar</span>')+
   blocoVideos('Binder na prática',[
-   ['Como medir e escolher o tamanho','como medir binder tamanho correto transmasculino','Tamanho errado é a causa mais comum de dor'],
-   ['Como vestir e tirar sem machucar','como colocar binder corretamente sem machucar','A forma de vestir muda a pressão nas costelas'],
-   ['Sinais de que está apertado demais','sinais binder apertado demais perigo costela','Falta de ar, formigamento e dor que não passa'],
-   ['Alternativas para treinar','alternativa binder para treinar top compressao transmasculino','Compressão leve que não limita a respiração']
+ ['0NdpmGurKjA','COMO MEDIR UM BINDER? Saiba aqui!!!','TIELY PRINCE','Tamanho errado é a causa mais comum de dor'],
+ ['0X53iJwX8E0','Chest Binders: How To Wear Them Safely And What To Avoid','Spectrum: The Other Clinic','A forma de vestir muda a pressão nas costelas'],
+ ['','Sinais de que está apertado demais','sinais binder apertado demais perigo costela','Falta de ar, formigamento e dor que não passa'],
+ ['','Alternativas para treinar','alternativa binder para treinar top compressao transmasculino','Compressão leve que não limita a respiração']
   ],'Quatro coisas que mudam o risco de verdade: tamanho, forma de vestir, horas por dia e o que você usa para treinar.')+
   '<div class="card"><p class="xtiny muted" style="line-height:1.65">No maior estudo sobre binder, com 1.800 pessoas, '+
   'mais de 97% relataram pelo menos um efeito negativo, e 50 relataram fratura de costela. Nada disso significa parar de usar: '+
@@ -5755,7 +5889,7 @@ function stCorpoMasc(){
    'mas ressonância, peso e entonação continuam sendo treino — e é o treino que evita o aperto na garganta enquanto a voz muda.</p>'+
    '<button class="btn bl sm" style="margin-top:11px" data-a="go-sub" data-tab="cuidados" data-st="voz">Abrir o treino de voz</button></div>'+
   '<div class="card">'+chTtl('play','Vídeos')+
-   '<div class="stack" style="gap:8px">'+MASC_VIDEOS.map(v=>vidLink(v.t,v.q,v.d)).join('')+'</div></div>'+
+   listaVideos(MASC_VIDEOS)+'</div>'+
   blocoTH()+
   '<div class="card">'+chTtl('info','Hormonização')+
    '<p class="tiny muted" style="line-height:1.65">Este app não orienta nada sobre doses, marcas, vias de aplicação ou como começar a testosterona — '+
@@ -6189,9 +6323,9 @@ function blocoPostura(){
    '<div class="li"><div class="grow"><div class="ttl">'+esc(x[0])+'</div>'+
    '<div class="sub" style="line-height:1.55">'+esc(x[1])+'</div></div></div>').join('')+'</div>'+
   blocoVideos('Ver como se faz',[
-   ['Alongamento de peito na porta','alongamento peitoral porta postura ombro para frente','Para o encurtamento de quem anda curvado'],
-   ['Exercícios para ombro à frente','corrigir ombros para frente exercicios postura casa','Série curta, sem equipamento'],
-   ['Postura e uso de binder','postura binder homem trans alongamento compensar','Como compensar o uso diário']
+ ['6Be-s3RwVp4','Alongamento de peitoral (parede)','Grupo Longevitá - Brasília','Para o encurtamento de quem anda curvado'],
+ ['ZyzddYCVVMM','COMO CORRIGIR OS "OMBROS CAÍDOS" COM O ALONGAMENTO DE PEITORAL? APRENDA AGORA.','Personal Gustavo Teixeira','Série curta, sem equipamento'],
+ ['bNUNSu9LcQo','Como CORRIGIR POSTURA CURVADA em Casa com 1 CABO DE VASSOURA! VEJA AGORA','Rosi Bogorni | Pilates, saúde e bem-estar!','Como compensar o uso diário']
   ],'A postura responde a força nas costas somada a alongamento de peito. Só um dos dois não segura.')+'</div>';
 }
 
@@ -6337,9 +6471,9 @@ function stGuias(){
    '<p class="xtiny muted" style="margin-top:11px;line-height:1.6">Se você está pensando em se machucar agora, o 188 atende de graça, '+
    'a qualquer hora, e você não precisa estar em crise para ligar.</p></div>'+
   blocoVideos('Ver alguém explicando o caminho',[
-   ['Retificação de nome e gênero no cartório','retificacao nome genero cartorio pessoa trans passo a passo','Relato de quem já fez, com a lista de documentos'],
-   ['Processo transexualizador no SUS','processo transexualizador SUS como conseguir hormonio encaminhamento','Como foi a fila e o encaminhamento na prática'],
-   ['Primeira consulta de hormonização','primeira consulta hormonizacao o que perguntar pessoa trans','O que levar e o que perguntar']
+ ['M_yBJMUULkc','RETIFICAÇÃO DE NOME/GÊNERO - Como fazer? (Passo a Passo)','Vinícius Zangari','Relato de quem já fez, com a lista de documentos'],
+ ['ZcuaoAQqD_4','“O Processo Transexualizador do SUS da Portaria n. 2.803/13 descreve e orienta uma série de providên','Excellence Educacional','Como foi a fila e o encaminhamento na prática'],
+ ['LLhrxtwnMPg','COMO CONSEGUIR ENDOCRINOLOGISTA E PRIMEIRA CONSULTA','Jhonny Yann','O que levar e o que perguntar']
   ],'Relato ajuda a saber o que esperar. A regra que vale é a do link oficial, não a do vídeo.');
 }
 
@@ -6494,9 +6628,9 @@ function stHigiene(){
    'a ideia de fazer a versão pequena da tarefa antes de esperar a vontade aparecer. Tem meta-análise com 26 ensaios atrás. '+
    selo('ativacao','A meta-análise')+'</p></div>'+
   blocoVideos('Quando o básico está difícil',[
-   ['Higiene em dia de depressão','higiene pessoal depressao como fazer o minimo','Estratégias de quem já esteve nesse lugar'],
-   ['Banho quando parece impossível','banho depressao dificuldade como facilitar','Dividir em partes, sentar, água morna'],
-   ['Escovar os dentes com baixa energia','escovar dentes depressao estrategias minimo','O mínimo também protege a boca']
+ ['','Higiene em dia de depressão','higiene pessoal depressao como fazer o minimo','Estratégias de quem já esteve nesse lugar'],
+ ['VGnH5iZFOVw','BURLANDO A DEPRESSÃO: TRUQUES PARA ACABAR COM O CICLO DA INÉRCIA','CAMILLA IMPERA','Dividir em partes, sentar, água morna'],
+ ['','Escovar os dentes com baixa energia','escovar dentes depressao estrategias minimo','O mínimo também protege a boca']
   ],'Vídeo não resolve e não é terapia. Mas ver alguém dizendo em voz alta que isso acontece já tira parte do peso.')+
   '<div class="card">'+chTtl('check','Itens da sua lista')+
    '<p class="tiny muted" style="margin-bottom:10px">Desmarque o que não se aplica a você. '+
@@ -6745,9 +6879,9 @@ function cicloMenstrual(){
    '<p class="tiny muted" style="line-height:1.7;margin-top:10px">O app não sugere nada sobre parar de menstruar. '+
    'Existem caminhos, funcionam de formas diferentes e todos passam por receita — é conversa com quem te acompanha, não com um aplicativo.</p></div>'+
   blocoVideos('Ver alguém falando disso',[
-   ['Disforia menstrual: como lidar','disforia menstrual homem trans como lidar','Relato e estratégias de quem passa por isso'],
-   ['Produtos sem gatilho','absorvente coletor cueca menstrual homem trans','Cueca menstrual e coletor costumam gerar menos disforia'],
-   ['Menstruação e testosterona','menstruacao testosterona homem trans o que esperar','O que a T faz e em quanto tempo']
+ ['png9Y122SiQ','Eu sou um homem trans e voltei a menstruar | MSD #9','Dante Olivier','Relato e estratégias de quem passa por isso'],
+ ['WoYgbdsA9vw','como inserir e retirar o coletor menstrual?','pantys','Cueca menstrual e coletor costumam gerar menos disforia'],
+ ['A0Nneo1cGZE','TRANS MAN GETS PERIOD AFTER 8.5 YEARS ON HORMONES','uppercaseCHASE1','O que a testosterona faz e em quanto tempo']
   ],'Nada aqui substitui quem te acompanha. Serve para você não achar que é só com você.')+
   (r.length?'<div class="card">'+chTtl('clock','Registros','<span class="tag n">'+r.length+'</span>')+
    '<div class="stack" style="gap:0">'+r.slice().reverse().slice(0,14).map(function(x,i,arr){
@@ -6781,9 +6915,9 @@ function cicloHormonal(){
    'Se em dois ou três meses aparecer um padrão claro perto do fim do intervalo, isso é informação útil para levar '+
    'a quem acompanha a sua hormonização — quem decide dose e intervalo é essa pessoa.</p></div>'+
   blocoVideos('Ver alguém falando disso',[
-   ['O que esperar da hormonização','hormonizacao mulher trans o que esperar linha do tempo','Linha do tempo realista, mês a mês'],
-   ['Variação de humor no intervalo','estradiol injetavel variacao humor intervalo dose','Relatos de quem usa injetável'],
-   ['Aplicação com segurança','como aplicar estradiol injetavel seguranca','Técnica, rodízio de local e higiene']
+ ['JbwvDNCWpXk','Três principais efeitos colaterais da hormonização trans','Endocrinologia Para Todos | Tribu Saúde','O que muda, e os efeitos colaterais que existem de verdade'],
+ ['1kKDU8K-TM8','What If Your Estradiol Patches Run Out? | Transgender Hormone Therapy','Transgender Medicine Made Simple','O que acontece quando o estradiol cai entre as doses'],
+ ['Lou6M3o5cJQ','Administração de Medicamentos, injeção de Voltaren Intramuscular','Professor Emerson Marques','Técnica, rodízio de local e higiene']
   ],'O app não orienta dose nem via. Isso é com quem prescreve.');
 }
 
@@ -6794,6 +6928,31 @@ function cicloHormonal(){
    olhos e da boca. Maquiagem mexe exatamente nessas três coisas. O que é
    técnica de maquiador e não pesquisa está marcado como convenção.
    ===================================================================== */
+/* Problemas que aparecem na prática e o que fazer com cada um. A lista de
+   passos ensina o caminho; isto é para quando ele não funciona. */
+const SOCORRO_MAQ=[
+   ['Derreteu antes do meio-dia','Pele oleosa derrete base. Primer matificante antes, pó translúcido só na zona T depois, e fixador por último. E menos produto: camada grossa escorre mais rápido que camada fina.'],
+   ['Craquelou em volta do nariz e da boca','Pele seca ou hidratante de menos. Hidrate e espere dez minutos de verdade antes da base — esse tempo é o que falta na maioria das vezes.'],
+   ['Ficou acinzentada em cima da sombra de barba','Faltou neutralizar. Corretivo cor de laranja ou pêssego ANTES da base, só na área azulada, batendo com o dedo em vez de esfregar.'],
+   ['O tom da base não bate com o pescoço','Teste sempre na linha da mandíbula, com luz do dia, e escolha pelo pescoço — não pelo rosto. Base certa some; base errada vira máscara.'],
+   ['Oxidou e escureceu depois de duas horas','Quase toda base escurece um pouco. Escolha meio tom mais claro, ou use primer: a oxidação acontece no contato com a oleosidade da pele.'],
+   ['A sobrancelha ficou dura e desenhada','Produto demais e traço contínuo. Faça riscos curtos no sentido do pelo, comece pelo meio e deixe o começo da sobrancelha mais leve.'],
+   ['O contorno ficou com cara de risco','Faltou esfumar. Passe pouco, esfume muito, e sempre na direção da orelha. Na dúvida, menos contorno e mais blush resolve melhor.'],
+   ['Alguém percebeu e comentou','Isso não é erro de técnica. Maquiagem bem feita é discreta de perto e some de longe — e mesmo assim tem quem comente. O comentário diz do outro, não da sua mão.']
+];
+const TIRAR_MAQ=[
+   ['Primeiro o óleo, depois o sabonete','Óleo de limpeza ou micelar dissolve base e filtro solar; sabonete sozinho não tira e ainda resseca de tanto esfregar. Essa ordem chama-se dupla limpeza.'],
+   ['Olho com calma','Algodão com micelar encostado por vinte segundos antes de deslizar. Esfregar o olho puxa cílio e marca a pálpebra com o tempo.'],
+   ['Não durma de maquiagem','Uma noite não arruína a pele, mas vira hábito rápido. Base a noite toda entope poro, e o app tem uma aba inteira de pele que esse hábito desfaz.'],
+   ['Hidratante depois, sempre','Limpar tira a maquiagem e um pouco da barreira junto. Repor é o que impede a pele de compensar produzindo mais óleo.']
+];
+const BARBA_MAQ=[
+   ['Amoleça o pelo antes','Banho quente ou toalha morna por um minuto. Pelo seco e duro é o que mais causa corte e irritação, não a lâmina.'],
+   ['A favor do pelo primeiro','A primeira passada é sempre no sentido do crescimento. Contra o pelo só na segunda, e só se precisar — é o que gera o pelo encravado.'],
+   ['Lâmina nova, pressão leve','Lâmina velha puxa em vez de cortar. Deixe o peso da lâmina trabalhar; apertar não raspa mais rente, só machuca.'],
+   ['Depois: frio e hidratante sem álcool','Água fria fecha o que ficou aberto. Loção com álcool arde e inflama — pós-barba sem álcool, ou só hidratante, resolve melhor.'],
+   ['Pelo encravado tem tratamento','Ácido mandélico ou salicílico duas a três vezes por semana na área. Não cutuque: cutucar vira mancha escura que demora meses.']
+];
 const MAQ_FEM=[
  {n:'Preparar a pele',t:'base',
   o:'Hidratante e, se tiver, primer. Dez minutos antes.',
@@ -6941,43 +7100,65 @@ function stAparencia(){
   h+=dobra('ap:moda-m','Roupa: silhueta mais masculina','ruler',
    MODA_MASC.length+' peças e o efeito de cada uma',()=>listaModa(MODA_MASC,'Roupa: silhueta mais masculina'));
  }
+ /* Quando dá errado. A lista de passos ensina o caminho certo; isto aqui é
+    para o dia em que não saiu como devia, que é quando a pessoa desiste. */
+ h+=dobra('ap:socorro','Deu errado, e agora','info',
+  SOCORRO_MAQ.length+' problemas comuns e o que fazer com cada um',function(){
+   return '<div class="card"><div class="stack" style="gap:0">'+SOCORRO_MAQ.map(function(x){
+    return '<div class="li"><div class="grow"><div class="ttl">'+esc(x[0])+'</div>'+
+     '<div class="sub" style="line-height:1.55">'+esc(x[1])+'</div></div></div>';
+   }).join('')+'</div></div>';
+  });
+ h+=dobra('ap:tirar','Tirar a maquiagem','drop',
+  'a parte que estraga a pele quando é pulada',function(){
+   return '<div class="card"><div class="stack" style="gap:0">'+TIRAR_MAQ.map(function(x){
+    return '<div class="li"><div class="grow"><div class="ttl">'+esc(x[0])+'</div>'+
+     '<div class="sub" style="line-height:1.55">'+esc(x[1])+'</div></div></div>';
+   }).join('')+'</div>'+
+   '<button class="btn gh bl sm" style="margin-top:11px" data-a="cuid-ir" data-v="pele">'+
+   ic('sparkle')+' A rotina de pele completa</button></div>';
+  });
+ h+=dobra('ap:barba','Barba: fazer, manter ou tirar','wand',
+  'técnica que vale para quem raspa e para quem deixa crescer',function(){
+   return '<div class="card"><p class="tiny muted" style="line-height:1.65;margin-bottom:11px">'+
+   'Vale nos dois sentidos: para quem raspa todo dia e para quem está deixando crescer e '+
+   'precisa que a pele aguente.</p><div class="stack" style="gap:0">'+BARBA_MAQ.map(function(x){
+    return '<div class="li"><div class="grow"><div class="ttl">'+esc(x[0])+'</div>'+
+     '<div class="sub" style="line-height:1.55">'+esc(x[1])+'</div></div></div>';
+   }).join('')+'</div></div>';
+  });
  /* a rotina inteira, do rosto limpo ao fixador, em vez de quatro links soltos */
  const VID_MASC=[
-  ['Maquiagem masculinizante do zero','maquiagem masculinizante transmasculino rotina completa iniciante',
-   'A rotina inteira, para quem nunca passou nada'],
-  ['Barba falsa com sombra','como fazer barba falsa maquiagem stubble transmasculino',
-   'O truque que mais muda a leitura do rosto'],
-  ['Baixar o contraste da pele','maquiagem masculinizar pele matificar tirar brilho',
-   'Menos brilho, menos rosa: a base de tudo'],
-  ['Sobrancelha mais cheia e reta','como preencher sobrancelha masculina lapis mais reta',
-   'Tirar o arco sem parecer desenhada'],
-  ['Quadrar a mandíbula','contorno masculinizar mandibula queixo maquiagem',
-   'Onde entra o contorno para marcar ângulo'],
-  ['Disfarçar sem parecer maquiado','maquiagem masculina natural corretivo discreto homem',
-   'O ponto em que produto demais entrega'],
-  ['Roupa e silhueta','moda transmasculina silhueta ombro camadas',
-   'O que a roupa faz pelo corpo, de graça']
+ ['At4joUG8UWw','Make para o dia a dia ! Maquiagem masculina simples básica e rápida !','luan Henrique','A rotina inteira, para quem nunca passou nada'],
+ ['gQX22EwlU5g','TUTORIAL - APLICAÇÃO DE POSTIÇOS - como colar barba','Anna Paola Melfi','O truque que mais muda a leitura do rosto'],
+ ['qqOsuWrR7I0','COMO TIRAR O BRILHO DA PELE? COMO REMOVER O BRILHO DO PROTETOR SOLAR?','Felipe Scarabeli','Menos brilho, menos rosa: a base de tudo'],
+ ['J_Q7eL-inZw','5 DICAS PARA REFLORESTAR AS SOBRANCELHAS - #Lista26','Vanessa Rozan','Deixar a sobrancelha mais cheia, que é metade do caminho'],
+ ['TosTzKh9atc','CONTORNO - Aprenda definitivamente a não errar mais na make','Belezza da Mulher','Como esfumar o contorno para não virar risco'],
+ ['djtdVT-Lz5w','MAKE MASCULINA BEM BASIQUINHA','Igor Carvalho','O ponto em que produto demais entrega'],
+ ['','Roupa e silhueta','moda transmasculina silhueta ombro camadas','O que a roupa faz pelo corpo, de graça']
  ];
  const VID_FEM=[
-  ['Maquiagem do zero para iniciante','maquiagem basica iniciante passo a passo do zero trans',
-   'A rotina inteira, na ordem'],
-  ['Cobrir a sombra de barba','corretivo laranja cobrir sombra de barba maquiagem trans',
-   'Corretivo cor de laranja: por que funciona'],
-  ['Base: tom certo e cobertura','como escolher tom de base e aplicar cobertura alta',
-   'O erro de tom que aparece na luz do dia'],
-  ['Sobrancelha com arco','sobrancelha arco feminino como preencher e desenhar',
-   'Onde fica o arco e como não exagerar'],
-  ['Suavizar a mandíbula','contorno feminilizar mandibula maquiagem trans',
-   'Contorno para arredondar, não para esculpir'],
-  ['Olhos e cílios','delineado basico e cilios postiços iniciante passo a passo',
-   'O delineado que não precisa de mão firme'],
-  ['Fazer durar o dia inteiro','como fixar maquiagem durar o dia todo pele oleosa',
-   'Primer, pó e fixador: o que cada um faz'],
-  ['Roupa e silhueta','moda trans feminina silhueta cintura',
-   'O que a roupa faz pelo corpo, de graça']
+ ['aggkow-RUlg','AULA DE MAQUIAGEM PARA INICIANTES EM 2026 *APRENDA A SE MAQUIAR SOZINHA* PASSO A PASSO COMPLETO','Thassyane Miranda','A rotina inteira, na ordem'],
+ ['CAuSWgqed5A','TUTORIAL maquiagem Drag Queen: como esconder ou cobrir a barba','Penelopy Jean','Corretivo cor de laranja: por que funciona'],
+ ['T4r8Kk4uayU','COMO ESCOLHER O TOM DE BASE PERFEITO?! #INICIANTES','Bruna Malheiros','O erro de tom que aparece na luz do dia'],
+ ['I1MMhkUPB1U','Aprenda a Desenhar Sobrancelhas Perfeitas Usando Sombra em Poucos Passos!','Carolina Marques','Onde fica o arco e como não exagerar'],
+ ['t4ZH_a6ZuKg','CONTORNO E ILUMINAÇÃO PARA TODOS OS TIPOS DE ROSTO | 4ª AULA | JOANNA MARIA','Joanna Maria','Contorno para arredondar, não para esculpir'],
+ ['_NsNhFcwPLs','APRENDA A FAZER DELINEADO GATINHO E COLAR CÍLIOS POSTIÇOS | PASSO A PASSO PARA INICIANTES','Lais Furlaneto','O delineado que não precisa de mão firme'],
+ ['bgetBs4HwKA','Dicas de maquiagem para quem tem hiperidrose facial! Como não derreter?','Mariana Dino','Primer, pó e fixador: o que cada um faz'],
+ ['nTpdi9xT8wo','How to DEFINE your waist: Tie front blouses!','Boho Lifestyle','O que a roupa faz pelo corpo, de graça']
  ];
  const lista=t==='masc'?VID_MASC:t==='fem'?VID_FEM:VID_FEM.concat(VID_MASC);
- h+=blocoVideos('Ver a maquiagem sendo feita',lista,
+ h+=blocoVideosTocam('Resolver os problemas mais comuns',[
+ ['kbjlh9LE-eE','Como acertar o tom de base para a pele | Juliana Rakoza','BASH','O erro de tom que aparece na luz do dia'],
+ ['bzvbY5STVjE','COMO COBRIR OLHEIRAS - EVITANDO QUE O CORRETIVO CRAQUELE','Márcia França','Olheira sem craquelar o corretivo'],
+ ['lFFpQWSmcAQ','COMO APLICAR BLUSH EM ROSTO REDONDO / ANA CLAUDIA','Ana Claudia','Onde o blush vai, conforme o formato do rosto'],
+ ['Nbq9OZzifVY','Como fazer para a maquiagem durar em Pele Oleosa','Mulher','Para a maquiagem não derreter no meio do dia'],
+ ['dDN9rCWyook','Chega de preguiça: Joyce Kitamura ensina como remover a maquiagem com Make B. Skin | O Boticário','Desejos de Make - O Boticário','Tirar tudo sem maltratar a pele'],
+ ['QSeNxokUEB4','Como fazer Maquiagem Masculina ?','Barcellos','Maquiagem masculina discreta, para quem nunca usou'],
+ ['19vVAwtsW1g','Como fazer barba do pescoço evitando irritação da pele','Everton Barbeiro','Barba sem irritar nem encravar'],
+ ['Qh1TM7kfi34','ROTINA CAPILAR DA LAVAGEM A FINALIZAÇÃO CABELO CURTO|LAURA BARBOSA','Laura Barbosa','Rotina de cabelo, que muda o rosto tanto quanto o resto']
+ ],'Estes tocam aqui dentro. Os de baixo abrem uma busca, porque dependem da sua trilha.')+
+ blocoVideos('Ver a maquiagem sendo feita',lista,
   'Maquiagem é a parte do app que menos se aprende lendo. Cada passo da lista acima também tem o vídeo dele.');
  $('#st-aparencia').innerHTML=h;
 }
@@ -7040,6 +7221,8 @@ function avisosDe(onde){
   if(a.trilhas.indexOf(tr)<0)return false;
   if(a.id==='menor'&&Number(S.perfil.idade||99)>=18)return false;
   if(a.id==='meta_baixa'&&!metaSegura().limitada)return false;
+  /* o aviso fala de "cada pessoa listada": sem lista, nao ha do que falar */
+  if(a.id==='profissionais'&&!PROFISSIONAIS.length)return false;
   if(!a.fixo&&avisoOff(a.id))return false;
   return true;
  });
@@ -7079,6 +7262,11 @@ const EMAIL_CONTATO='sendmenoflowers@duck.com';
    caminho é o inverso — quem quiser aparecer pede, fica claro que pedir não é
    ser aprovado, e a pessoa que vai consultar confere por conta.
    ===================================================================== */
+/* O diretório de profissionais. Vazio: nenhum pedido foi conferido ainda.
+   A tela muda sozinha quando entrar gente aqui — lista inventada seria
+   pior que lista nenhuma. Cada ficha: nome, profissão, registro no
+   conselho, cidade, se atende online e contato. */
+const PROFISSIONAIS=[];
 const CHECAR_PROF=[
  ['Confira o registro no conselho','Nutricionista tem CRN, educador físico tem CREF, fonoaudiólogo tem CRFa, médico tem CRM, psicólogo tem CRP. Dá para consultar no site do conselho em um minuto, de graça, e vale sempre.'],
  ['Pergunte sobre experiência com pessoas trans','Não é sobre ser trans: é sobre já ter atendido. A pergunta "você já acompanhou pessoas trans antes?" responde muita coisa.'],
@@ -7099,28 +7287,49 @@ function stProfissionais(){
   'Experiência com pessoas trans:\n'+
   'Contato que pode ser publicado:\n'+
   'Valor ou se atende por convênio ou gratuito:\n');
+ const temLista=PROFISSIONAIS.length>0;
  $('#st-profissionais').innerHTML=
   blocoAvisos('profissionais')+
 
-  '<div class="card hero">'+chTtl('user','Profissionais')+
-   '<p class="tiny muted" style="line-height:1.7">Profissional que atende pessoas trans sem constrangimento.</p>'+
-   '<p class="tiny muted" style="line-height:1.7;margin-top:10px">Quem quiser aparecer pede por e-mail, '+
-   'e <b>cada pedido é conferido um por um antes de entrar</b> — registro no conselho da categoria, principalmente. '+
-   'Nada é publicado automático.</p>'+
-   '<p class="tiny muted" style="line-height:1.7;margin-top:10px">Mesmo assim, registro conferido não é garantia de bom atendimento. '+
-   'Por isso existe a denúncia, e por isso a lista abaixo de como se proteger continua valendo.</p></div>'+
+  (temLista
+   ?'<div class="card hero">'+chTtl('user','Profissionais')+
+     '<p class="tiny muted" style="line-height:1.7">Profissional que atende pessoas trans sem constrangimento. '+
+     'Cada pedido é conferido um por um antes de entrar — registro no conselho da categoria, principalmente. '+
+     'Nada é publicado automático.</p>'+
+     '<p class="tiny muted" style="line-height:1.7;margin-top:10px">Mesmo assim, registro conferido não é garantia '+
+     'de bom atendimento. Por isso existe a denúncia, e por isso a lista de como se proteger continua valendo.</p></div>'+
+    '<div class="card">'+chTtl('search','Quem já está listado','<span class="tag n">'+PROFISSIONAIS.length+'</span>')+
+     '<div class="stack" style="gap:0">'+PROFISSIONAIS.map(function(x){
+      return '<div class="li"><div class="grow"><div class="ttl">'+esc(x.nome)+'</div>'+
+       '<div class="sub" style="line-height:1.55">'+esc(x.prof)+' · '+esc(x.registro)+' · '+esc(x.cidade)+
+       (x.online?' · atende online':'')+'</div></div></div>';
+     }).join('')+'</div></div>'
 
-  '<div class="card">'+chTtl('check','O que conferir mesmo assim','<span class="tag w">vale sempre</span>')+
-   '<div class="stack" style="gap:0">'+CHECAR_PROF.map(function(x){
-    return '<div class="li"><div class="grow"><div class="ttl">'+esc(x[0])+'</div>'+
-     '<div class="sub" style="line-height:1.55">'+esc(x[1])+'</div></div></div>';
-   }).join('')+'</div></div>'+
+   /* Enquanto não existe lista, a tela não finge que existe: diz o que é
+      útil hoje, que é procurar e conferir por conta própria. */
+   :'<div class="card hero">'+chTtl('user','Achar profissional que te atenda bem')+
+     '<p class="tiny" style="line-height:1.7">O app ainda <b>não tem uma lista de profissionais</b>. '+
+     'Nenhum pedido foi conferido até agora, e lista inventada seria pior que lista nenhuma.</p>'+
+     '<p class="tiny muted" style="line-height:1.7;margin-top:10px">O que dá para fazer hoje está logo abaixo: '+
+     'onde procurar, e como conferir quem você encontrar.</p></div>'+
+    '<div class="card">'+chTtl('search','Onde procurar')+
+     '<div class="stack" style="gap:0">'+[
+      ['Ambulatório trans do SUS','Atendimento público e especializado. A lista de serviços está no guia de hormonização, aqui em Direitos e serviços.'],
+      ['Conselho da categoria','CRM, CRN, CREF, CRFa e CRP têm busca pública de profissionais por cidade, de graça.'],
+      ['Indicação de quem já foi','Grupo local, coletivo ou amizade trans costuma ser a fonte mais confiável que existe.'],
+      ['Universidade com clínica-escola','Atendimento gratuito ou barato, com supervisão, em psicologia, nutrição e educação física.']
+     ].map(function(x){
+      return '<div class="li"><div class="grow"><div class="ttl">'+esc(x[0])+'</div>'+
+       '<div class="sub" style="line-height:1.55">'+esc(x[1])+'</div></div></div>';
+     }).join('')+'</div>'+
+     '<button class="btn gh bl sm" style="margin-top:11px" data-a="cuid-ir" data-v="servicos">'+
+     ic('book')+' Ver o guia do SUS</button></div>'+
 
-  '<div class="card">'+chTtl('search','Quem já está listado','<span class="tag n">0</span>')+
-   '<p class="tiny muted" style="line-height:1.7">Ninguém ainda. Esta parte fica vazia até chegarem pedidos e eles serem conferidos — '+
-   'lista inventada seria pior que lista nenhuma.</p>'+
-   '<p class="xtiny muted" style="margin-top:10px;line-height:1.6">Cada ficha vai trazer o número de registro no conselho, '+
-   'para você poder conferir por conta também, mais a cidade e se atende online.</p></div>'+
+    '<div class="card">'+chTtl('check','Como conferir quem você encontrar','<span class="tag w">vale sempre</span>')+
+     '<div class="stack" style="gap:0">'+CHECAR_PROF.map(function(x){
+      return '<div class="li"><div class="grow"><div class="ttl">'+esc(x[0])+'</div>'+
+       '<div class="sub" style="line-height:1.55">'+esc(x[1])+'</div></div></div>';
+     }).join('')+'</div></div>')+
 
   '<div class="card">'+chTtl('bell','Você é profissional e quer ser listado?')+
    '<p class="tiny muted" style="line-height:1.7">Mande um e-mail com os dados abaixo. É de graça e não tem patrocínio: '+
@@ -7139,43 +7348,55 @@ function stProfissionais(){
    'Se o botão não funcionar no seu aparelho, escreva para <b>'+EMAIL_CONTATO+'</b>.</p>'+
    '<p class="xtiny muted" style="margin-top:9px;line-height:1.6">Pedir não garante publicação, e sair da lista é só pedir.</p></div>'+
 
-  '<div class="card" style="border-color:var(--warn)">'+chTtl('bell','Teve problema com alguém da lista?')+
+  (!temLista?'':'<div class="card" style="border-color:var(--warn)">'+chTtl('bell','Teve problema com alguém da lista?')+
    '<p class="tiny" style="line-height:1.7">Desrespeito, despreparo, cobrança indevida, qualquer coisa. '+
    '<b>Avise, que é apurado.</b> Quem não deveria estar aqui sai da lista.</p>'+
    '<p class="tiny muted" style="line-height:1.65;margin-top:9px">Você não precisa se identificar, e pode contar só o que se sentir à vontade para contar. '+
    'Se for algo grave, vale também denúncia ao conselho da categoria, que é quem tem poder de punir — o app só tira da lista.</p>'+
    '<a class="btn acc bl" style="margin-top:12px" href="mailto:'+EMAIL_CONTATO+
    '?subject='+encodeURIComponent('Denúncia sobre profissional listado no Norte')+'">'+
-   ic('bell')+' Denunciar por e-mail</a></div>'+
+   ic('bell')+' Denunciar por e-mail</a></div>')+
   blocoVideos('Como se proteger na consulta',[
-   ['Consultar registro no conselho','como consultar registro CRM CRN CREF CRP conselho','Leva um minuto e é de graça'],
-   ['Seus direitos no atendimento','direitos pessoa trans atendimento saude nome social','Nome social, acolhimento e o que fazer se for desrespeitado'],
-   ['Onde encontrar atendimento público','ambulatorio trans SUS como conseguir atendimento','Ambulatórios e o caminho pelo SUS']
+ ['','Consultar registro no conselho','como consultar registro CRM CRN CREF CRP conselho','Leva um minuto e é de graça'],
+ ['i81ZNj6Golo','População transgênero pode usar nome social em unidades de saúde do RJ','TV Brasil','Nome social, acolhimento e o que fazer se for desrespeitado'],
+ ['XI3hr2ubyeE','Ambulatório para Travestis e Transexuais em João Pessoa-PB = SUS','TV Câmara JP','Como funciona um ambulatório trans, num caso real']
   ],'')
 }
 
-/* Bloco de vídeos de um assunto. Abre busca no YouTube em vez de fixar um
-   vídeo só: canal sai do ar, vídeo é removido, e link quebrado é pior que
-   link nenhum. */
+/* Bloco de vídeos de um assunto.
+   Isto aqui dizia que abrir busca era melhor que fixar um vídeo, porque
+   canal sai do ar e link quebrado é pior que link nenhum. O raciocínio
+   estava certo e a conclusão errada: busca também devolve coisa errada, e
+   além disso jogava a pessoa fora do app no meio de uma rotina.
+   O que resolve de verdade é conferir cada id antes de entrar e ter um
+   caminho quando ele morre — que é o link embaixo de cada player. */
 /* Os doze blocos de vídeo do app somavam uns seis mil pixels de altura
    sempre abertos. Agora cada um é uma dobra, fechada por padrão: o título
    diz o que tem ali dentro e quantos vídeos. */
+/* Bloco de vídeos, dobrado, com o player dentro.
+   Antes havia duas funções quase iguais — uma com player e outra que só
+   abria busca no YouTube, embora o cabeçalho fechado das duas dissesse
+   "tocam aqui dentro". Agora é uma só, e a frase é verdade.
+
+   O id da dobra leva o id do primeiro vídeo no fim. Antes era só o título,
+   e "Ver alguém falando disso" aparece em quatro telas diferentes: abrir
+   numa abria em todas as outras. */
 function blocoVideos(titulo,lista,nota){
- const id='vid:'+titulo;
+ const n=lista.filter(function(v){return v[0]}).length;
+ const id='vid:'+titulo+':'+((lista[0]&&lista[0][0])||lista.length);
  if(!dobrado(id))
   return '<div class="dobra">'+
    '<button class="dh" data-a="dobra" data-id="'+esc(id)+'" aria-expanded="false">'+
    ic('play')+'<span class="grow" style="min-width:0">'+
    '<span class="dt">'+esc(titulo)+'</span>'+
-   '<span class="dr">'+lista.length+(lista.length===1?' vídeo':' vídeos')+', tocam aqui dentro</span></span>'+
+   '<span class="dr">'+lista.length+(lista.length===1?' vídeo':' vídeos')+
+    (n===lista.length?', tocam aqui dentro':n?', '+n+' tocam aqui dentro':'')+'</span></span>'+
    '<svg class="ic seta" aria-hidden="true"><use href="#i-right"/></svg></button></div>';
- return blocoVideosAberto(titulo,lista,nota,id);
-}
-function blocoVideosAberto(titulo,lista,nota,id){
  return '<div class="card">'+chTtl('play',titulo)+
   (nota?'<p class="tiny muted" style="margin-bottom:11px;line-height:1.6">'+nota+'</p>':'')+
-  lista.map(function(v){return vidLink(v[0],v[1],v[2]||'')}).join('')+'</div>';
+  listaVideos(lista)+'</div>';
 }
+const blocoVideosTocam=blocoVideos;
 
 /* =====================================================================
    PRIVACIDADE E TERMOS
@@ -7355,12 +7576,14 @@ function blocoHormonios(){
  h+=linhas('Lidar com a hormonização','heart',LIDAR_HORM);
  h+=blocoVideos('Ver alguém falando disso',
   t==='masc'
-  ?[['Linha do tempo da testosterona','timeline testosterona homem trans mes a mes','O que muda e quando, com relato real'],
-    ['Humor e emoção na T','mudancas emocionais testosterona homem trans relato','Relatos sobre sentir diferente'],
-    ['Exames e acompanhamento','exames hormonizacao homem trans acompanhamento medico','Por que ir mesmo quando está tudo bem']]
-  :[['Linha do tempo do estrogênio','timeline estrogenio mulher trans mes a mes','O que muda e quando'],
-    ['Humor na hormonização','mudancas emocionais hormonizacao mulher trans relato','Relatos sobre a parte emocional'],
-    ['Exames e acompanhamento','exames hormonizacao mulher trans acompanhamento','O que é checado e por quê']],
+  ?[
+ ['NLBPrS5Hn2Q','2 MESES DE TESTOSTERONA | HOMEM TRANS','(Eli)minado','O que muda e quando, com relato real'],
+ ['dj78hNxgtXY','Four Months on Testosterone | Voice and Mood Changes | Audio Log','BatteringRAM','Relatos sobre sentir diferente'],
+ ['sKQXQDr48dk','Quais exames tem que ser feito na hormonização','Natália Mirele Ferreira','Por que ir mesmo quando está tudo bem']]
+  :[
+ ['V7KGKVZc7jE','6 Months HRT','SafeWord','O que muda e quando'],
+ ['BiBumR0sHKQ','HRT two weeks in: this is what I noticed','Cal the Coffee Cat','Relatos sobre a parte emocional'],
+ ['sKQXQDr48dk','Quais exames tem que ser feito na hormonização','Natália Mirele Ferreira','O que é checado e por quê']],
   'Relato de outras pessoas ajuda a calibrar expectativa. Não substitui consulta.');
  return h;
 }
@@ -7500,7 +7723,11 @@ function stPeso(){
  /* Quem escolheu não ter meta de peso vê a tela sem alvo e sem cobrança. */
  const semMeta=semMetaDePeso();
  const imc=atual/Math.pow(S.perfil.altura/100,2);
- const cls=imc<18.5?['abaixo do peso','var(--warn)']:imc<25?['faixa normal','var(--ok)']:imc<30?['acima','var(--warn)']:['bem acima','var(--warn)'];
+ /* O IMC fica, sem adjetivo. Ele foi feito para comparar populações, não
+    para dar nota a uma pessoa, e não distingue músculo de gordura. A única
+    faixa que o app comenta é a de baixo, e mesmo essa falando do APP
+    ("não sugiro déficit"), não de você. */
+ const cls=['índice de massa corporal','var(--ink)'];
  const falta=n1(Math.abs(atual-meta));
  const rec=ps.filter(p=>diffDias(p.d,hoje())<=28);
  const ritmo=rec.length>1?n1(rec[rec.length-1].v-rec[0].v):0;
@@ -7511,7 +7738,8 @@ function stPeso(){
    'Pode continuar registrando normalmente: suas metas de comida seguem sendo recalculadas a cada pesagem, '+
    'só o valor é que não volta para a tela.</p>'+
    '<div class="row" style="gap:7px;margin-top:12px">'+
-    '<input type="number" step="0.1" inputmode="decimal" id="pesoIn" placeholder="kg" class="grow">'+
+    '<input type="number" step="0.1" inputmode="decimal" id="pesoIn" aria-label="Peso em quilos" '+
+    'placeholder="kg" class="grow">'+
     '<button class="btn acc" data-a="add-peso">Registrar</button></div>'+
    (ps.length?'<p class="tiny" style="margin-top:10px;color:var(--ok)">'+ps.length+
      (ps.length===1?' pesagem registrada':' pesagens registradas')+'. A última foi em '+fmtData(ps[ps.length-1].d)+'.</p>':'')+
@@ -7537,10 +7765,15 @@ function stPeso(){
      :Math.abs(atual-meta)<Math.abs(ini-meta)?'var(--ok)':'var(--ink)'))+
    tile('IMC',n1(imc),cls[0],cls[1])+'</div>'+
   '<div class="row" style="gap:7px;margin-top:12px">'+
-   '<input type="number" step="0.1" inputmode="decimal" id="pesoIn" placeholder="'+n1(atual)+'" class="grow">'+
+   '<input type="number" step="0.1" inputmode="decimal" id="pesoIn" aria-label="Peso em quilos" '+
+   'placeholder="'+n1(atual)+'" class="grow">'+
    '<button class="btn acc" data-a="add-peso">Registrar</button></div>'+
-  '<p class="tiny muted" style="margin-top:9px">Pese-se no mesmo horário, de preferência em jejum e depois do banheiro. '+
-   'Faltam <b>'+falta+' kg</b> para a meta'+(ritmo?'; nos últimos 28 dias você variou <b>'+(ritmo>0?'+':'')+ritmo+' kg</b>.':'.')+'</p></div>'+
+  '<p class="tiny muted" style="margin-top:9px;line-height:1.6">O peso oscila 1 a 2 kg no mesmo dia, '+
+   'por água, sal e intestino. Uma pesagem por semana diz mais que uma por dia, e pesar todo dia costuma '+
+   'atrapalhar mais do que ajudar.'+
+   (ritmo?' Nos últimos 28 dias você variou <b>'+(ritmo>0?'+':'')+ritmo+' kg</b>.':'')+
+   (imc<18.5?' <b>Abaixo de 18,5 de IMC o app não sugere déficit de calorias</b> — é trava do cálculo, não recado sobre você.':'')+
+   '</p></div>'+
   blocoRecalculo()+
   '<div class="card">'+chTtl('chart','Evolução','<span class="tag n">'+ps.length+' registros</span>')+
    lineChart(ps.map(p=>({x:fmtCurto(p.d),y:p.v})),'kg',null,
@@ -8059,8 +8292,9 @@ function pf_lembAgua(){
  return   '<div class="card">'+chTtl('bell','Lembretes de água')+
    '<div class="row wrap" style="gap:5px;margin-bottom:11px">'+(p.lembretes||[]).map((h,i)=>
     '<button class="chip" data-a="lemb-rm" data-i="'+i+'">'+h+' '+ic('x')+'</button>').join('')+'</div>'+
-   '<div class="row" style="gap:7px"><input type="time" id="lembIn" class="grow">'+
-   '<button class="btn sm" data-a="lemb-add">'+ic('plus')+'</button></div>'+
+   '<div class="row" style="gap:7px"><input type="time" id="lembIn" class="grow" '+
+   'aria-label="Horário do lembrete">'+
+   '<button class="btn sm" data-a="lemb-add" aria-label="Adicionar horário de lembrete">'+ic('plus')+'</button></div>'+
    '<p class="xtiny muted" style="margin-top:9px">Estes horários aparecem no Início e na aba de Água como marcos do dia. '+
    'A página não envia notificação pelo celular — ela mostra o que já passou e o quanto você deveria ter bebido até ali.</p></div>';
 }
@@ -8132,9 +8366,10 @@ function pf_lembretes(){
    '<p class="tiny muted" style="line-height:1.65">Escreva o que você quer ser lembrado e a que horas. '+
    'Aparece na sua linha do tempo do dia, junto com o resto.</p>'+
    '<div class="row" style="gap:6px;margin-top:11px">'+
-    '<input type="time" id="al_h" value="08:00" style="flex:none;width:112px">'+
-    '<input type="text" id="al_t" class="grow" placeholder="tomar o remédio, alongar, ligar pra alguém" maxlength="60">'+
-    '<button class="btn acc" data-a="alarm-add">'+ic('plus')+'</button></div>'+
+    '<input type="time" id="al_h" value="08:00" aria-label="Horário do alarme" style="flex:none;width:112px">'+
+    '<input type="text" id="al_t" class="grow" aria-label="O que o alarme vai lembrar" '+
+    'placeholder="tomar o remédio, alongar, ligar pra alguém" maxlength="60">'+
+    '<button class="btn acc" data-a="alarm-add" aria-label="Adicionar alarme">'+ic('plus')+'</button></div>'+
    ((p.alarmes||[]).length
     ?'<div class="stack" style="gap:0;margin-top:11px">'+p.alarmes.map((a,i)=>
       '<div class="li"><div class="grow"><div class="ttl num">'+esc(a.h)+'</div>'+
@@ -8148,13 +8383,20 @@ function pf_ocultar(){
    (p.viuOcultar?'':'<p class="tiny" style="background:var(--pink-soft);border-radius:11px;padding:11px;'+
     'line-height:1.6;font-weight:600;margin-bottom:11px">Antes de começar, escolha isto. '+
     'Depois o app não pergunta de novo — e você muda quando quiser, aqui mesmo.</p>')+
-   '<p class="tiny muted" style="line-height:1.65">Ver peso e percentual de gordura todo dia faz mal a muita gente. '+
-   'Desmarque o que você não quer que apareça: o app continua registrando e calculando igual, ' +
-   'e simplesmente para de devolver aquele número para a tela.</p>'+
+   '<p class="tiny muted" style="line-height:1.65">Peso, percentual de gordura, medidas e caloria vêm '+
+   '<b>desligados e travados</b>: ver estes números todo dia é gatilho para quem tem histórico de transtorno alimentar. '+
+   'O app continua registrando e calculando igual — só não devolve o número para a tela.</p>'+
    '<div class="row wrap" style="gap:5px;margin-top:11px">'+OCULTAVEIS.map(([k,n])=>
     '<button class="chip '+(oculto(k)?'':'on')+'" data-a="ocultar" data-k="'+k+'">'+
-    ic(oculto(k)?'x':'check')+' '+esc(n)+'</button>').join('')+'</div>'+
-   '<p class="xtiny muted" style="margin-top:9px">Marcado em cor = aparece. Apagado = escondido.</p>'+
+    ic(travado(k)?'check':(oculto(k)?'x':'check'))+' '+esc(n)+
+    (travado(k)?' <span class="tag n" style="margin-left:4px">travado</span>':'')+'</button>').join('')+'</div>'+
+   '<p class="xtiny muted" style="margin-top:9px">Marcado em cor = aparece. Apagado = escondido. '+
+   'Travado = só com senha.</p>'+
+   (numLiberado()
+    ?'<button class="btn gh bl sm" style="margin-top:11px" data-a="travar-de-novo">'+
+      ic('check')+' Desligar os números de novo</button>'
+    :'<button class="btn gh bl sm" style="margin-top:11px" data-a="destravar-abrir">'+
+      ic('bell')+' Quero ver os números mesmo assim</button>')+
    (p.viuOcultar?'':'<button class="btn acc bl" style="margin-top:12px" data-a="viu-ocultar">Pronto, pode continuar</button>')+'</div>';
 }
 function pf_disfarce(){
@@ -9044,10 +9286,21 @@ document.addEventListener('click',ev=>{
    toast('Nível ajustado. O plano já mudou.');break;
   case 'dia-cheio':S.perfil.diaCheio=!S.perfil.diaCheio;save('base');render();
    toast(S.perfil.diaCheio?'Treinos abrem na versão curta':'Treinos abrem completos');break;
-  case 'ocultar':{const o=S.perfil.ocultar||[],i=o.indexOf(d.k);
+  case 'ocultar':{
+   /* número travado não liga por toque: abre a tela que explica a trava */
+   if(travado(d.k)){sheetDestravar();break}
+   const o=S.perfil.ocultar||[],i=o.indexOf(d.k);
    if(i<0)o.push(d.k);else o.splice(i,1);
    S.perfil.ocultar=o;save('base');render();
    toast(i<0?'Escondido. O registro continua.':'Vai aparecer de novo.');break}
+  case 'destravar-abrir':sheetDestravar();break;
+  case 'destravar':{
+   const v=(($('#senhaNum')||{}).value||'').trim().toLowerCase();
+   if(v!==SENHA_NUMEROS){toast('Senha não confere.');return}
+   S.perfil.numLiberado=true;save('base');closeSheet();render();
+   toast('Números liberados. Dá para desligar de novo quando quiser.');break}
+  case 'travar-de-novo':{S.perfil.numLiberado=false;save('base');render();
+   toast('Desligados de novo.');break}
 
   /* configuração */
   case 'onboard':closeSheet();sheetOnboard();break;
