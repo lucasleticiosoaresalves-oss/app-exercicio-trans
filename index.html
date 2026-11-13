@@ -4386,6 +4386,45 @@ function blocoEnfase(){
   (S.perfil.trilha==='bem'?selo('exerc_humor','Por que este formato'):selo('freq','Por que duas vezes por semana'))+
   '</p></div>';
 }
+/* ---------------------------------------------------------------------
+   CREATINA
+   O único suplemento que este app menciona por nome. Ele passou cinco
+   versões sem falar de suplemento nenhum, e isso estava certo para whey,
+   barrinha e shake — e errado para creatina, que é a substância com mais
+   ensaio aleatorizado em cima dela na nutrição esportiva inteira.
+
+   Duas coisas que este bloco precisa dizer e que quase nenhum texto de
+   academia diz. A primeira é o tamanho do efeito, que é PEQUENO: 0,11 em
+   desvio padrão, intervalo passando pelo zero. A segunda é o exame: a
+   creatina vira creatinina no corpo, e creatinina é o que o laboratório
+   usa para estimar função do rim. O valor sobe sem o rim ter nada — e
+   creatinina está na lista de exames de acompanhamento hormonal deste
+   app, então essa confusão ia acontecer aqui dentro.
+   --------------------------------------------------------------------- */
+const CREATINA=[
+ ['O que ela faz, e quanto','Aumenta a reserva de energia rápida do músculo, o que rende um pouco mais de trabalho em série pesada. Medindo músculo direto, por ressonância e ultrassom, o ganho extra foi de 0,10 a 0,16 cm de espessura — pequeno e real. Ela não queima gordura, não é hormônio e não muda nada ligado a transição.'],
+ ['Quem ganha mais','Quem come pouca ou nenhuma carne. A reserva de creatina do corpo vem sobretudo da carne, então quem é vegetariana ou come carne raramente começa com o tanque mais baixo e sobe mais. Numa revisão de nove estudos, esse grupo ganhou massa magra, força e resistência muscular.'],
+ ['A dose','3 a 5 g por dia, da versão monoidratada, todo dia, inclusive nos dias sem treino. Não precisa de fase de saturação, não precisa de horário e não precisa de ciclo de pausa. As versões caras com outros nomes não se mostraram melhores que a monoidratada.'],
+ ['O preço','É o suplemento mais barato por efeito que existe. Um pote de 300 g, na dose de 3 g, dura cerca de cem dias, e custa bem menos que um pote de whey — que rende duas semanas e substitui comida que você poderia comprar.'],
+ ['Creatinina no exame: atenção','A creatina vira creatinina no corpo, e creatinina é justamente o que o laboratório usa para estimar como está o rim. Quem toma creatina costuma ver esse valor subir um pouco sem ter nada no rim. Avise quem te acompanha que você usa, antes de coletar — senão o exame vira susto, ou vira investigação que não precisava acontecer.'],
+ ['O que ela não é','Não é esteroide, não é hormônio e não tem nada a ver com bloqueador ou com testosterona. Isso está respondido com estudo no artigo de dúvidas comuns que está nas fontes.'],
+ ['Quando não faz sentido','Se você ainda não treina com regularidade, não bate a proteína do dia ou dorme mal, creatina não vai aparecer em nada. Ela é a última coisa da fila, não a primeira. E quem tem doença de rim, ou está grávida, pergunta antes.']
+];
+function blocoCreatina(){
+ return dobra('plano:creatina','Creatina','leaf',
+  'o único suplemento com evidência forte, e o efeito dele é pequeno',function(){
+  return '<div class="card">'+chTtl('leaf','Creatina')+
+   '<p class="tiny muted" style="line-height:1.7">Este é o único suplemento que o app cita por nome, e não é por entusiasmo: '+
+   'é porque a evidência dele é forte e o efeito dele é pequeno, e as duas coisas precisam ser ditas na mesma frase. '+
+   'O app não vende nada e não indica marca.</p>'+
+   '<div class="stack" style="gap:0;margin-top:12px">'+CREATINA.map(function(x){
+    return '<div class="li"><div class="grow"><div class="ttl">'+esc(x[0])+'</div>'+
+     '<div class="sub" style="line-height:1.55">'+esc(x[1])+'</div></div></div>';
+   }).join('')+'</div>'+
+   '<p class="xtiny muted" style="margin-top:11px;line-height:1.6">Nenhum destes estudos foi feito em pessoas trans, '+
+   'e nenhum olhou interação com hormonização. '+selo('creatina','De onde vem tudo isto')+'</p></div>';
+ });
+}
 function stPlano(){
  const n=diaPlano();
  $('#st-plano').innerHTML=
@@ -4395,6 +4434,7 @@ function stPlano(){
     :'Quatro fases, um ciclo de 7 dias que se repete dentro de cada uma. '+
      'Todo dia do calendário tem destino: treino, descanso ativo ou descanso total.')+'</p></div>'+
   blocoEnfase()+
+  blocoCreatina()+
   /* Quatro fases abertas davam nove telas de rolagem. A fase de agora fica
      aberta, porque é a que você está vivendo; as outras dobram. */
   PHASES.filter(f=>S.perfil.trilha!=='bem'||f.id<=2).map(f=>{
@@ -4616,12 +4656,12 @@ function microDe(nome){return MICRO[nome]||null}
 /* Referências de ingestão. São valores gerais de população, não meta sua:
    servem para você saber se está muito longe, não para fechar conta. */
 const REFS_MICRO=[
- {k:'fib',n:'Fibra',u:'g',alvo:25,tipo:'minimo',
-  por:'A recomendação mais usada é de pelo menos 25 g por dia para adultos. Fibra é o que mais sacia por caloria e o que mais muda o intestino — e é justamente o que falta em dia de comida pronta.'},
- {k:'fe',n:'Ferro',u:'mg',alvo:18,alvoSem:8,tipo:'minimo',
-  por:'18 mg por dia para quem menstrua, 8 mg para quem não menstrua. Mas tem um detalhe que quase nenhum app diz: testosterona aumenta a produção de glóbulos vermelhos e o consumo de ferro, e por isso a orientação clínica é checar ferritina antes de começar e acompanhar depois. Ferro baixo cansa mesmo sem anemia.'},
- {k:'ca',n:'Cálcio',u:'mg',alvo:1000,tipo:'minimo',
-  por:'1000 mg por dia para adultos. Importa para todo mundo e importa em dobro em transição: densidade óssea é um dos pontos que o acompanhamento hormonal olha, e o osso se constrói com cálcio, vitamina D e treino de força — os três juntos.'},
+ {k:'fib',n:'Fibra',u:'g',alvo:25,tipo:'minimo',ev:'fibra',
+  por:'25 g por dia é o PISO de uma faixa, não o teto dela. A série de revisões da Lancet, com 185 estudos prospectivos e 58 ensaios clínicos, achou a maior redução de risco entre 25 e 29 g por dia, e a curva continua descendo acima disso. Fibra também é o que mais sacia por caloria e o que mais muda o intestino — e é justamente o que some em dia de comida pronta. Para intestino preso, o que funcionou nos ensaios foi dose acima de 10 g por dia por pelo menos 4 semanas, com psyllium ou pectina; aumentar de uma vez dá gases, aumentar aos poucos não.'},
+ {k:'fe',n:'Ferro',u:'mg',alvo:18,alvoSem:8,tipo:'minimo',ev:'ferro',
+  por:'18 mg por dia para quem menstrua, 8 mg para quem não menstrua. Quem decide qual dos dois vale aqui é o seu registro de ciclo, não a sua trilha. Menstruação intensa é a causa mais comum de falta de ferro em idade reprodutiva, e é uma relação tão normalizada que passa batido até no serviço de saúde — ferro baixo cansa, atrapalha a concentração e derruba o rendimento muito antes de virar anemia. Do outro lado: testosterona aumenta a produção de glóbulos vermelhos, e por isso ferritina, hemoglobina e hematócrito entram no acompanhamento. Num corte de 6.670 pessoas em hormonização, hematócrito alto foi raro.'},
+ {k:'ca',n:'Cálcio',u:'mg',alvo:1000,tipo:'minimo',ev:'osso',
+  por:'1000 mg por dia para adultos. Importa para todo mundo e tem peso próprio em transição, mas não pelo motivo que costuma circular: a hormonização em si não derruba o osso. O que a literatura aponta como atenção é massa óssea já baixa antes de começar, interrupção do hormônio, e bloqueio puberal sem hormonização em seguida. Cálcio, vitamina D e treino de força são os três que dá para fazer — e na meta-análise de 84 grupos de exercício, todos os tipos de treino melhoraram a densidade óssea.'},
  {k:'na',n:'Sódio',u:'mg',alvo:2000,tipo:'maximo',
   por:'Menos de 2000 mg por dia, o que dá mais ou menos 5 g de sal. É o único desta lista em que o alvo é não passar. Quase todo o excesso vem de comida industrializada e de embutido, não do saleiro.'}
 ];
@@ -4686,7 +4726,9 @@ function sheetMicro(){
   '<div class="stack" style="gap:0">'+REFS_MICRO.map(function(r){
    return '<div class="li"><div class="grow"><div class="ttl">'+esc(r.n)+' · '+
     (r.tipo==='maximo'?'no máximo ':'')+alvoMicro(r)+' '+r.u+' por dia</div>'+
-    '<div class="sub" style="line-height:1.55">'+esc(r.por)+'</div></div></div>';
+    '<div class="sub" style="line-height:1.55">'+esc(r.por)+
+    (r.ev?'<br><span style="display:inline-block;margin-top:7px">'+selo(r.ev)+'</span>':'')+
+    '</div></div></div>';
   }).join('')+'</div>'+
   '<hr class="sep"><div class="lbl" style="margin-bottom:6px">De onde vêm os números dos alimentos</div>'+
   '<p class="xtiny muted" style="line-height:1.65">Duas tabelas. A primeira é a TACO, 4a edição, do Núcleo de Estudos e Pesquisas em Alimentação da UNICAMP, '+
@@ -6332,8 +6374,43 @@ const EXAMES_COMUNS=[
  ['Hemoglobina','g/dL'],['Ferritina','ng/mL'],['TGO','U/L'],['TGP','U/L'],
  ['Creatinina','mg/dL'],['Colesterol total','mg/dL'],['HDL','mg/dL'],
  ['LDL','mg/dL'],['Triglicerídeos','mg/dL'],['Prolactina','ng/mL'],
- ['TSH','µUI/mL'],['Glicose','mg/dL'],['Vitamina D','ng/mL']
+ ['TSH','µUI/mL'],['Glicose','mg/dL'],['Vitamina D','ng/mL'],
+ /* Densitometria não tem unidade de laboratório: o que se anota é o
+    T-score, que é um número puro. Por isso a unidade fica em branco. */
+ ['Densitometria óssea (T-score)','']
 ];
+
+/* ---------------------------------------------------------------------
+   OSSO
+   Fica na tela de exames porque é aqui que a pessoa está pensando no que
+   levar para a consulta. O medo que circula é "hormônio come o osso", e
+   a literatura diz o contrário: o que derruba osso é passar tempo sem
+   hormônio nenhum. Esse é o recado principal, e ele é prático, porque
+   falta de medicação acontece no Brasil por desabastecimento e por fila.
+   --------------------------------------------------------------------- */
+function blocoOsso(){
+ const T=S.perfil.trilha;
+ const linhas=[
+  ['O medo é o contrário do achado','Nos estudos, a hormonização em pessoas adultas não aparece associada a perda óssea importante. Na meta-análise com 1.484 homens trans, a densidade na coluna, no quadril, no colo do fêmur e no corpo inteiro não mudou depois de 12 e 24 meses de testosterona, e o marcador de formação de osso subiu.'],
+  ['O que derruba osso é a falta','Ficar sem hormônio nenhum é o que a literatura aponta como risco — e isso pesa mais depois de cirurgia que retira ovário ou testículo, porque aí o corpo não produz mais por conta. Interromper por conta própria, ou ficar meses sem conseguir a medicação, não é neutro. Se faltou, isso é assunto de consulta, não de esperar passar.'],
+  ['Cálcio, vitamina D e sol','São a parte que não depende de receita. O app acompanha o cálcio do seu dia no painel "Além das calorias", e vitamina D está na lista de exames aqui desta tela.'],
+  ['Treino de força é a outra metade','Na meta-análise de 84 grupos de exercício, todos os tipos de treino melhoraram a densidade óssea, com os maiores efeitos do treino de força no quadril. É mais um motivo para o plano do app ser de carga, e não só de caminhada.'],
+  ['Quando pedir densitometria','Quem decide é quem te acompanha. O que a revisão recomenda é limiar baixo para pedir quando existe fator de risco, e tratar seguindo as mesmas diretrizes da população geral. Dá para anotar o resultado aqui mesmo, como T-score.']
+ ];
+ if(T==='fem'||T==='andro')linhas.splice(2,0,
+  ['Para mulheres trans, um detalhe que muda a conversa','A massa óssea baixa costuma já estar lá ANTES de começar o tratamento, e não ser causada por ele. No estudo brasileiro de Porto Alegre, 18% das 142 mulheres trans avaliadas tinham massa óssea baixa para a idade, contra nenhuma do grupo de comparação — e isso apareceu ligado a massa magra menor, não ao hormônio. Nas 46 reavaliadas quase três anos depois, o osso ficou estável e a massa magra caiu. É mais um argumento para treinar força.']);
+ return dobra('exames:osso','Osso','info',
+  'o que a hormonização faz com o osso, e o que fazer a respeito',function(){
+  return '<div class="card">'+chTtl('info','Osso')+
+   '<div class="stack" style="gap:0">'+linhas.map(function(x){
+    return '<div class="li"><div class="grow"><div class="ttl">'+esc(x[0])+'</div>'+
+     '<div class="sub" style="line-height:1.55">'+esc(x[1])+'</div></div></div>';
+   }).join('')+'</div>'+
+   '<p class="xtiny muted" style="margin-top:11px;line-height:1.6">Densidade óssea é um número intermediário: '+
+   'o que importa de verdade é fratura, e falta dado sobre fratura em pessoas trans. Nada aqui é motivo para mudar nada por conta própria. '+
+   selo('osso','De onde vêm estes números')+'</p></div>';
+ });
+}
 function stExames(){
  const ex=(S.exames||[]).slice().sort((a,b)=>a.d<b.d?1:-1);
  const porNome={};
@@ -6358,6 +6435,7 @@ function stExames(){
       }).join('')+'</div></div>';
     }).join('')
    :'<div class="card">'+vazio('chart','Nenhum resultado anotado ainda.')+'</div>')+
+  blocoOsso()+
   '<div class="card"><p class="xtiny muted" style="line-height:1.7">Fica só neste aparelho, como todo o resto, '+
   'e some junto se você usar o apagar tudo. Exame é dado de saúde: pense duas vezes antes de deixar o app aberto '+
   'num celular que outras pessoas pegam — a senha no Perfil ajuda nisso.</p></div>';
@@ -6849,6 +6927,34 @@ function blocoSintomas(){
   }).join('')+'</div></div>';
 }
 
+/* ---------------------------------------------------------------------
+   FERRO
+   Só aparece nas trilhas em que menstruação existe. O app NÃO sugere
+   suplemento de ferro e não diagnostica nada: ferro demais faz mal, e
+   tomar por conta própria pode esconder uma causa de sangramento que
+   precisa ser investigada. O que este bloco faz é dar a pergunta pronta,
+   que é o que falta quando a conversa é normalizada dos dois lados.
+   --------------------------------------------------------------------- */
+const FERRO_CICLO=[
+ ['Viver cansada não é parte do pacote','Menstruação intensa é a causa mais comum de falta de ferro em idade reprodutiva. A revisão mais recente sobre isso diz, com todas as letras, que a relação entre as duas coisas é normalizada — por quem sangra, por quem convive e pelos próprios serviços.'],
+ ['Falta de ferro pesa antes da anemia','Cansaço que não passa com sono, dificuldade de concentração, queda de rendimento na escola e no trabalho. Isso aparece com ferro baixo mesmo quando o hemograma ainda está normal, e é por isso que hemograma sozinho não responde.'],
+ ['O exame que mostra antes','Ferritina, que mede o estoque. Hemoglobina e hematócrito mostram quando o estoque já acabou. Os três estão na lista de exames que dá para anotar em Progresso.'],
+ ['Testosterona entra na conta dos dois lados','Ela aumenta a produção de glóbulos vermelhos — por isso hematócrito entra no acompanhamento. E num corte de 6.670 pessoas em hormonização, hematócrito acima de 52% apareceu em 2,7%, com média dentro da faixa normal: é acompanhamento, não é motivo de pânico.'],
+ ['O que este app não faz','Não sugere suplemento de ferro, não diz se o seu valor está bom e não trata sangramento. Ferro em excesso faz mal e pode esconder uma causa que precisa ser investigada. A conta de ferro do diário é um piso: ela soma só o que está na tabela de alimentos.']
+];
+function blocoFerro(){
+ return dobra('ciclo:ferro','Ferro','leaf',
+  'por que menstruar muito e viver cansada andam juntos, e o que perguntar',function(){
+  return '<div class="card">'+chTtl('leaf','Ferro')+
+   '<div class="stack" style="gap:0">'+FERRO_CICLO.map(function(x){
+    return '<div class="li"><div class="grow"><div class="ttl">'+esc(x[0])+'</div>'+
+     '<div class="sub" style="line-height:1.55">'+esc(x[1])+'</div></div></div>';
+   }).join('')+'</div>'+
+   '<button class="btn gh bl sm" style="margin-top:12px" data-a="go-sub" data-tab="prog" data-st="exames">'+
+   ic('chart')+' Anotar ferritina, hemoglobina ou hematócrito</button>'+
+   '<p class="xtiny muted" style="margin-top:10px;line-height:1.6">'+selo('ferro','De onde vêm estes números')+'</p></div>';
+ });
+}
 function stCiclo(){
  /* Na trilha androginia o app não presume nada: mostra as duas coisas e
     deixa você marcar só o que faz sentido para o seu corpo. */
@@ -6862,6 +6968,7 @@ function stCiclo(){
      'porque nesta trilha o app não presume qual é o seu caso. Use só a que serve para você — '+
      'a outra pode ficar ali sem nunca ser preenchida.</p></div>'+cicloMenstrual()+cicloHormonal()
    :(S.perfil.trilha!=='fem'?cicloMenstrual():cicloHormonal()))+
+  (S.perfil.trilha!=='fem'?blocoFerro():'')+
   dobra('ciclo:horm','Informativo de hormônios','bell',
    'o que acontece e quando, e como lidar com a parte emocional',blocoHormonios);
 }
@@ -7766,7 +7873,7 @@ const COMIDA_BARATA=[
  ['Leite em pó e ovo em pó','Rendem mais que o fresco por real gasto, e não estragam.'],
  ['Fruta da estação e de feira no fim do dia','O preço cai bastante, e vale perguntar. Banana e mamão costumam ser os mais baratos o ano todo.'],
  ['Sobrecoxa em vez de peito','Mais barata, mais gostosa e com proteína parecida. Peito de frango é caro por moda, não por valor.'],
- ['O que não vale o dinheiro','Suplemento de proteína quando falta comida, shake, barrinha e qualquer coisa vendida como "fitness". Ovo ganha de todos por real gasto.']
+ ['O que não vale o dinheiro','Suplemento de proteína quando falta comida, shake, barrinha e qualquer coisa vendida como "fitness". Ovo ganha de todos por real gasto. A exceção é a creatina, que é barata e tem evidência forte — e está explicada no plano de treino.']
 ];
 
 const PORCOES=[['pouco',0.6],['normal',1],['bastante',1.5]];
@@ -8894,7 +9001,35 @@ const FONTES={
  aasm15:{r:'Consenso da American Academy of Sleep Medicine com a Sleep Research Society sobre duração de sono em adultos, 2015',
   u:'https://aasm.org/seven-or-more-hours-of-sleep-per-night-a-health-necessity-for-adults/'},
  luz11:{r:'Lieverse e colegas. Ensaio controlado por placebo de luz brilhante matinal em adultos acima de 60 anos com depressão não sazonal. Archives of General Psychiatry, 2011',
-  u:'https://pubmed.ncbi.nlm.nih.gov/21199966/'}
+  u:'https://pubmed.ncbi.nlm.nih.gov/21199966/'},
+
+ /* Osso, creatina, ferro e fibra. Cada identificador abaixo foi conferido
+    pela API do NCBI, que devolve o título do artigo, antes de virar selo
+    em qualquer tela. */
+ osso_rev:{r:'Verroken e colegas. Revisão sobre massa, estrutura e metabolismo ósseo na hormonização afirmativa, em adultos e em adolescentes. Calcified Tissue International, 2022',
+  u:'https://pubmed.ncbi.nlm.nih.gov/35366693/'},
+ osso_t:{r:'Tienforti e colegas. Revisão sistemática com meta-análise de 14 estudos e 1.484 pessoas: o que acontece com o osso de homens trans nos primeiros 12 e 24 meses de testosterona. Calcified Tissue International, 2024',
+  u:'https://pubmed.ncbi.nlm.nih.gov/39356296/'},
+ osso_br:{r:'Fighera e colegas. Densitometria de 142 mulheres trans no Hospital de Clínicas de Porto Alegre, com reavaliação de 46 delas depois de 31 meses. Clinical Endocrinology, 2018. Estudo brasileiro',
+  u:'https://pubmed.ncbi.nlm.nih.gov/29630732/'},
+ osso_exerc:{r:'Kemmler e colegas. Meta-análise de 84 grupos de exercício: qual tipo de treino muda densidade óssea, e quanto. Calcified Tissue International, 2020',
+  u:'https://pubmed.ncbi.nlm.nih.gov/32785775/'},
+ crea_issn:{r:'Position stand da International Society of Sports Nutrition sobre segurança e eficácia da creatina no exercício, no esporte e na medicina. Journal of the International Society of Sports Nutrition, 2017',
+  u:'https://pubmed.ncbi.nlm.nih.gov/28615996/'},
+ crea_duvidas:{r:'Antonio e colegas. Doze perguntas e mitos sobre creatina respondidos pela evidência: rim, queda de cabelo, esteroide, fase de saturação, mulheres, adolescentes. Journal of the International Society of Sports Nutrition, 2021. Leia também a declaração de conflito de interesses, que é longa',
+  u:'https://pubmed.ncbi.nlm.nih.gov/33557850/'},
+ crea_hiper:{r:'Burke e colegas. Revisão sistemática com meta-análise de 10 ensaios e 44 desfechos, com medida direta de músculo por ressonância, tomografia ou ultrassom. Nutrients, 2023',
+  u:'https://pubmed.ncbi.nlm.nih.gov/37432300/'},
+ crea_veg:{r:'Kaviani, Shaw e Chilibeck. Revisão sistemática de nove estudos sobre creatina em pessoas vegetarianas comparadas a onívoras. International Journal of Environmental Research and Public Health, 2020',
+  u:'https://pubmed.ncbi.nlm.nih.gov/32349356/'},
+ ferro_mens:{r:'Munro e colegas. Revisão sobre a relação entre menstruação intensa, deficiência de ferro e anemia ferropriva, e sobre o quanto essa relação é normalizada. American Journal of Obstetrics and Gynecology, 2023',
+  u:'https://pubmed.ncbi.nlm.nih.gov/36706856/'},
+ ferro_t:{r:'Krishnamurthy e colegas. Hematócrito de 6.670 pessoas em uso de testosterona como hormonização afirmativa, por nível e por via de aplicação. Journal of Clinical Endocrinology and Metabolism, 2024',
+  u:'https://pubmed.ncbi.nlm.nih.gov/38011684/'},
+ fibra_lancet:{r:'Reynolds, Mann e colegas. Série de revisões sistemáticas e meta-análises sobre qualidade do carboidrato: 185 estudos prospectivos e 58 ensaios clínicos, quase 135 milhões de pessoas-ano. The Lancet, 2019',
+  u:'https://pubmed.ncbi.nlm.nih.gov/30638909/'},
+ fibra_intest:{r:'van der Schoot e colegas. Meta-análise de 16 ensaios aleatorizados com 1.251 pessoas sobre suplementação de fibra na constipação crônica. American Journal of Clinical Nutrition, 2022',
+  u:'https://pubmed.ncbi.nlm.nih.gov/35816465/'}
 };
 function linkFonte(k){const f=FONTES[k];if(!f)return '#';
  return f.u||'https://pubmed.ncbi.nlm.nih.gov/?term='+encodeURIComponent(f.q)}
@@ -8956,6 +9091,11 @@ const EVID=[
   por:'Uma revisão de 7 estudos prospectivos com 664 homens trans achou resultado inconsistente: quatro relataram algum aumento em medidas ligadas a agressividade, um relatou queda, e todos tinham risco de viés de moderado a alto, com seguimento menor que 12 meses. Um estudo prospectivo com 56 pessoas não encontrou aumento de agressividade, e apontou a ansiedade como preditor mais forte do que a testosterona. Num acompanhamento com 178 adolescentes e jovens trans, 69,6% mantiveram níveis normais de raiva durante todo o período. O que sobra de mais consistente é que emoção fica mais perto da superfície, não que a pessoa fique agressiva.',
   no:'A tela de hormônios diz isso com os números, em vez de repetir o estereótipo. E trata pavio curto como sinal para investigar sono, dor, ansiedade e disforia — não como "é a T". Também diz, em destaque, para nunca mexer em dose por causa de humor.',
   fontes:['raiva_rev','defreyne18','huit26']},
+ {id:'osso',area:'Hormônios',af:'A hormonização não derruba o osso; o que derruba é ficar sem hormônio nenhum',forca:'media',
+  por:'A revisão que reúne o assunto, de 2022, diz que a hormonização afirmativa em pessoas adultas não está associada a perda óssea importante. Na meta-análise de 14 estudos e 1.484 homens trans, a densidade óssea não mudou de forma significativa na coluna, no quadril, no colo do fêmur nem no corpo inteiro depois de 12 e de 24 meses de testosterona, e o P1NP, que é marcador de formação de osso, subiu — o que aponta para efeito anabólico, não para perda. O ponto de atenção é outro, e é em mulheres trans: a prevalência de massa óssea baixa já é alta ANTES de começar o tratamento. No estudo brasileiro do Hospital de Clínicas de Porto Alegre, 18% das 142 mulheres trans avaliadas tinham massa óssea baixa para a idade, contra nenhuma pessoa do grupo de comparação, e isso apareceu ligado a massa magra menor, não ao hormônio; nas 46 reavaliadas depois de 31 meses a densidade ficou estável, enquanto a massa magra caiu. Em adolescentes, o bloqueio puberal sozinho prejudica o desenvolvimento do osso, com recuperação ao menos parcial depois que a hormonização começa. Sobre o que dá para fazer: na meta-análise de 84 grupos de exercício, todos os tipos de treino melhoraram a densidade óssea na coluna, no colo do fêmur e no quadril, com os efeitos maiores do treino de força no quadril.',
+  no:'Entrou um bloco de osso na tela de exames, com os três pontos que a literatura aponta: não interromper a hormonização por conta própria, ainda mais depois de cirurgia que retira gônada; cálcio e vitamina D; e treino de força. Densitometria óssea entrou na lista de exames que dá para anotar. O alvo de cálcio do painel de micronutrientes passou a ter fonte, e a linha que já dizia que treino de força protege o osso virou um número.',
+  masnao:'Quase tudo aqui é densidade medida por densitometria, que é um desfecho intermediário: o que importa é fratura, e a própria revisão diz que falta dado sobre risco de fratura em pessoas trans. Os seguimentos são curtos — 12 e 24 meses não dizem nada sobre trinta anos. E a meta-análise de exercício é em mulheres na pós-menopausa, que não é a mesma população: ela entra aqui como a melhor evidência disponível sobre treino e osso, não como estudo em pessoas trans.',
+  fontes:['osso_rev','osso_t','osso_br','osso_exerc']},
  {id:'ciclo',area:'Ciclo',af:'Acompanhar o ciclo porque menstruar é gatilho de disforia',forca:'media',
   por:'Numa revisão de prontuários de 129 adolescentes transmasculinos, 93% relataram disforia ligada à menstruação e 88% tinham interesse em suprimir. São estudos retrospectivos, de poucos serviços, então mostram o tamanho do problema melhor do que mostram solução. Para quem usa estradiol injetável não existe literatura parecida: o que se relata sobre variação ao longo do intervalo é muito menos estudado e depende da via e da dose.',
   no:'Na trilha masculinizar e na de melhorar, o app prevê a próxima menstruação depois de dois ou três registros e deixa marcar sintomas por dia. Na trilha feminilizar não existe previsão nenhuma, só registro ao longo do intervalo da dose — porque prever sem base seria invenção. Nada aqui sugere supressão: isso passa por receita e por quem te acompanha.',
@@ -9000,6 +9140,11 @@ const EVID=[
   por:'A relação entre estímulo e resultado é de dose: nas meta-regressões, mais trabalho rende mais, até um ponto. Carga parada por semanas significa dose parada.',
   no:'Cada exercício guarda o histórico de carga e o 1RM estimado, então dá para ver num relance se a carga subiu ou ficou parada. As observações dos treinos dizem na cara quando subir: "suba a carga quando fechar as 4 séries com folga". A cada oito semanas entra uma semana mais leve, para a conta não virar só acúmulo.',
   fontes:['pelland24','bazvalle22']},
+ {id:'creatina',area:'Treino',af:'Creatina é o único suplemento de treino com evidência forte — e o efeito dela é pequeno',forca:'forte',
+  por:'O position stand da International Society of Sports Nutrition é a revisão mais completa do assunto e conclui duas coisas: a creatina monoidratada melhora o desempenho em esforço intenso e as adaptações ao treino, e o uso de curto e de longo prazo é seguro e bem tolerado em pessoas saudáveis — ele cita até 30 g por dia por cinco anos. A dose de manutenção recomendada é bem menor, de 3 a 5 g por dia, ou 0,1 g por quilo, e não existe necessidade de fase de saturação. O tamanho do efeito vem de outro lugar, e é honesto dizer que é pequeno: uma meta-análise de 2023 que mediu músculo direto, por ressonância, tomografia ou ultrassom, em 10 ensaios e 44 desfechos, achou 0,11 em desvio padrão a favor da creatina somada ao treino, com intervalo que passa pelo zero, e de 0,10 a 0,16 cm de espessura muscular. Quem mais ganha é quem come pouca ou nenhuma carne: numa revisão de nove estudos em pessoas vegetarianas, a creatina subiu massa magra, força, resistência muscular e potência, muitas vezes acima do que subia em onívoros, porque a reserva delas começava mais baixa.',
+  no:'Entrou um bloco de creatina no plano de treino, com dose, preço, o que ela não faz e o aviso sobre o exame de creatinina. É o único suplemento que o app menciona por nome próprio. A lista de comida barata foi corrigida junto: ela dizia que suplemento não vale o dinheiro, o que continua certo para whey, barrinha e shake, e é errado para creatina.',
+  masnao:'Pequeno é pequeno. Creatina não substitui treinar, comer proteína e dormir, e quem não faz essas três coisas não vai notar diferença nenhuma. Boa parte dos autores das revisões sobre creatina declara ligação com empresas que a fabricam, e essa declaração está impressa nos próprios artigos — vale ler. E nenhum destes estudos foi feito em pessoas trans nem olhou para interação com hormonização.',
+  fontes:['crea_issn','crea_duvidas','crea_hiper','crea_veg']},
 
  {id:'tmb',area:'Comida',af:'Gasto em repouso pela fórmula de Mifflin-St Jeor',forca:'media',
   por:'Na comparação entre as fórmulas de estimativa, Mifflin-St Jeor foi a que acertou dentro de 10% do valor medido na maior parte das pessoas, e a que menos erra sempre para o mesmo lado. É a mais recomendada para uso geral. Mesmo assim é estimativa: pode estar 10% acima ou abaixo do seu gasto real, e erra mais em quem tem obesidade.',
@@ -9009,6 +9154,16 @@ const EVID=[
   por:'A meta-análise com 49 estudos e 1.863 pessoas encontrou o ponto em que a proteína extra para de render ganho perto de 1,6 g por quilo por dia. O intervalo de confiança é largo, então um alvo pouco acima tem margem. Em déficit calórico o valor sobe porque a proteína é o que segura a massa magra enquanto o peso cai.',
   no:'A meta de proteína sai do seu peso atual e muda junto com ele. O diário mostra quanto falta e as receitas são ordenadas por densidade de proteína.',
   fontes:['morton18']},
+ {id:'fibra',area:'Comida',af:'De 25 a 29 g de fibra por dia é onde a curva de risco mais cai',forca:'forte',
+  por:'A série de revisões publicada na Lancet em 2019 juntou 185 estudos prospectivos e 58 ensaios clínicos — quase 135 milhões de pessoas-ano. Comparando quem come mais fibra com quem come menos, a mortalidade por qualquer causa, a doença coronariana, o derrame, o diabetes tipo 2 e o câncer de intestino aparecem de 15 a 30% menores, e a redução de risco é maior quando a ingestão do dia fica entre 25 e 29 g. Nos ensaios aleatorizados, que são a parte forte do conjunto, mais fibra deu peso, pressão sistólica e colesterol total menores. A curva de dose-resposta sugere que acima de 29 g o benefício ainda continua subindo. Para intestino preso existe meta-análise própria, com 16 ensaios e 1.251 pessoas: responderam ao tratamento 66% de quem recebeu fibra contra 41% de quem recebeu controle, e o que funcionou foi dose acima de 10 g por dia, por pelo menos 4 semanas, com psyllium e pectina.',
+  no:'Os 25 g por dia do painel "Além das calorias" passam a ter fonte, e o texto do alvo passa a dizer que 25 é o piso de uma faixa que vai até 29, não um teto. O painel também ganhou o aviso de que a conta é um piso: ela soma só os alimentos que estão na tabela.',
+  masnao:'A parte de mortalidade e de câncer vem de estudo observacional. Quem come mais fibra em geral também fuma menos, se mexe mais e tem mais dinheiro, e nenhum ajuste estatístico resolve isso por completo — os próprios autores classificaram a certeza como moderada. E a meta-análise de intestino achou mais gases no grupo da fibra: aumentar de uma vez incomoda, aumentar aos poucos não.',
+  fontes:['fibra_lancet','fibra_intest']},
+ {id:'ferro',area:'Comida',af:'Menstruar é a causa mais comum de falta de ferro, e isso costuma passar batido',forca:'media',
+  por:'A revisão de 2023 na American Journal of Obstetrics and Gynecology trata o ponto de frente: menstruação intensa é muito comum e é a principal causa de deficiência de ferro em idade reprodutiva, e a relação entre as duas coisas é normalizada — por quem sangra, por quem convive e pelos próprios serviços de saúde. Falta de ferro pesa no dia a dia antes de virar anemia: cansaço, dificuldade de concentração, falta e queda de rendimento na escola e no trabalho. Do outro lado está o medo de quem usa testosterona, e aí o número é tranquilizador: num corte de 6.670 pessoas em hormonização, 8,4% tinham hematócrito de 50% ou mais, 2,7% de 52% ou mais e 0,9% de 54% ou mais. A média ficou dentro da faixa normal em todos os níveis de testosterona, e foi um pouco maior na via intramuscular que na transdérmica — 44,96% contra 43,41%.',
+  no:'O alvo de ferro do painel "Além das calorias" é de 18 mg para quem menstrua e 8 mg para quem não menstrua, e quem decide qual dos dois vale é o seu registro de ciclo, não a sua trilha. Na tela de Ciclo entrou um bloco com o que levar para a consulta e por que ferritina mostra o problema antes da anemia. Ferritina, hemoglobina e hematócrito já estavam na lista de exames que dá para anotar.',
+  masnao:'O app não diagnostica e não sugere suplemento de ferro a ninguém. Ferro em excesso faz mal, e tomar por conta própria pode esconder uma causa de sangramento que precisa ser investigada. A conta de ferro do diário é um piso, não um total: ela soma só os alimentos que estão na tabela.',
+  fontes:['ferro_mens','ferro_t']},
  {id:'agua',area:'Comida',af:'Meta de água pela referência europeia de ingestão adequada',forca:'media',
   por:'A conta de 35 ml por quilo circula em todo lugar, mas não achei recomendação oficial que a sustente. O que existe é a ingestão adequada da EFSA: 2,0 L por dia para mulheres e 2,5 L para homens, de água TOTAL — e de 20 a 30% disso vem da própria comida. Sobra perto de 1,6 e 2,0 L para beber. Nos dias de treino entra a reposição do suor.',
   no:'Era aqui que o app estava errado: a meta antiga era 35 ml por quilo mais 500 ml, o que dava quase 3 litros de bebida para 70 kg. Agora parte da referência da EFSA e soma 500 ml só em dia de treino. É valor de referência, não necessidade exata: sede e urina clara dizem mais, e você pode ajustar a meta na mão.',
@@ -9141,7 +9296,19 @@ const FATOS=[
   t:'No Brasil, medo de discriminação faz gente trans deixar de procurar atendimento',
   d:'A pesquisa mais citada é da Antra, com cerca de 1.100 pessoas trans e travestis: 94% relataram já ter sofrido violência ou discriminação no atendimento à saúde, 62% disseram ter evitado procurar serviço por medo de preconceito e 36% relataram recusa de atendimento. É amostra não probabilística, feita por entidade do movimento, então o número exato não dá para generalizar para o país. O que sustenta a direção é a literatura revisada: uma revisão integrativa brasileira aponta discriminação, patologização, despreparo dos profissionais e falta de serviço específico como barreiras, e descreve pessoas trans evitando entrar no serviço, o que piora o quadro de saúde. Um estudo do projeto TransOdara descreve o mesmo com mulheres trans e travestis.',
   pra:'Isso explica por que um app como este existe, e também o que ele não pode ser. Material de apoio não substitui atendimento: ele serve para você chegar na consulta com registro na mão — peso, exames, sintomas, o que já tentou. Nome social é direito no SUS e pode ser pedido no cadastro. Recusa de atendimento é denunciável na ouvidoria do serviço, no Disque 100 e no conselho da categoria.',
-  fontes:['antra23','br_saude','br_transodara']}
+  fontes:['antra23','br_saude','br_transodara']},
+
+ {id:'fat_osso',area:'Hormonização',forca:'media',ev:'osso',
+  t:'"Hormônio enfraquece o osso" é o contrário do que os estudos acharam',
+  d:'A revisão que reúne o assunto, de 2022, conclui que a hormonização afirmativa em pessoas adultas não está associada a perda óssea importante. Para quem usa testosterona existe meta-análise: 14 estudos, 1.484 homens trans, e a densidade óssea não mudou de forma significativa na coluna, no quadril, no colo do fêmur nem no corpo inteiro depois de 12 e de 24 meses — e o P1NP, que é marcador de formação de osso, subiu. Para mulheres trans o quadro é diferente do que o boato sugere: a massa óssea baixa costuma já estar lá ANTES de começar. No estudo brasileiro do Hospital de Clínicas de Porto Alegre, 18% das 142 mulheres trans avaliadas tinham massa óssea baixa para a idade, contra nenhuma do grupo de comparação, e isso apareceu ligado a massa magra menor, não ao hormônio. O que a literatura de fato aponta como risco é o oposto: passar tempo sem hormônio nenhum, sobretudo depois de cirurgia que retira ovário ou testículo. Em adolescentes, o bloqueio puberal isolado prejudica o desenvolvimento do osso, com recuperação ao menos parcial quando a hormonização começa.',
+  pra:'Três coisas práticas. A primeira: se alguém usa osso como argumento para você não começar ou não continuar, o argumento não se sustenta — e você pode levar os estudos. A segunda, que é a que de fato importa: interromper por conta própria, ou ficar meses sem conseguir a medicação, não é neutro, e falta de medicação por desabastecimento ou fila é motivo de consulta, não de esperar passar. A terceira: a parte que depende de você é cálcio, vitamina D e treino de força — e treino de força é o que mais aparece nos estudos de osso.',
+  fontes:['osso_rev','osso_t','osso_br','osso_exerc']},
+
+ {id:'fat_creatina',area:'Treino',forca:'forte',ev:'creatina',
+  t:'Creatina não é esteroide e não faz mal ao rim — mas ela altera um exame de rim',
+  d:'As dúvidas sobre creatina têm resposta reunida num artigo da International Society of Sports Nutrition que pega as doze mais comuns uma por uma: se ela é esteroide anabolizante, se causa dano ao rim, se causa queda de cabelo, se causa cãibra e desidratação, se engorda, se precisa de fase de saturação, se funciona só para homens, se as versões caras são melhores que a monoidratada. A conclusão é que são mitos, e o position stand da mesma sociedade registra que o uso de curto e de longo prazo é seguro e bem tolerado em pessoas saudáveis. Existe um ponto real, e é outro: a creatina se degrada em creatinina, que é exatamente a substância que o laboratório mede para estimar como está o rim. Quem toma creatina costuma ver esse valor subir um pouco sem ter nenhuma lesão renal. O efeito sobre músculo, medido direto por ressonância e ultrassom, é pequeno: 0,11 em desvio padrão, com intervalo passando pelo zero, e de 0,10 a 0,16 cm de espessura. Quem mais ganha é quem come pouca ou nenhuma carne, porque começa com a reserva mais baixa.',
+  pra:'Se você usa creatina, diga isso a quem te acompanha antes de coletar exame — senão a creatinina alterada vira susto, ou vira investigação que não precisava acontecer. Isso vale em dobro aqui, porque creatinina faz parte do acompanhamento de quem está em hormonização. Sobre começar: 3 a 5 g por dia da monoidratada, todo dia, sem fase de saturação e sem ciclo de pausa. E sobre não começar: se você ainda não treina com regularidade, não bate a proteína do dia ou dorme mal, ela não vai aparecer em nada. Uma ressalva de leitura: quase todos os autores dessas revisões declaram ligação com empresas que fabricam creatina, e a declaração está impressa nos próprios artigos.',
+  fontes:['crea_duvidas','crea_issn','crea_hiper','crea_veg']}
 ];
 
 function cardFato(f){
