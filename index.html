@@ -2056,6 +2056,22 @@ const VIDEOS={
  ['cP1FmnyVuug','Treino de Calistenia em Casa: 30 Minutos para Ganhar Força (Sem Equipamentos)','MBP Gym','Sem barra, sem paralela, sem desculpa'],
  ['b4wUMJvmZL4','Barras Paralelas','Renato Fenasc [EXERCÍCIOS]','Como proteger o ombro e progredir com segurança']
  ],
+ /* Progressões de calistenia com nome próprio. São um bloco à parte do
+    'calistenia' de cima de propósito: aquele é a porta de entrada, este é
+    o meio do caminho, que é onde a pessoa trava e desiste. */
+ calistenia_prog:[
+ ['MaMaHo7nhI8','Strict Bar Muscle Up, passo a passo do zero ao avançado.','Igor Santos','O movimento que separa quem treina barra de quem domina barra'],
+ ['6NvXYG5SJak','L-sit, Front Lever e Dragon Flag: O Guia Definitivo em Casa','Ronaldo Batista','L-sit, front lever e dragon flag no mesmo vídeo, em casa'],
+ ['p1-VrbRYnS8','O quê é barra australiana e como ela vai te ajudar na barra fixa','Meta treino','A remada que dá para fazer antes de conseguir a primeira barra'],
+ ['ySD2GqTF1x0','FLEXÃO NÓRDICA INVERTIDA | TREINO DE PERNAS | EXERCÍCIO PARA MEMBROS INFERIORES | JFIT','Treino JFIT','Nórdica invertida: quadríceps sem peso nenhum, e dói mais que parece'],
+ ['9ryjFfS1WDA','Como fazer Hollow Hold (Posição de Canoinha)','Carlos Klein','A posição de canoinha, que é a base de quase toda isometria'],
+ ['_BQnE_QiCkI','Do ZERO ao FULL PLANCHE - O início! #1','Américo Neto','Planche do zero — a progressão mais longa da calistenia'],
+ ['2qvScmj5eXI','SKIN THE CAT - a base para os movimentos na barra (muita mobilidade)','HITALLO ANDRADE','Mobilidade de ombro na barra, que previne a lesão mais comum'],
+ ['R0jAWMqgjU4','PROGRESSÕES PARA APRENDER A FLEXÃO ARQUEIRO DO JEITO CERTO','Conrado Niehues','Flexão arqueiro: o caminho para a flexão com um braço'],
+ ['vJO526_sjPA','QUAL A DIFERENÇA DA PEGADA PRONADA E DA PEGADA SUPINADA? | FABRICIO PACHOLOK','Fabricio Pacholok','Pegada pronada e supinada mudam o músculo que trabalha'],
+ ['PeED-ZUNTPg','A verdade sobre mobilidade de punhos e COMO RESOLVER DE VERDADE','Isabella Campos','Punho é o que trava primeiro em quem apoia o peso nas mãos'],
+ ['14vFrVcceis','Tempo Sob Tensão: O Segredo Para a Hipertrofia Muscular na Calistenia.','Spencer','Tempo sob tensão: como progredir sem poder aumentar a carga']
+ ],
  casa:[
  ['YbQghaqU-uk','Treino para o CORPO TODO - Ganhar Massa Muscular e Definir em casa','Olena Starodubets','Sessões curtas de corpo inteiro'],
  ['H-qllUh9Fy4','15 Exercícios com Elástico Extensor | Treino COMPLETO','Yangfit Brasil','O acessório mais barato que mais rende em casa'],
@@ -2109,6 +2125,15 @@ const VOZ_ALVO={
   res:'Ressonância intermediária, sem concentrar nem no peito nem no rosto.',
   peso:'Peso vocal médio, sem muito ar e sem muita firmeza.',
   ent:'Melodia moderada, variação média ao longo da frase.'}
+};
+/* Um vídeo por exercício de voz, tocado dentro da própria ficha.
+   [id do YouTube, título real, canal]. Quem não tem vídeo aqui continua
+   com o botão de busca, que é o comportamento antigo. */
+const VOZEXVID={
+ resp:['AOCN8PofbRE','‍ A respiração com o diafragma é fundamental para controlar a dor nas costas','Dr. Alexandre Mota'],
+ canudo:['PaxiRRnVc7o','Adeus voz presa e cansada- Conheça o exercício do CANUDO','Manu Cavalaro'],
+ ent:['Mk9R_2znaJY','Você quer FALAR MELHOR? Trabalhe sua MODULAÇÃO | #Comunica','Cá me disse'],
+ desc:['1b7plOfE_ts','A importância de se descansar a voz para deixá-la saudável','Telmara Damasceno - Falar em Público']
 };
 const VOZ_EX=[
  {id:'resp',n:'Respiração diafragmática',min:3,tipo:'aquecimento',
@@ -2864,7 +2889,13 @@ function metas(d){
     ceil o piso passa a valer de verdade. */
  if(kcal<tmb*1.05)kcal=Math.ceil(tmb*1.05/10)*10;         /* nunca abaixo do gasto em repouso */
  if(kcal<1200)kcal=1200;                                   /* piso absoluto */
- if(dir==='perder'&&imcDe(peso)<18.5)kcal=Math.round(gasto/10)*10; /* abaixo do peso não entra em déficit */
+ /* Abaixo do peso ninguém entra em déficit, qualquer que seja o objetivo
+    escrito no perfil. Isto valia só para quem tinha escolhido "perder".
+    Numa simulação de um ano, uma pessoa com objetivo GANHAR foi de IMC
+    18,4 a 12,0 porque a fórmula subestimava o gasto dela: a meta nunca
+    chegou a ser um déficit no papel, mas era na prática, e a trava antiga
+    nem olhava para o caso dela. */
+ if(imcDe(peso)<18.5&&kcal<gasto)kcal=Math.round(gasto/10)*10;
  /* Proteína: meta-análises colocam o ponto de virada perto de 1,6 g/kg para
     quem treina. Em déficit calórico sobe, porque protege a massa magra. */
  let prot=Math.round(peso*(dir==='perder'?2.2:1.8));
@@ -2886,6 +2917,110 @@ function metas(d){
 /* Gasto calórico medido pelos seus próprios dados, não pela fórmula.
    Se você comeu X por dia e o peso mudou Y, o gasto real sai dessa conta.
    Vale mais que qualquer estimativa — mas só depois de algumas semanas. */
+/* ---------------------------------------------------------------------
+   O RUMO: o peso está indo para onde você disse que queria?
+
+   O app estima o gasto calórico por fórmula, e fórmula erra de 10 a 15%
+   para muita gente. Quando erra, a meta sai errada, o peso vai para o
+   lado contrário do objetivo, e a meta seguinte é calculada em cima do
+   peso novo — que está errado pelo mesmo motivo. A conta se afunda
+   sozinha, e nada avisava.
+
+   Isto compara a direção real do peso nas últimas oito semanas com a
+   direção pedida. Devolve null quando está tudo certo, ou quando ainda
+   não há peso registrado o bastante para afirmar qualquer coisa: três
+   pesagens e pelo menos três semanas entre a primeira e a última, porque
+   abaixo disso é oscilação de água, não tendência.
+   --------------------------------------------------------------------- */
+function rumoPeso(){
+ const ps=S.pesos.slice().sort((a,b)=>a.d<b.d?-1:1);
+ const corte=addDias(hoje(),-56);
+ const jan=ps.filter(x=>x.d>=corte);
+ if(jan.length<3)return null;
+ const a=jan[0],b=jan[jan.length-1],dias=diffDias(a.d,b.d);
+ if(dias<21)return null;
+ const delta=b.v-a.v, porSem=delta/(dias/7), imc=imcDe(b.v);
+ const mc=metaCorpo(), obj=mc?(mc.kcal==='nenhuma'?'manter':mc.kcal):S.perfil.obj;
+ let tipo=null;
+ if(imc<18.5&&delta<=-0.5)tipo='magro';
+ else if(obj==='ganhar'&&porSem<=-0.15)tipo='ganhar';
+ else if(obj==='perder'&&porSem>=0.15)tipo='perder';
+ else if(obj==='manter'&&Math.abs(porSem)>=0.3)tipo='manter';
+ /* A segunda janela, de seis meses. A de oito semanas mede VELOCIDADE, e
+    por isso não vê deriva lenta: 0,14 kg por semana some dentro da
+    oscilação normal de água e intestino, mas em um ano são 7 kg. Numa
+    simulação de doze meses, duas pessoas que pediram manter terminaram
+    8 kg mais leves sem o app dizer nada, uma delas na borda de abaixo do
+    peso. Esta janela olha o ACUMULADO: mais de 5% do corpo andando na
+    direção contrária ao pedido é coisa para saber. */
+ if(!tipo){
+  const l=ps.filter(x=>x.d>=addDias(hoje(),-190));
+  if(l.length>=5&&diffDias(l[0].d,l[l.length-1].d)>=120){
+   const dl=l[l.length-1].v-l[0].v, pct=dl/l[0].v*100;
+   const contra=(obj==='ganhar'&&pct<=-5)||(obj==='perder'&&pct>=5)||
+                (obj==='manter'&&Math.abs(pct)>=5);
+   if(contra)return{tipo:'deriva',obj,delta:Math.round(dl*10)/10,
+    dias:diffDias(l[0].d,l[l.length-1].d),pct:Math.round(pct*10)/10,
+    porSem:Math.round(dl/(diffDias(l[0].d,l[l.length-1].d)/7)*100)/100,
+    imc:Math.round(imc*10)/10,peso:b.v};
+  }
+ }
+ if(!tipo)return null;
+ return{tipo,obj,delta:Math.round(delta*10)/10,dias,
+  porSem:Math.round(porSem*100)/100,imc:Math.round(imc*10)/10,peso:b.v};
+}
+/* O cartão. Fica no diário de comida e na tela de peso — não no Perfil,
+   que é onde este aviso morava de fato e onde ninguém o via. */
+function cardRumo(){
+ const r=rumoPeso(); if(!r)return '';
+ /* Este cartão aparece mesmo com os números escondidos. Quem escondeu
+    peso e caloria é quem mais precisa de alguém olhando o rumo por ela —
+    esconder o número nunca quis dizer "me deixe ir para o lado errado
+    sem avisar". O que muda é o jeito de falar: direção, não quilo. */
+ const semN=oculto('peso')||oculto('kcal');
+ const t=semN?{faltam:1}:tdeeReal(), tem=!t.faltam;
+ const sobe=r.delta>0;
+ const kg=x=>semN?'':(' '+Math.abs(x)+' kg');
+ const TXT={
+  magro:['O peso está caindo, e já está baixo',
+   'Nos últimos '+r.dias+' dias o peso caiu'+kg(r.delta)+
+   (semN?'. ':'. Com a sua altura, isso põe o índice de massa corporal em '+r.imc+'. ')+
+   'Independente do que esteja escrito como objetivo, o app não vai sugerir comer menos daqui.'],
+  ganhar:['Você pediu para ganhar, e o peso está caindo',
+   'Em '+r.dias+' dias o peso caiu'+kg(r.delta)+'. A meta de calorias sai de uma fórmula, '+
+   'e fórmula erra para muita gente: quando ela subestima o seu gasto, a meta fica baixa demais sem parecer baixa.'],
+  perder:['Você pediu para perder, e o peso está subindo',
+   'Em '+r.dias+' dias o peso subiu'+kg(r.delta)+'. Isso não quer dizer que você falhou: '+
+   'quer dizer que a meta de calorias, que sai de uma fórmula, provavelmente está acima do seu gasto real.'],
+  manter:['O peso está se movendo mais que o combinado',
+   'Você pediu para manter, e em '+r.dias+' dias o peso '+(sobe?'subiu':'caiu')+kg(r.delta)+
+   '. Pode ser só o período; se continuar na próxima pesagem, a meta precisa de ajuste.'],
+  deriva:['O peso vem andando devagar na direção contrária há meses',
+   'Em '+r.dias+' dias o peso '+(sobe?'subiu':'caiu')+kg(r.delta)+
+   (semN?'':' — '+Math.abs(r.pct)+'% do seu corpo')+', e você pediu para '+
+   (r.obj==='ganhar'?'ganhar':r.obj==='perder'?'perder':'manter')+
+   '. Semana a semana isso é pequeno demais para notar, e foi por isso que o app demorou a falar: '+
+   'ele só consegue separar deriva de oscilação olhando meses, não dias.']
+ }[r.tipo];
+ const dif=tem?(t.sugerido-t.atual):0;
+ return '<div class="card" style="border-color:var(--warn)">'+
+  chTtl('bell',TXT[0])+
+  '<p class="tiny" style="line-height:1.7">'+esc(TXT[1])+'</p>'+
+  (tem
+   ?'<p class="tiny" style="line-height:1.7;margin-top:10px">Pelos seus próprios registros — '+
+    t.dias+' dias de comida anotada e '+t.span+' dias entre a primeira e a última pesagem — '+
+    'o seu gasto real está perto de <b>'+t.tdee+' kcal</b> por dia, e a meta que corresponde ao '+
+    'seu objetivo seria <b>'+t.sugerido+' kcal</b>, contra as '+t.atual+' de agora.</p>'+
+    (Math.abs(dif)>=60
+     ?'<button class="btn acc bl" style="margin-top:12px" data-a="usar-tdee" data-v="'+t.sugerido+'">'+
+      'Passar a meta para '+t.sugerido+' kcal</button>'
+     :'')
+   :'<p class="tiny muted" style="line-height:1.7;margin-top:10px">O app ainda não consegue medir o seu gasto real '+
+    'para dizer de quanto é o ajuste: '+esc(t.faltam)+'.</p>')+
+  '<p class="xtiny muted" style="margin-top:10px;line-height:1.6">Este aviso olha oito semanas, não um dia. '+
+  'Peso oscila com água, sal, intestino e, para quem menstrua, com o ciclo — '+
+  'por isso ele só aparece quando a direção se manteve por semanas.</p></div>';
+}
 function tdeeReal(){
  const d0=addDias(hoje(),-34);
  const dias=Object.keys(S.dias).filter(d=>d>=d0&&d<=hoje()).sort();
@@ -4227,9 +4362,17 @@ function bibliotecaMovimentos(){
  return dobra('plano:biblio','Biblioteca de movimentos','book',
    Object.keys(MOV).length+' movimentos, com vídeo, passo a passo e erros comuns',()=>
    '<div class="card"><div class="g2">'+Object.keys(MOV).map(mini).join('')+'</div></div>')+
-  (L==='cal'?dbloco('Calistenia','wave',VIDEOS.calistenia)+dbloco('Musculação','dumb',VIDEOS.musculacao)
-   :L==='casa'?dbloco('Treino em casa','home',VIDEOS.casa)+dbloco('Calistenia','wave',VIDEOS.calistenia)
-   :dbloco('Musculação','dumb',VIDEOS.musculacao)+dbloco('Calistenia','wave',VIDEOS.calistenia));
+  (L==='cal'
+   ?dbloco('Calistenia: por onde começar','wave',VIDEOS.calistenia)+
+    dbloco('Calistenia: as progressões','target',VIDEOS.calistenia_prog)+
+    dbloco('Musculação','dumb',VIDEOS.musculacao)
+   :L==='casa'
+   ?dbloco('Treino em casa','home',VIDEOS.casa)+
+    dbloco('Calistenia: por onde começar','wave',VIDEOS.calistenia)+
+    dbloco('Calistenia: as progressões','target',VIDEOS.calistenia_prog)
+   :dbloco('Musculação','dumb',VIDEOS.musculacao)+
+    dbloco('Calistenia: por onde começar','wave',VIDEOS.calistenia)+
+    dbloco('Calistenia: as progressões','target',VIDEOS.calistenia_prog));
 }
 /* O que realmente muda no treino de cada trilha. */
 function blocoEnfase(){
@@ -4580,7 +4723,7 @@ function stDiario(){
    '<p class="xtiny muted" style="margin-top:10px;line-height:1.6">Este é o plano que te passaram. '+
    'O app não recalcula nem discute com ele — registre abaixo o que você realmente comeu.</p></div>'
   :'';
- $('#st-diario').innerHTML=blocoMicro(d)+
+ $('#st-diario').innerHTML=cardRumo()+blocoMicro(d)+
   (oculto('kcal')?'':dobra('nutri:porque','Por que estes números','info',
    'de onde sai cada meta da sua conta',blocoPorqueComida))+
   dietaFora+
@@ -5579,8 +5722,13 @@ function sheetVozEx(id){
   '<p class="tiny" style="background:var(--surface-2);border-radius:11px;padding:11px;margin-bottom:14px;line-height:1.5">'+
    '<b>Por que funciona:</b> '+esc(e2.dica)+
    (e2.ev?'<br><span style="display:inline-block;margin-top:8px">'+selo(e2.ev,'Os estudos por trás disso')+'</span>':'')+'</p>'+
-  '<a class="btn gh bl sm" href="'+esc(yt(e2.n+' exercício vocal fonoaudiologia'))+'" target="_blank" rel="noopener" style="margin-bottom:9px">'+
-   ic('play')+' Ver no YouTube</a>'+
+  (VOZEXVID[id]
+   ?'<div class="lbl" style="margin-bottom:7px">Ver sendo feito</div>'+
+    '<div style="margin-bottom:12px">'+cardVideo(VOZEXVID[id][1],VOZEXVID[id][0])+
+     '<p class="xtiny muted" style="margin-top:6px;line-height:1.5">Canal: '+
+     esc(VOZEXVID[id][2])+'. Não é do app, e o app não ganha nada com ele.</p></div>'
+   :'<a class="btn gh bl sm" href="'+esc(yt(e2.n+' exercício vocal fonoaudiologia'))+'" target="_blank" rel="noopener" style="margin-bottom:9px">'+
+    ic('play')+' Ver no YouTube</a>')+
   '<button class="btn '+(ok?'gh':'acc')+' bl" data-a="voz-ex" data-id="'+id+'" data-close="1">'+
    (ok?'Desmarcar':'Marcar como feito')+'</button>',
   e2.min+' minutos');
@@ -7746,7 +7894,7 @@ function stPeso(){
    avisoOculto('Dá para voltar a ver quando quiser.')+'</div>';
   return;
  }
- $('#st-peso').innerHTML=
+ $('#st-peso').innerHTML=cardRumo()+
   blocoAvisos('prog')+
   '<div class="card hero">'+chTtl('scale','Peso',semMeta?'<span class="tag n">sem meta</span>'
    :'<span class="tag '+(Math.abs(atual-meta)<.6?'o':'n')+'">meta '+meta+' kg</span>')+
@@ -8579,10 +8727,14 @@ function temTH(d){const n=diffDias(d,hoje());if(n<0)return '—';
    existe estudo, está escrito que não existe.
    ===================================================================== */
 const FONTES={
- ent_masc:{r:'Ensaio clínico aleatorizado de treino intensivo de entonação em 23 pessoas trans e de gênero diverso que buscavam voz mais masculina. Journal of Speech, Language, and Hearing Research',
+ /* Os dois ensaios de entonação têm quase o mesmo título e os mesmos
+    autores, e saíram em revistas diferentes: o da voz mais masculina no
+    AJSLP e o da voz mais feminina no JSLHR. Estavam com o nome da revista
+    trocado entre si. */
+ ent_masc:{r:'Ensaio clínico aleatorizado de treino intensivo de entonação em 23 pessoas trans e de gênero diverso que buscavam voz mais masculina. Papeleu e colegas, American Journal of Speech-Language Pathology, 2026',
   u:'https://pubmed.ncbi.nlm.nih.gov/41616377/'},
- ent_fem:{r:'Ensaio clínico aleatorizado de treino intensivo de entonação em pessoas trans e de gênero diverso que buscavam voz mais feminina, 2024',
-  u:'https://pubs.asha.org/doi/10.1044/2024_JSLHR-24-00563'},
+ ent_fem:{r:'Ensaio clínico aleatorizado de treino intensivo de entonação em 30 pessoas trans e de gênero diverso que buscavam voz mais feminina. Papeleu e colegas, Journal of Speech, Language, and Hearing Research, 2025',
+  u:'https://pubmed.ncbi.nlm.nih.gov/40152688/'},
  voz_ritmo:{r:'Comparação entre esquema intensivo e tradicional de treino vocal afirmativo em 34 pessoas transfemininas',
   u:'https://www.sciencedirect.com/science/article/abs/pii/S0892199722000674'},
  azelaico:{r:'Revisão sistemática sobre ácido azelaico em acne, rosácea, melasma e envelhecimento. Journal of Cosmetic Dermatology, 2023',
@@ -8590,7 +8742,7 @@ const FONTES={
  azel_mec:{r:'Ácido azelaico: mecanismos de ação e usos clínicos',
   u:'https://pmc.ncbi.nlm.nih.gov/articles/PMC11512533/'},
  cochrane_acne:{r:'Revisão Cochrane de tratamentos tópicos para acne: ácido azelaico, ácido salicílico, nicotinamida, enxofre, zinco e alfa-hidroxiácidos. 13 revisões sistemáticas e 46 ensaios aleatorizados',
-  q:'Cochrane evidence based topical treatments azelaic salicylic nicotinamide sulfur zinc acne'},
+  u:'https://pubmed.ncbi.nlm.nih.gov/32356369/'},
  niacin_melasma:{r:'Ensaio duplo-cego aleatorizado comparando niacinamida 4% com hidroquinona 4% em melasma',
   u:'https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3142702/'},
  smiles:{r:'Ensaio SMILES: aleatorizado e controlado, dieta mediterrânea modificada como tratamento somado na depressão moderada a grave, 12 semanas',
@@ -8600,7 +8752,7 @@ const FONTES={
  dieta_meta:{r:'Revisão sistemática com meta-análise sobre efeito de médio a longo prazo de intervenções alimentares em depressão e ansiedade. Annals of Internal Medicine, 2025',
   u:'https://www.acpjournals.org/doi/10.7326/ANNALS-24-03016'},
  cafe_umbrella:{r:'Revisão guarda-chuva de meta-análises sobre consumo de café e desfechos de saúde',
-  q:'coffee consumption health umbrella review meta-analyses multiple health outcomes BMJ'},
+  u:'https://pubmed.ncbi.nlm.nih.gov/29167102/'},
  cafeina_fda:{r:'Limite de 400 mg de cafeína por dia para adultos saudáveis, e revisão das evidências sobre consumo excessivo',
   u:'https://odphp.health.gov/sites/default/files/2019-09/Appendix-E-2.40.pdf'},
  issn_prot:{r:'Position stand da International Society of Sports Nutrition sobre proteína e exercício: total diário, dose por refeição e distribuição ao longo do dia',
@@ -8661,50 +8813,62 @@ const FONTES={
   u:'https://www.scielo.br/j/tes/a/NGpjbDZLqR78J8Hw4SRsHwL/?lang=pt'},
  br_transodara:{r:'A experiência de mulheres trans e travestis no acesso a serviços públicos de saúde. Revista Brasileira de Enfermagem, projeto TransOdara. Em português',
   u:'https://www.scielo.br/j/reben/a/nTprMxSFmkwk4CsxJYSH3jr/?lang=pt'},
- antra23:{r:'Pesquisa da Antra com cerca de 1.100 pessoas trans e travestis sobre violência e discriminação no atendimento à saúde. Amostra não probabilística. Em português',
-  q:'Antra pesquisa nacional pessoas trans travestis acesso saude discriminacao atendimento'},
+ /* A Antra é associação, não revista indexada: o PubMed não tem isso, e
+    enquanto este era um link de busca ele abria uma página vazia. */
+ antra23:{r:'Pesquisa da Antra (Associação Nacional de Travestis e Transexuais) com cerca de 1.100 pessoas trans e travestis sobre violência e discriminação no atendimento à saúde. Amostra não probabilística, não revisada por pares. Em português',
+  u:'https://antrabrasil.org/'},
  raiva_rev:{r:'Revisão sistemática de 7 estudos prospectivos, 664 homens trans, sobre testosterona e medidas de agressividade',
-  q:'systematic review testosterone aggression transgender men prospective cohort studies'},
+  u:'https://pubmed.ncbi.nlm.nih.gov/33309817/'},
  defreyne18:{r:'Defreyne e colegas. Estudo prospectivo com 56 homens trans sobre terapia com testosterona e agressividade, 2018',
   u:'https://pubmed.ncbi.nlm.nih.gov/29699761'},
  huit26:{r:'Huit e colegas. Acompanhamento de 178 adolescentes e jovens trans e de gênero diverso e níveis de raiva. Journal of Adolescent Health, 2026',
-  q:'Huit anger transgender gender diverse adolescents gender affirming hormone therapy Journal of Adolescent Health'},
- voz25:{r:'Meta-análise de 2025 com 24 estudos e 893 participantes sobre terapia vocal e cirurgia na feminização da voz',
-  q:'meta-analysis 2025 voice feminization therapy surgery fundamental frequency 24 studies'},
- leyns24:{r:'Leyns e colegas. Ensaio randomizado cruzado comparando treino de altura, treino de ressonância e os dois juntos em 30 mulheres trans, 14 semanas',
-  q:'Leyns randomized crossover pitch elevation articulation resonance training transgender women'},
+  u:'https://pubmed.ncbi.nlm.nih.gov/41739008/'},
+ voz25:{r:'Revisão sistemática com meta-análise de 2025 sobre eficácia e satisfação em procedimentos de feminização da voz, comparando terapia e cirurgia. Otolaryngology–Head and Neck Surgery',
+  u:'https://pubmed.ncbi.nlm.nih.gov/39963873/'},
+ leyns24:{r:'Leyns e colegas. Ensaio randomizado cruzado comparando treino de altura, treino de ressonância e os dois juntos em 30 mulheres trans, 14 semanas. American Journal of Speech-Language Pathology, 2023',
+  u:'https://pubmed.ncbi.nlm.nih.gov/36455242/'},
  peitzmeier17:{r:'Peitzmeier e colegas. Health impact of chest binding among transgender adults: a community-engaged, cross-sectional study. Culture, Health & Sexuality, 2017 — 1.800 pessoas',
-  q:'Peitzmeier health impact of chest binding among transgender adults cross-sectional study 2017'},
+  u:'https://pubmed.ncbi.nlm.nih.gov/27300085/'},
  menstrual:{r:'Revisão de prontuários de 129 adolescentes transmasculinos sobre disforia ligada à menstruação e interesse em supressão',
-  q:'menstrual dysphoria transgender adolescents chart review menstrual suppression interest'},
+  u:'https://pubmed.ncbi.nlm.nih.gov/35123055/'},
  brownperrett93:{r:'Brown e Perrett. What gives a face its gender? Perception, 1993',
-  q:'Brown Perrett what gives a face its gender perception 1993'},
- rosto18:{r:'Análise conjunta com 922 participantes sobre quais traços pesam na percepção de masculinidade do rosto, 2018',
-  q:'conjoint analysis facial masculinity perception eyebrow thickness jawbone prominence 2018'},
+  u:'https://pubmed.ncbi.nlm.nih.gov/8115240/'},
+ /* Aqui havia uma "análise conjunta com 922 participantes, 2018" que eu
+    não consegui achar de jeito nenhum: a API do PubMed devolve contagem
+    zero para ela, buscada de quatro formas. Em vez de manter um selo de
+    evidência apontando para um estudo que talvez não exista, troquei pelo
+    que sustenta a mesma coisa e que dá para conferir. */
+ rosto18:{r:'Estudo de rastreamento ocular: para onde o olhar de observadores vai num rosto, antes e depois de cirurgia de feminização facial. Aesthetic Surgery Journal, 2022',
+  u:'https://pubmed.ncbi.nlm.nih.gov/34994379/'},
  luminancia09:{r:'Estudo da Université de Montréal sobre o papel da sombra em volta dos olhos e da boca na identificação rápida de gênero, 2009',
-  q:'luminance eyes mouth rapid gender discrimination faces Montreal 2009'},
+  u:'https://pubmed.ncbi.nlm.nih.gov/19271920/'},
  to20:{r:'To e colegas. Visual conformity with affirmed gender, ansiedade e depressão na coorte STRONG, 2020',
-  q:'To visual conformity affirmed gender anxiety depression STRONG cohort transgender 2020'},
+  u:'https://pubmed.ncbi.nlm.nih.gov/32807706/'},
  estigma_nz:{r:'Counting Ourselves: pesquisa nacional com 1.178 pessoas trans e não binárias da Nova Zelândia sobre estigma e saúde mental',
   u:'https://countingourselves.nz/transgender-people-who-experience-discrimination-and-stigma-are-more-likely-to-have-poor-mental-health-outcomes/'},
  arfid25:{r:'Thomas e colegas. Sintomas de ARFID em 182 adultos de gênero diverso e a relação com traços autistas, de TDAH e sensibilidade sensorial, 2025',
   u:'https://www.ncbi.nlm.nih.gov/pmc/articles/PMC11834292/'},
  pares_rev:{r:'Dowers e colegas. Revisão sistemática sobre apoio social em pessoas trans, de gênero diverso e não binárias',
-  q:'Dowers systematic review social support trans gender diverse non-binary adults'},
+  u:'https://pubmed.ncbi.nlm.nih.gov/34993509/'},
  kia_pares:{r:'Kia e colegas. Revisão de escopo com 34 estudos sobre apoio entre pares e risco de suicídio em populações trans',
-  q:'Kia peer support protective factor suicide trans populations scoping review'},
+  u:'https://pubmed.ncbi.nlm.nih.gov/34010778/'},
  schoenfeld16:{r:'Schoenfeld, Ogborn e Krieger. Effects of resistance training frequency on measures of muscle hypertrophy: a systematic review and meta-analysis. Sports Medicine, 2016',
-  q:'Schoenfeld resistance training frequency muscle hypertrophy systematic review meta-analysis 2016'},
+  u:'https://pubmed.ncbi.nlm.nih.gov/27102172/'},
  bazvalle22:{r:'Baz-Valle e colegas. Revisão sistemática sobre volume de treino e hipertrofia. Journal of Human Kinetics, 2022',
-  q:'Baz-Valle resistance training volume hypertrophy systematic review 2022'},
- pelland24:{r:'Pelland e colegas. Meta-regressão sobre a relação entre séries por semana e resultado, 2024',
-  q:'resistance training dose response meta-regression weekly set volume hypertrophy strength'},
- singer24:{r:'Singer e colegas. Revisão sistemática com meta-análise sobre tempo de descanso entre séries, 2024',
-  q:'rest interval duration resistance training hypertrophy strength systematic review meta-analysis 2024'},
+  u:'https://pubmed.ncbi.nlm.nih.gov/35291645/'},
+ pelland24:{r:'Pelland e colegas. Meta-regressão sobre a relação entre séries por semana e resultado. Sports Medicine, 2026',
+  u:'https://pubmed.ncbi.nlm.nih.gov/41343037/'},
+ /* Mesma história: a revisão de "Singer, 2024" sobre descanso entre
+    séries não aparece em busca nenhuma. Estas duas aparecem, dizem a
+    mesma coisa, e uma delas é o ensaio clássico de 1 contra 3 minutos. */
+ singer24:{r:'Grgic e colegas. Revisão sistemática sobre duração do descanso entre séries e força. Sports Medicine, 2018',
+  u:'https://pubmed.ncbi.nlm.nih.gov/28933024/'},
+ descanso_sch:{r:'Schoenfeld e colegas. Ensaio comparando 1 minuto com 3 minutos de descanso entre séries, em homens treinados. Journal of Strength and Conditioning Research, 2016',
+  u:'https://pubmed.ncbi.nlm.nih.gov/26605807/'},
  refalo23:{r:'Refalo e colegas. Influence of resistance training proximity-to-failure on skeletal muscle hypertrophy: a systematic review with meta-analysis. Sports Medicine, 2023',
   u:'https://openrepository.aut.ac.nz/items/78679612-6ff4-4d00-95d1-7920d072a760'},
  frankenfield05:{r:'Frankenfield, Roth-Yousey e Compher. Comparison of predictive equations for resting metabolic rate. Journal of the American Dietetic Association, 2005',
-  q:'Frankenfield comparison predictive equations resting metabolic rate healthy nonobese obese adults 2005'},
+  u:'https://pubmed.ncbi.nlm.nih.gov/15883556/'},
  morton18:{r:'Morton e colegas. Effect of protein supplementation on resistance training-induced gains in muscle mass and strength: systematic review, meta-analysis and meta-regression. British Journal of Sports Medicine, 2018',
   u:'https://bjsm.bmj.com/content/52/6/376'},
  efsa10:{r:'EFSA, Painel de Nutrição. Scientific Opinion on Dietary Reference Values for water. EFSA Journal, 2010',
@@ -8712,25 +8876,25 @@ const FONTES={
  marines22:{r:'Comparação do método militar de circunferências com DXA em militares da ativa. Frontiers in Physiology, 2022',
   u:'https://www.frontiersin.org/articles/10.3389/fphys.2022.868627/full'},
  schwarz23:{r:'Schwarz e colegas. Meta-análise de 16 estudos sobre terapia vocal em mulheres trans, 2023',
-  q:'voice therapy transgender women fundamental frequency meta-analysis 2023'},
+  u:'https://pubmed.ncbi.nlm.nih.gov/37481572/'},
  kapsner15:{r:'Kapsner-Smith e colegas. Ensaio randomizado com exercícios de trato vocal semiocluído. Journal of Speech, Language, and Hearing Research, 2015',
-  q:'Kapsner-Smith randomized controlled trial flow phonation semi-occluded vocal tract exercises'},
+  u:'https://pubmed.ncbi.nlm.nih.gov/25675335/'},
  stuart21:{r:'Stuart e colegas. Meta-análise em rede de tratamentos tópicos para acne: 40 ensaios, 18.089 participantes. British Journal of Dermatology, 2021',
-  q:'topical preparations mild moderate acne vulgaris systematic review network meta-analysis Stuart'},
+  u:'https://pubmed.ncbi.nlm.nih.gov/33825196/'},
  adapaBpo24:{r:'Revisão sistemática de 8 ensaios randomizados, 4.596 participantes, sobre adapaleno com peróxido de benzoíla. Cureus, 2024',
   u:'https://www.ncbi.nlm.nih.gov/pmc/articles/PMC11472206/'},
  adapa96:{r:'Ensaio multicêntrico com 323 pacientes comparando adapaleno 0,1% com tretinoína 0,025% em 12 semanas, 1996',
   u:'https://pubmed.ncbi.nlm.nih.gov/8609263/'},
  nambour13:{r:'Ensaio randomizado de Nambour: uso diário de filtro solar e envelhecimento da pele em 4,5 anos. Annals of Internal Medicine, 2013',
-  q:'Hughes sunscreen and prevention of skin aging randomized trial Annals of Internal Medicine 2013'},
+  u:'https://pubmed.ncbi.nlm.nih.gov/23732711/'},
  noetel24:{r:'Noetel e colegas. Effect of exercise for depression: systematic review and network meta-analysis of randomised controlled trials. BMJ, 2024 — 218 estudos, 14.170 participantes',
-  q:'Noetel effect of exercise for depression systematic review network meta-analysis BMJ 2024'},
+  u:'https://pubmed.ncbi.nlm.nih.gov/38355154/'},
  ekers14:{r:'Ekers e colegas. Behavioural activation for depression: an update of meta-analysis of effectiveness and sub group analysis. PLoS One, 2014 — 26 ensaios randomizados',
   u:'https://pubmed.ncbi.nlm.nih.gov/24936656/'},
  aasm15:{r:'Consenso da American Academy of Sleep Medicine com a Sleep Research Society sobre duração de sono em adultos, 2015',
   u:'https://aasm.org/seven-or-more-hours-of-sleep-per-night-a-health-necessity-for-adults/'},
  luz11:{r:'Lieverse e colegas. Ensaio controlado por placebo de luz brilhante matinal em adultos acima de 60 anos com depressão não sazonal. Archives of General Psychiatry, 2011',
-  q:'Lieverse bright light treatment elderly patients non-seasonal major depressive disorder randomized placebo'}
+  u:'https://pubmed.ncbi.nlm.nih.gov/21199966/'}
 };
 function linkFonte(k){const f=FONTES[k];if(!f)return '#';
  return f.u||'https://pubmed.ncbi.nlm.nih.gov/?term='+encodeURIComponent(f.q)}
@@ -8827,7 +8991,7 @@ const EVID=[
  {id:'descanso',area:'Treino',af:'1 a 2 minutos de descanso entre séries, 2 a 3 quando o foco é força',forca:'media',
   por:'A revisão com meta-análise sobre intervalos encontrou o melhor resultado de hipertrofia entre 1 e 2 minutos, e vantagem para intervalos acima de 2 a 3 minutos quando o objetivo é força máxima.',
   no:'Cada exercício tem o descanso escrito do lado, e o cronômetro já abre com esse tempo. Nos exercícios pesados de 5 e 6 repetições o descanso sobe para 2 e 3 minutos.',
-  fontes:['singer24']},
+  fontes:['singer24','descanso_sch']},
  {id:'falha',area:'Treino',af:'Pare 1 ou 2 repetições antes de não conseguir mais',forca:'media',
   por:'A meta-análise sobre proximidade da falha não achou vantagem clara em levar a série até não conseguir mais: o efeito foi trivial com a definição mais ampla de falha e desapareceu com a definição estrita. Como a fadiga cobra mais caro, parar perto da falha entrega o mesmo por menos.',
   no:'As observações dos exercícios dizem "até faltar 1" ou "até faltar 2" em vez de "até falhar". Onde o treino pede falha de propósito, é só na última série de um acessório leve.',
