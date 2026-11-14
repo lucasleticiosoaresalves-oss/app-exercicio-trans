@@ -22,6 +22,8 @@
  media-src 'self' blob:;
  connect-src 'self' https://world.openfoodfacts.org;
  frame-src https://www.youtube-nocookie.com;
+ manifest-src 'self';
+ worker-src 'self';
  base-uri 'none';
  form-action 'none';
  object-src 'none'">
@@ -30,6 +32,14 @@
      proteção contra a página ser embutida em outro site depende de onde
      ela for hospedada. -->
 <title>Norte</title>
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" href="./icone-192.png" type="image/png">
+<!-- o iPhone ignora o manifesto para o ícone da tela inicial e usa este -->
+<link rel="apple-touch-icon" href="./icone-192.png">
+<meta name="apple-mobile-web-app-title" content="Norte">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <style>
@@ -739,6 +749,7 @@ button.cday:active{transform:scale(.94)}
    <div id="st-corpo" class="stack" style="gap:14px" hidden></div>
    <div id="st-higiene" class="stack" style="gap:14px" hidden></div>
    <div id="st-ciclo" class="stack" style="gap:14px" hidden></div>
+   <div id="st-humor" class="stack" style="gap:14px" hidden></div>
    <div id="st-guias" class="stack" style="gap:14px" hidden></div>
    <div id="st-profissionais" class="stack" style="gap:14px" hidden></div>
   </div>
@@ -1869,7 +1880,87 @@ RECIPES.push(
   'Bata por 40 segundos, até não restar pedaço.',
   'Junte a chia e mexa com a colher — batida, ela perde a textura.',
   'Deixe 5 minutos descansando se quiser mais encorpado: a chia engrossa sozinha.'],
- dica:'Mamão com aveia é a combinação mais barata que resolve intestino preso sem precisar de suplemento.'}
+ dica:'Mamão com aveia é a combinação mais barata que resolve intestino preso sem precisar de suplemento.'},
+
+/* ---------------------------------------------------------------
+   Oito receitas sem nenhum ingrediente animal. Elas entraram junto
+   com o filtro de restrição alimentar, porque o filtro expôs o
+   problema: das 57 receitas que o app tinha, só QUATRO passavam em
+   "sem ingrediente animal", e as quatro eram lanche — nenhum café da
+   manhã, nenhum almoço, nenhum jantar. Entregar um filtro que deixa
+   quatro lanches é dizer "você não cabe aqui" com uma tela.
+
+   São comida brasileira barata, não substituto industrializado:
+   nenhuma pede tofu, proteína de soja nem leite vegetal caro, porque
+   esses não estão na tabela de composição do app e eu não invento
+   número.
+
+   As macros não foram estimadas: cada uma é a soma dos ingredientes
+   pela tabela FOODS daqui mesmo, que vem da TACO da UNICAMP e, no que
+   ela não cobre, da base do Departamento de Agricultura dos Estados
+   Unidos.
+   --------------------------------------------------------------- */
+{id:'r58',nome:'Mingau de aveia com banana e pasta de amendoim',ref:['cafe','lanche1'],t:8,kcal:440,p:17,c:67,g:13,rende:'1 tigela',
+ ing:[i('Aveia em flocos',50,'aveia'),i('Bebida de soja sem açúcar',200,'leite'),i('Banana',100,'banana'),i('Pasta de amendoim',15,'amendoim'),i('Canela em pó',1,'canela')],
+ modo:['Leve a aveia e a bebida de soja ao fogo baixo, mexendo sempre.',
+  'Quando começar a engrossar, em uns 4 minutos, desligue — ele engrossa mais fora do fogo.',
+  'Amasse metade da banana e misture no mingau ainda quente; corte a outra metade em rodelas por cima.',
+  'Finalize com a pasta de amendoim e a canela.'],
+ dica:'A bebida de soja é a única vegetal que chega perto do leite em proteína. Com bebida de amêndoa ou de aveia, este mingau perde quase 5 g de proteína.'},
+
+{id:'r59',nome:'Arroz, feijão e couve refogada',ref:['almoco','jantar'],t:25,kcal:456,p:16,c:73,g:12,rende:'1 prato',
+ ing:[i('Arroz integral cozido',150,'arroz'),i('Feijão carioca cozido',180,'feijao'),i('Couve refogada',80,'couve'),i('Cenoura crua',50,'cenoura'),i('Azeite de oliva',8,'azeite'),i('Alho e sal',4,'alho')],
+ modo:['Corte a couve em tiras finas e deixe secar bem — couve molhada cozinha em vez de refogar.',
+  'Doure o alho no azeite em fogo alto e jogue a couve. Mexa por 2 minutos, no máximo: ela tem que continuar verde e firme.',
+  'Rale a cenoura crua por cima na hora de servir.',
+  'Sirva com o arroz e o feijão quentes.'],
+ dica:'Arroz com feijão junto fecha o perfil de aminoácidos, e isso não é lenda: o que falta em um sobra no outro. Esta é a refeição mais barata e mais completa da lista inteira.'},
+
+{id:'r60',nome:'Lentilha refogada com arroz e salada',ref:['almoco','jantar'],t:30,kcal:473,p:21,c:78,g:9,rende:'1 prato',
+ ing:[i('Lentilha cozida',180,'lentilha'),i('Arroz branco cozido',130,'arroz'),i('Tomate',60,'tomate'),i('Alface',30,'alface'),i('Cebola',30,'cebola'),i('Azeite de oliva',8,'azeite'),i('Alho, sal e louro',5,'alho')],
+ modo:['Refogue a cebola picada no azeite até ficar transparente, junte o alho e espere soltar o cheiro.',
+  'Junte a lentilha já cozida e escorrida, com uma folha de louro, e deixe pegar gosto por 5 minutos.',
+  'Se secar demais, acrescente um pouco da água do cozimento, não água fria.',
+  'Monte o prato com o arroz, a lentilha e a salada de tomate e alface.'],
+ dica:'Lentilha cozinha em 20 minutos sem molho de véspera, ao contrário do feijão. É a leguminosa para quem decidiu o almoço na hora.'},
+
+{id:'r61',nome:'Macarrão com molho de tomate e grão-de-bico',ref:['almoco','jantar'],t:20,kcal:446,p:17,c:70,g:12,rende:'1 prato',
+ ing:[i('Macarrão integral cozido',140,'macarrao'),i('Tomate',120,'tomate'),i('Grão-de-bico cozido',100,'grao-de-bico'),i('Cebola',40,'cebola'),i('Azeite de oliva',8,'azeite'),i('Alho, sal e orégano',5,'alho')],
+ modo:['Refogue a cebola e o alho no azeite.',
+  'Junte o tomate picado sem pele e deixe desmanchar em fogo baixo por uns 10 minutos, amassando com a colher.',
+  'Acrescente o grão-de-bico escorrido e deixe mais 3 minutos.',
+  'Misture o macarrão no molho ainda na panela, com uma concha da água do cozimento — é ela que faz o molho grudar na massa.'],
+ dica:'Grão-de-bico no molho é o que transforma macarrão em refeição: sozinho, o macarrão com tomate tem quase nada de proteína.'},
+
+{id:'r62',nome:'Vitamina de banana com aveia e amendoim',ref:['cafe','lanche1','lanche2'],t:4,kcal:379,p:15,c:56,g:12,rende:'1 copo de 400 ml',
+ ing:[i('Bebida de soja sem açúcar',250,'leite'),i('Banana',100,'banana'),i('Aveia em flocos',30,'aveia'),i('Pasta de amendoim',15,'amendoim'),i('Canela',1,'canela')],
+ modo:['Ponha a bebida de soja no liquidificador primeiro, para a aveia não grudar na lâmina.',
+  'Junte a banana em pedaços, a aveia e a pasta de amendoim.',
+  'Bata por 40 segundos e beba na hora.'],
+ dica:'É a versão sem whey e sem leite da vitamina que já existe no app. Congele a banana em rodelas e ela vira milk-shake sem precisar de gelo.'},
+
+{id:'r63',nome:'Cuscuz de milho com legumes e grão-de-bico',ref:['cafe','jantar'],t:15,kcal:375,p:11,c:64,g:9,rende:'1 prato',
+ ing:[i('Cuscuz de milho cozido',150,'cuscuz'),i('Grão-de-bico cozido',80,'grao-de-bico'),i('Tomate',50,'tomate'),i('Cebola',30,'cebola'),i('Azeite de oliva',6,'azeite'),i('Cebolinha e sal',3,'cebolinha')],
+ modo:['Hidrate o flocão com água e sal até ficar úmido mas solto, e deixe descansar 10 minutos antes de levar ao vapor.',
+  'Enquanto cozinha, refogue a cebola no azeite e junte o tomate picado e o grão-de-bico.',
+  'Sirva o refogado por cima do cuscuz, com cebolinha.'],
+ dica:'Cuscuz é café da manhã no Nordeste e jantar em qualquer lugar. Com grão-de-bico ele deixa de ser só carboidrato e vira refeição.'},
+
+{id:'r64',nome:'Quinoa com legumes assados e castanha',ref:['almoco','jantar'],t:40,kcal:383,p:10,c:43,g:19,rende:'1 prato',
+ ing:[i('Quinoa cozida',150,'quinoa'),i('Abobrinha refogada',80,'abobrinha'),i('Berinjela assada',70,'berinjela'),i('Pimentão',50,'pimentao'),i('Azeite de oliva',8,'azeite'),i('Castanha-do-pará',10,'castanha'),i('Sal e pimenta',2,'sal')],
+ modo:['Corte abobrinha, berinjela e pimentão em pedaços grandes, misture com metade do azeite e sal.',
+  'Asse a 200 graus por 25 a 30 minutos, mexendo uma vez. Legume assado tem que ficar com borda escura: é dali que vem o sabor.',
+  'Misture a quinoa cozida com os legumes ainda quentes e o resto do azeite.',
+  'Quebre a castanha por cima na hora de servir.'],
+ dica:'Quinoa é boa e é cara. Arroz integral com lentilha na mesma panela chega perto no perfil de aminoácidos por uma fração do preço — a troca está no bloco de trocas.'},
+
+{id:'r65',nome:'Sopa de lentilha com mandioquinha',ref:['jantar','ceia'],t:35,kcal:348,p:16,c:58,g:7,rende:'1 prato fundo',
+ ing:[i('Lentilha cozida',150,'lentilha'),i('Mandioquinha cozida',100,'mandioquinha'),i('Cenoura crua',60,'cenoura'),i('Cebola',40,'cebola'),i('Azeite de oliva',6,'azeite'),i('Alho, sal e louro',5,'alho')],
+ modo:['Refogue cebola, alho e cenoura em cubos no azeite por 3 minutos.',
+  'Junte a mandioquinha em pedaços e água quente até cobrir dois dedos acima, com uma folha de louro.',
+  'Cozinhe até a mandioquinha desmanchar no garfo, uns 20 minutos.',
+  'Acrescente a lentilha cozida, acerte o sal e deixe 5 minutos. Amasse uma parte com a colher para engrossar, sem bater.'],
+ dica:'Amassar parte da sopa em vez de bater tudo deixa textura, e textura é o que faz uma sopa sustentar até de manhã. Congela bem em porção individual.'}
 );
 
 /* ---- grupos musculares, inferidos pelo nome do exercício (para o gráfico de volume) ---- */
@@ -2419,7 +2510,8 @@ const DEF={
    vozAlvo:'masc',pele:'oleosa',horaTreino:'18:00',acordar:'07:00',dormir:'23:00',
    lembretes:['09:00','11:00','14:00','16:30','19:00','21:00'],ocultar:[],alarmes:[],
    viuOcultar:false,disfarce:'',diaCheio:false,avisosOff:[],nivel:'zero',limites:[],higMin:[],
-   corpoMeta:'',rampa:false,contador:'mes',hormAndro:'',pronome:'',identidade:'',senha:''},
+   corpoMeta:'',rampa:false,contador:'mes',hormAndro:'',pronome:'',identidade:'',senha:'',
+   restricoes:[],alergias:[],semIng:[]},
  dias:{},pesos:[],medidas:[],cargas:{},despensa:[],fotos:[],compras:[],recentes:[],favs:[],vozLog:[],
  salvos:[],trocas:{},ficha:{},externo:{ativo:false,fonte:'',treino:{},dieta:[]},th:{freq:14,hist:[]},
  ciclo:{regras:[],sintomas:{}},meds:[],notas:[],higMeus:[],exames:[],
@@ -2577,7 +2669,22 @@ function normalizaTudo(){
 }
 
 function esc(t){return String(t==null?'':t).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
-function nrm(t){return String(t||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').trim()}
+/* nrm faz toLowerCase, normalize NFD e uma troca por expressão regular.
+   Barato uma vez; caro setecentas mil vezes, que é quanto a tela de
+   receitas chamava para contar o que cada alergênico tira. O app usa
+   sempre as mesmas poucas centenas de strings — nome de alimento, chave
+   de ingrediente, termo de busca — então vale lembrar. O teto existe só
+   para a busca livre, onde cada tecla gera uma string nova. */
+const _nrmCache=new Map();
+function nrm(t){
+ const k=String(t||'');
+ const v=_nrmCache.get(k);
+ if(v!==undefined)return v;
+ const r=k.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').trim();
+ if(_nrmCache.size>4000)_nrmCache.clear();
+ _nrmCache.set(k,r);
+ return r;
+}
 function n1(v){return Math.round(v*10)/10}
 function agoraMin(){const d=new Date();return d.getHours()*60+d.getMinutes()}
 function hm2min(h){const[a,b]=String(h).split(':').map(Number);return a*60+(b||0)}
@@ -2611,7 +2718,8 @@ function diaFoco(){return S.ui.diaDiario||hoje()}
    Antes isso era engolido e a pessoa perdia o registro sem saber. Num app
    cuja promessa é "fica no seu aparelho", avisar é parte da promessa. */
 let gravacaoFalhou=false;
-function lsSave(){
+function lsGravaAgora(){
+ lsPendente=false;
  try{
   localStorage.setItem(LS,JSON.stringify(S));
   if(gravacaoFalhou){gravacaoFalhou=false}
@@ -2622,6 +2730,22 @@ function lsSave(){
   }
  }
 }
+/* Gravar serializa o estado inteiro, e isso acontecia dentro do toque, a
+   cada render. Agora é agendado para o próximo intervalo ocioso — e cai
+   na hora quando o app vai sumir da tela, que é o único momento em que
+   adiar poderia custar um registro. */
+let lsPendente=false,lsTimer=null;
+const lsOcioso=window.requestIdleCallback||function(f){return setTimeout(f,120)};
+function lsSave(){
+ if(lsPendente)return;
+ lsPendente=true;
+ clearTimeout(lsTimer);
+ lsTimer=setTimeout(function(){lsOcioso(function(){if(lsPendente)lsGravaAgora()})},60);
+}
+function lsFlush(){if(lsPendente){clearTimeout(lsTimer);lsGravaAgora()}}
+window.addEventListener('visibilitychange',function(){if(document.hidden)lsFlush()});
+window.addEventListener('pagehide',lsFlush);
+window.addEventListener('beforeunload',lsFlush);
 function lsLoad(){try{const r=localStorage.getItem(LS)||localStorage.getItem('rotaforte.v2');if(!r)return;
  const o=JSON.parse(r);
  S={...DEF,...o,perfil:{...DEF.perfil,...(o.perfil||{})},
@@ -2667,6 +2791,140 @@ function hidratarFotos(){
    if(b){img.src=URL.createObjectURL(b);img.dataset.pronto='1'}
   }).catch(()=>{});
  });
+}
+
+/* =====================================================================
+   BACKUP
+   Uma lista só, dos dois lados. A exportação levava 11 das 21 chaves do
+   estado e deixava para trás ciclo, exames, histórico de hormônio,
+   medicação, anotações e a dieta passada por profissional — e o botão
+   dizia "baixar tudo que é seu". A importação, escrita noutro momento,
+   aceitava três chaves que a exportação nunca mandava.
+
+   Agora as duas pontas leem daqui. Chave nova no estado entra no backup
+   sozinha, e não tem como divergirem de novo porque não existem duas
+   listas. 'ui' fica de fora de propósito: é preferência de navegação
+   deste aparelho, não dado da pessoa.
+   ===================================================================== */
+const CHAVES_BACKUP=Object.keys(DEF).filter(function(k){return k!=='ui'});
+
+function blobParaDataURL(b){
+ return new Promise(function(res,rej){
+  const fr=new FileReader();
+  fr.onload=function(){res(fr.result)};fr.onerror=function(){rej(fr.error)};
+  fr.readAsDataURL(b);
+ });
+}
+function dataURLParaBlob(u){
+ const m=/^data:([^;,]+)?(;base64)?,/.exec(String(u||''));
+ if(!m)return null;
+ const tipo=m[1]||'image/jpeg', corpo=String(u).slice(m[0].length);
+ try{
+  if(m[2]){
+   const bin=atob(corpo),arr=new Uint8Array(bin.length);
+   for(let i=0;i<bin.length;i++)arr[i]=bin.charCodeAt(i);
+   return new Blob([arr],{type:tipo});
+  }
+  return new Blob([decodeURIComponent(corpo)],{type:tipo});
+ }catch(e){return null}
+}
+/* As fotos moram no IndexedDB, não no localStorage: elas precisam ser
+   lidas uma a uma e viajam em base64. Foto que não abrir é pulada, e o
+   backup sai assim mesmo — melhor um backup sem uma foto do que nenhum. */
+function fotosParaBackup(){
+ const lista=(S.fotos||[]).filter(function(f){return f&&f.id});
+ if(!lista.length||!window.indexedDB)return Promise.resolve({});
+ return Promise.all(lista.map(function(f){
+  return fotoLer(f.id)
+   .then(function(b){return b?blobParaDataURL(b).then(function(u){return[f.id,u]}):null})
+   .catch(function(){return null});
+ })).then(function(l){
+  return l.filter(Boolean).reduce(function(a,par){a[par[0]]=par[1];return a},{});
+ });
+}
+function montaBackup(){
+ return fotosParaBackup().then(function(imgs){
+  const o={v:4,app:'Norte',em:new Date().toISOString()};
+  CHAVES_BACKUP.forEach(function(k){o[k]=S[k]});
+  o.fotosImg=imgs;
+  return o;
+ });
+}
+function baixarArquivo(nome,texto,tipo){
+ try{
+  const blob=new Blob([texto],{type:tipo||'application/json;charset=utf-8'});
+  const url=URL.createObjectURL(blob),a=document.createElement('a');
+  a.href=url;a.download=nome;document.body.appendChild(a);a.click();
+  setTimeout(function(){URL.revokeObjectURL(url);a.remove()},1500);
+  return true;
+ }catch(e){return false}
+}
+function exportarTudo(){
+ montaBackup().then(function(o){
+  const txt=JSON.stringify(o,null,1);
+  const kb=Math.max(1,Math.round(txt.length/1024));
+  const nf=Object.keys(o.fotosImg||{}).length;
+  const nome='norte-'+hoje()+'.json';
+  if(baixarArquivo(nome,txt))
+   toast('Baixado: '+nome+' · '+kb+' KB'+(nf?' · '+nf+(nf===1?' foto':' fotos'):''));
+  else copiar(txt,'Dados copiados · '+kb+' KB');
+ }).catch(function(){
+  /* Se a leitura das fotos falhar, o backup do texto sai mesmo assim. */
+  const o={v:4,app:'Norte',em:new Date().toISOString()};
+  CHAVES_BACKUP.forEach(function(k){o[k]=S[k]});
+  const txt=JSON.stringify(o,null,1);
+  if(!baixarArquivo('norte-'+hoje()+'.json',txt))copiar(txt,'Dados copiados');
+  toast('Baixado sem as fotos: não consegui ler as imagens deste navegador');
+ });
+}
+
+/* A volta. Texto de fora entra conferido chave por chave, com o formato
+   conferido contra o do estado: lista continua lista, objeto continua
+   objeto, e o que não bater é ignorado em silêncio em vez de derrubar o
+   app ou entrar torto. */
+function aplicaBackup(o){
+ let nd=0,nf=0;
+ if(o.perfil&&typeof o.perfil==='object'&&!Array.isArray(o.perfil)){
+  Object.keys(DEF.perfil).forEach(function(k){
+   if(Object.prototype.hasOwnProperty.call(o.perfil,k))S.perfil[k]=o.perfil[k];
+  });
+ }
+ CHAVES_BACKUP.forEach(function(k){
+  if(k==='perfil'||k==='dias')return;
+  const v=o[k],base=DEF[k];
+  if(v==null)return;
+  if(Array.isArray(base)){if(Array.isArray(v))S[k]=v.slice(0,5000);return}
+  if(base&&typeof base==='object'){
+   if(typeof v==='object'&&!Array.isArray(v))S[k]=Object.assign({},S[k],v);
+  }
+ });
+ if(o.dias&&typeof o.dias==='object'&&!Array.isArray(o.dias))
+  Object.keys(o.dias).forEach(function(dd){
+   if(/^\d{4}-\d{2}-\d{2}$/.test(dd)&&o.dias[dd]&&typeof o.dias[dd]==='object'){
+    S.dias[dd]=o.dias[dd];nd++}});
+ /* As imagens voltam para o IndexedDB deste aparelho. */
+ const imgs=(o.fotosImg&&typeof o.fotosImg==='object'&&!Array.isArray(o.fotosImg))?o.fotosImg:{};
+ Object.keys(imgs).forEach(function(id){
+  const b=dataURLParaBlob(imgs[id]);
+  if(b){nf++;fotoSalvar(id,b).catch(function(){})}
+ });
+ return{dias:nd,fotos:nf};
+}
+
+/* Dado de fora, venha de arquivo ou de texto colado, entra pelo mesmo
+   caminho conferido, e depois passa pelas mesmas normalizações da
+   abertura do app — antes elas não rodavam e o estado ficava torto até a
+   próxima vez que a pessoa fechasse o app. */
+function importarTexto(txt){
+ let o;
+ try{o=JSON.parse(txt||'')}catch(e){return toast('Não consegui ler esse texto')}
+ if(!o||typeof o!=='object'||Array.isArray(o))return toast('Arquivo inválido')
+ const r=aplicaBackup(o);
+ const corrigidos=normalizaTudo();
+ save('base');closeSheet();render();
+ setTimeout(function(){if(typeof hidratarFotos==='function')hidratarFotos()},400);
+ toast('Importado: '+r.dias+' dias'+(r.fotos?' e '+r.fotos+(r.fotos===1?' foto':' fotos'):'')+
+  (corrigidos.length?'. Ajustei '+corrigidos.join(', ')+' para valores possíveis.':''));
 }
 
 /* =====================================================================
@@ -3107,15 +3365,43 @@ function refeicoesDoTreino(d){
  });
  return{treino:true,antes:antes,depois:depois};
 }
+/* O que já foi comido hoje, refeição por refeição. É daqui que o cardápio
+   passou a partir: antes ele montava seis refeições do zero contra a meta
+   do dia inteiro, e quem almoçasse e abrisse a tela às 15h via sugestão de
+   almoço — a conta só fechava jogando fora o almoço que já tinha sido
+   comido. */
+function comidoHoje(){
+ const d=hoje(),por={};let kcal=0,p=0;
+ MEALS.forEach(function(ref){
+  const t=totalRef(d,ref.k);por[ref.k]=t;kcal+=t.kcal;p+=t.p;
+ });
+ return{por,kcal:Math.round(kcal),p:Math.round(p)};
+}
 function gerarCardapio(semente){
  const m=metas(),out={};
  const sem=semente||Math.floor(Math.random()*9999);
  const tr=refeicoesDoTreino();
+ const ja=comidoHoje();
+ /* Só as refeições ainda em branco entram na sugestão. */
+ const faltam=MEALS.filter(function(ref){return ja.por[ref.k].kcal<=0});
+ const somaPct=faltam.reduce(function(a,r){return a+r.pct},0)||1;
+ const restam=Math.max(0,m.kcal-ja.kcal);
  /* ISSN: 0,25 g de proteína por quilo por refeição, ou 20 a 40 g. */
  const pisoProt=Math.max(20,Math.min(40,Math.round(pesoAtual()*0.25)));
- MEALS.forEach((ref,ri)=>{
-  const alvo=m.kcal*ref.pct;
-  let cand=RECIPES.filter(r=>r.ref.includes(ref.k));
+ /* Abaixo disto o app não sugere mais refeição nenhuma: a meta do dia já
+    está alcançada pelo que foi registrado, e empurrar mais comida seria
+    o app ensinando a ignorar saciedade. */
+ if(restam<150)return{sem,itens:{},treino:tr,comido:ja.kcal,dia:hoje(),restam:Math.round(restam),cheio:true};
+ const escolhas={};
+ faltam.forEach((ref,ri)=>{
+  /* O alvo da refeição não é mais a fatia dela do dia inteiro: é a fatia
+     dela do que AINDA FALTA, redistribuída entre as que sobraram. */
+  const alvo=Math.max(80,restam*(ref.pct/somaPct));
+  let cand=filtraRestr(RECIPES).filter(r=>r.ref.includes(ref.k));
+  /* Se as restrições deixarem a refeição sem nenhuma opção, o app abre a
+     mão do horário antes de abrir a mão da restrição: sugerir frango para
+     quem marcou "sem carne" é pior do que sugerir jantar no café. */
+  if(!cand.length)cand=filtraRestr(RECIPES);
   if(!cand.length)cand=RECIPES;
   const principal=ref.pct>=.20;
   const perto=tr.treino&&(ref.k===tr.antes||ref.k===tr.depois);
@@ -3131,9 +3417,85 @@ function gerarCardapio(semente){
    return{r,s};})
    .sort((a,b)=>a.s-b.s);
   const janela=scored.slice(0,Math.min(4,scored.length));
-  out[ref.k]=janela[(sem+ri*3)%janela.length].r.id;
+  /* Não repetir a mesma receita no mesmo dia. Com o app inteiro
+     disponível isto nunca faz falta — cada refeição tem quatro
+     candidatas e elas raramente colidem. Com filtro apertado faz toda a
+     falta: no caso extremo, sobrando uma receita só, o cardápio sugeria
+     a mesma coisa seis vezes. */
+  const usados=Object.keys(out).map(k=>out[k]);
+  let pick=janela[(sem+ri*3)%janela.length].r.id;
+  if(usados.indexOf(pick)>=0){
+   const livre=janela.find(z=>usados.indexOf(z.r.id)<0)
+     ||scored.find(z=>usados.indexOf(z.r.id)<0);
+   /* Sem receita nova para esta refeição, ela fica em branco. Seis
+      sugestões iguais não são um cardápio. */
+   if(!livre)return;
+   pick=livre.r.id;
+  }
+  out[ref.k]=pick;
+  /* Guardo as melhores candidatas desta refeição para a segunda passada.
+     Doze é o bastante para fechar a conta sem abrir mão da qualidade: a
+     segunda passada só escolhe entre receitas que a primeira já aprovou. */
+  escolhas[ref.k]=scored.slice(0,Math.min(12,scored.length)).map(z=>z.r);
  });
- return{sem,itens:out,treino:tr};
+
+ /* -------------------------------------------------------------------
+    SEGUNDA PASSADA: fechar o total do dia.
+    Cada refeição foi escolhida sozinha, mirando a fatia dela do que
+    falta — e seis escolhas boas isoladamente somam um dia ruim. Numa
+    conferência real, com o almoço já registrado, o dia fechava 522 kcal
+    abaixo da meta.
+    Aqui o app troca, uma de cada vez, a refeição cuja troca mais
+    aproxima o TOTAL do dia da meta. Para quando chega perto o bastante
+    ou quando nenhuma troca melhora.
+    ------------------------------------------------------------------- */
+ const kcalDe=id=>{const r=RECIPES.find(z=>z.id===id);return r?r.kcal:0};
+ const totalCom=o=>ja.kcal+faltam.reduce((a,ref)=>a+kcalDe(o[ref.k]),0);
+ const perto=m.kcal*0.04;
+ for(let passo=0;passo<12;passo++){
+  const erro=Math.abs(totalCom(out)-m.kcal);
+  if(erro<=perto)break;
+  let melhor=null;
+  faltam.forEach(function(ref){
+   (escolhas[ref.k]||[]).forEach(function(r){
+    if(r.id===out[ref.k])return;
+    /* a mesma receita não entra duas vezes no mesmo dia */
+    if(faltam.some(o=>o.k!==ref.k&&out[o.k]===r.id))return;
+    const tent=Object.assign({},out);tent[ref.k]=r.id;
+    const e2=Math.abs(totalCom(tent)-m.kcal);
+    if(e2<erro-1&&(!melhor||e2<melhor.e))melhor={k:ref.k,id:r.id,e:e2};
+   });
+  });
+  if(!melhor)break;
+  out[melhor.k]=melhor.id;
+ }
+
+ /* -------------------------------------------------------------------
+    TERCEIRA PASSADA: tirar refeição que só faz passar da meta.
+    A troca acima só TROCA. Quando restam 160 kcal do dia e ainda há
+    quatro refeições em branco, nenhuma combinação fecha: a menor receita
+    do app tem perto de 200 kcal, e espalhar quatro delas estourava a
+    meta em 745 kcal numa conferência real.
+    Em dia normal esta passada não remove nada, porque tirar qualquer
+    refeição piora o erro. Ela só age quando o que sobrou do dia não
+    comporta mais uma refeição inteira.
+    ------------------------------------------------------------------- */
+ for(let passo=0;passo<6;passo++){
+  const erro=Math.abs(totalCom(out)-m.kcal);
+  let pior=null;
+  faltam.forEach(function(ref){
+   if(!out[ref.k])return;
+   const tent=Object.assign({},out);delete tent[ref.k];
+   const e2=Math.abs(totalCom(tent)-m.kcal);
+   if(e2<erro-1&&(!pior||e2<pior.e))pior={k:ref.k,e:e2};
+  });
+  if(!pior)break;
+  delete out[pior.k];
+ }
+ /* 'comido' é a assinatura do dia no momento em que este cardápio foi
+    montado. A tela compara com o valor atual e remonta quando muda, para
+    o cardápio não ficar falando de um dia que já passou. */
+ return{sem,itens:out,treino:tr,comido:ja.kcal,dia:hoje(),restam:Math.round(restam)};
 }
 
 /* =====================================================================
@@ -3192,16 +3554,53 @@ function ic(n,st){return '<svg class="ic" aria-hidden="true" focusable="false"'+
  (st?' style="'+st+'"':'')+'><use href="#i-'+n+'"/></svg>'}
 function toast(t){const r=$('#toastRoot');r.innerHTML='<div class="toast">'+esc(t)+'</div>';
  clearTimeout(toast._t);toast._t=setTimeout(()=>r.innerHTML='',2300)}
+/* De onde o foco veio, para poder voltar. Quem navega por teclado
+   abria uma folha e, ao fechar, caía no começo da página sem saber onde
+   estava. */
+let focoAntesDaFolha=null;
 function sheet(titulo,html,sub){
- $('#modalRoot').innerHTML='<div class="ovl" data-a="close-ovl"><div class="sheet" id="sheetBox">'+
-  '<div class="sh-h"><div><h3>'+esc(titulo)+'</h3>'+(sub?'<div class="xtiny muted">'+esc(sub)+'</div>':'')+'</div>'+
+ focoAntesDaFolha=document.activeElement;
+ $('#modalRoot').innerHTML='<div class="ovl" data-a="close-ovl">'+
+  '<div class="sheet" id="sheetBox" role="dialog" aria-modal="true" aria-labelledby="sheetTitulo" tabindex="-1">'+
+  '<div class="sh-h"><div><h3 id="sheetTitulo">'+esc(titulo)+'</h3>'+
+   (sub?'<div class="xtiny muted">'+esc(sub)+'</div>':'')+'</div>'+
   '<button class="x" data-a="close" aria-label="Fechar">'+ic('x')+'</button></div>'+html+'</div></div>';
  document.body.style.overflow='hidden';
+ /* Nada atrás da folha deve ser alcançável por Tab nem lido em voz. */
+ const app=$('#main');
+ if(app){app.setAttribute('inert','');app.setAttribute('aria-hidden','true')}
+ const cx=$('#sheetBox');
+ if(cx){
+  const primeiro=cx.querySelector('input:not([type=hidden]),textarea,select');
+  (primeiro||cx).focus({preventScroll:true});
+ }
 }
 function closeSheet(){
  if(typeof pararCamera==='function')pararCamera();
+ if(typeof pararMedidor==='function')pararMedidor();
  $('#modalRoot').innerHTML='';document.body.style.overflow='';
+ const app=$('#main');
+ if(app){app.removeAttribute('inert');app.removeAttribute('aria-hidden')}
+ if(focoAntesDaFolha&&document.contains(focoAntesDaFolha)){
+  try{focoAntesDaFolha.focus({preventScroll:true})}catch(e){}
+ }
+ focoAntesDaFolha=null;
 }
+/* Tab circula dentro da folha em vez de sair por baixo dela. */
+document.addEventListener('keydown',function(ev){
+ if(ev.key!=='Tab')return;
+ const cx=document.querySelector('#sheetBox');
+ if(!cx)return;
+ const alvos=[...cx.querySelectorAll('a[href],button:not([disabled]),input:not([type=hidden]):not([disabled]),textarea:not([disabled]),select:not([disabled]),[tabindex]:not([tabindex="-1"])')]
+  .filter(function(e2){return e2.offsetParent!==null||e2===document.activeElement});
+ if(!alvos.length)return;
+ const primeiro=alvos[0],ultimo=alvos[alvos.length-1];
+ if(ev.shiftKey&&(document.activeElement===primeiro||document.activeElement===cx)){
+  ev.preventDefault();ultimo.focus();
+ }else if(!ev.shiftKey&&document.activeElement===ultimo){
+  ev.preventDefault();primeiro.focus();
+ }
+});
 function ring(pct,cor,size,txt,sub){
  size=size||84;const r=(size-10)/2,c=2*Math.PI*r,v=Math.min(1,Math.max(0,pct||0))*c;
  return '<div style="position:relative;width:'+size+'px;height:'+size+'px;flex:none">'+
@@ -3318,8 +3717,25 @@ function nomeDoApp(){return S.perfil.disfarce||'Norte'}
    ocupava quase um quinto da tela do celular o tempo inteiro. */
 /* Com oito sub-abas, a ativa pode estar fora do campo de visão depois de
    um render. Isto a traz para perto da borda esquerda, sem animação brusca. */
-function centralizaSubAba(){
- document.querySelectorAll('.subtabs').forEach(function(f){
+/* Esta função custava de 110 a 180 ms por render — mais que todo o resto
+   do app junto — porque percorria as faixas de TODAS as abas, inclusive
+   as escondidas, e lia offsetLeft logo depois de o innerHTML ter sido
+   reescrito. Ler offsetLeft ali obriga o navegador a refazer o layout do
+   documento inteiro na hora, parado, três vezes por render.
+
+   Agora: só a faixa da aba visível, só quando a sub-aba ativa mudou, e
+   dentro de requestAnimationFrame, para a leitura cair depois do layout
+   que o navegador já ia fazer sozinho. */
+let subAbaUltima='';
+function centralizaSubAba(forcar){
+ const marca=S.ui.tab+':'+(S.ui.sub[S.ui.tab]||'');
+ if(!forcar&&marca===subAbaUltima)return;
+ subAbaUltima=marca;
+ const aba=document.querySelector('#tab-'+S.ui.tab);
+ if(!aba)return;
+ const f=aba.querySelector('.subtabs');
+ if(!f)return;
+ requestAnimationFrame(function(){
   const on=f.querySelector('.subtab.on,.chip.on');
   if(!on)return;
   const alvo=on.offsetLeft-16;
@@ -4750,6 +5166,34 @@ function sheetMicro(){
   'Referências de população, não meta sua');
 }
 
+/* ---------------------------------------------------------------------
+   ISTO NÃO É DIETA
+   Esta aba faz conta de caloria, monta cardápio e ordena receita por
+   proteína. Isso se PARECE com prescrição, e não é. No Brasil prescrever
+   dieta é ato de nutricionista ou de médico, e este app não sabe do seu
+   exame, da sua medicação, do seu intestino nem do seu histórico.
+
+   Fica no alto do diário, que é a primeira tela da aba, e não dobra nem
+   some: é a moldura de tudo que vem abaixo.
+   --------------------------------------------------------------------- */
+function avisoComida(){
+ return '<div class="card" style="border-color:var(--warn)">'+
+  chTtl('info','Isto é sugestão de comida, não é dieta')+
+  '<p class="tiny" style="line-height:1.7">Tudo nesta aba — a meta de caloria, o cardápio, a ordem das receitas — '+
+  'é <b>sugestão montada a partir dos números que você mesma digitou</b>: peso, altura, idade e nível de atividade. '+
+  'É um ponto de partida razoável para a maioria das pessoas, e pode estar errado para você.</p>'+
+  '<p class="tiny muted" style="line-height:1.7;margin-top:10px">O app não sabe do seu exame de sangue, da sua medicação, '+
+  'de como está o seu intestino, de condição de saúde nem do seu histórico com comida. '+
+  'Quem prescreve dieta é nutricionista ou médico — é profissão regulamentada, e por um motivo.</p>'+
+  '<p class="tiny muted" style="line-height:1.7;margin-top:10px"><b>Procure profissional</b> se você tem alguma condição de saúde, '+
+  'está grávida, usa medicação de uso contínuo, tem alergia alimentar diagnosticada, tem ou já teve transtorno alimentar, '+
+  'ou se algum exame veio alterado. Nesses casos o que está aqui não serve como plano.</p>'+
+  '<p class="tiny" style="line-height:1.7;margin-top:10px">E vale dizer o óbvio: <b>você pode ignorar qualquer sugestão daqui.</b> '+
+  'Nada nesta tela cobra nada de ninguém, e um dia fora da conta não desfaz nada.</p>'+
+  '<button class="btn gh bl sm" style="margin-top:12px" data-a="go-sub" data-tab="cuidados" data-st="profissionais">'+
+  ic('user')+' Como achar profissional que atende pessoas trans</button></div>';
+}
+
 function stDiario(){
  const d=diaFoco(),m=metas(d),t=totalDia(d),x=dia(d);
  const restante=Math.round(m.kcal-t.kcal);
@@ -4765,7 +5209,7 @@ function stDiario(){
    '<p class="xtiny muted" style="margin-top:10px;line-height:1.6">Este é o plano que te passaram. '+
    'O app não recalcula nem discute com ele — registre abaixo o que você realmente comeu.</p></div>'
   :'';
- $('#st-diario').innerHTML=cardRumo()+blocoMicro(d)+
+ $('#st-diario').innerHTML=avisoComida()+cardRumo()+blocoMicro(d)+
   (oculto('kcal')?'':dobra('nutri:porque','Por que estes números','info',
    'de onde sai cada meta da sua conta',blocoPorqueComida))+
   dietaFora+
@@ -4823,18 +5267,42 @@ function stDiario(){
 }
 
 function stCardapio(){
- const m=metas();
- if(!S.ui.cardapio)S.ui.cardapio=gerarCardapio();
+ const m=metas(), ja=comidoHoje(), d=hoje();
+ /* Remonta quando o dia virou ou quando o diário mudou desde a última
+    montagem. Sem isto o cardápio continuaria falando de um dia que já
+    passou, ou de um almoço que você já comeu. */
+ const c0=S.ui.cardapio;
+ if(!c0||c0.dia!==d||c0.comido!==ja.kcal)
+  S.ui.cardapio=gerarCardapio(c0&&c0.dia===d?c0.sem:undefined);
  const c=S.ui.cardapio;
- let tot={kcal:0,p:0,c:0,g:0};
+
+ let sug={kcal:0,p:0,c:0,g:0};
  MEALS.forEach(r=>{const rec=RECIPES.find(z=>z.id===c.itens[r.k]);
-  if(rec){tot.kcal+=rec.kcal;tot.p+=rec.p;tot.c+=rec.c;tot.g+=rec.g}});
+  if(rec){sug.kcal+=rec.kcal;sug.p+=rec.p;sug.c+=rec.c;sug.g+=rec.g}});
+ const tot={kcal:ja.kcal+sug.kcal,p:ja.p+sug.p};
+ const totC=MEALS.reduce((a,r)=>a+(totalRef(d,r.k).c),0)+sug.c;
+ const totG=MEALS.reduce((a,r)=>a+(totalRef(d,r.k).g),0)+sug.g;
+ const nJa=MEALS.filter(r=>ja.por[r.k].kcal>0).length;
+ const bateu=ja.kcal>=m.kcal;
+
  return ''+
   '<div class="card hero">'+chTtl('wand','Cardápio sugerido para hoje',
    '<div class="row" style="gap:5px">'+
    '<button class="btn gh xs" data-a="plano-semana">'+ic('cal')+' semana</button>'+
    '<button class="btn gh xs" data-a="novo-cardapio">'+ic('redo')+' outro</button></div>')+
-   '<p class="tiny muted">Montado a partir das suas metas, das receitas favoritas e do que você marcou como disponível em casa.</p>'+
+   '<p class="tiny muted" style="line-height:1.65">'+
+   (nJa
+    ?'<b>'+nJa+(nJa===1?' refeição já está registrada':' refeições já estão registradas')+' hoje.</b> '+
+     'O que aparece abaixo é só o que ainda falta, recalculado para fechar o seu dia — '+
+     'não é um cardápio do zero por cima do que você já comeu.'
+    :'Montado a partir das suas metas, das receitas favoritas e do que você marcou como disponível em casa.')+
+   '</p>'+
+   (bateu
+    ?'<p class="tiny" style="line-height:1.65;margin-top:10px;color:var(--ok);font-weight:600">'+
+     'O que você já registrou hoje alcança a sua meta de caloria. O app parou de sugerir refeição aqui — '+
+     'não porque você não possa comer mais, mas porque empurrar comida depois disso seria o app ensinando a ignorar fome e saciedade. '+
+     'Se você está com fome, coma.</p>'
+    :'')+
    (function(){
     const tr=c.treino||refeicoesDoTreino();
     if(!tr.treino)return '<p class="xtiny muted" style="margin-top:8px;line-height:1.55">'+
@@ -4854,29 +5322,73 @@ function stCardapio(){
     :'<div class="gauto" style="margin-top:11px">'+
      tile('Total',Math.round(tot.kcal),'de '+m.kcal+' kcal',Math.abs(tot.kcal-m.kcal)<m.kcal*.12?'var(--ok)':'var(--warn)')+
      tile('Proteína',Math.round(tot.p)+'g','meta '+m.prot+' g','var(--primary)')+
-     tile('Carboidrato',Math.round(tot.c)+'g','meta '+m.carb+' g','var(--water)')+
-     tile('Gordura',Math.round(tot.g)+'g','meta '+m.gord+' g','var(--warn)')+'</div>')+
-   '<button class="btn acc bl" style="margin-top:12px" data-a="registrar-cardapio">Registrar o dia inteiro no diário</button>'+
+     tile('Carboidrato',Math.round(totC)+'g','meta '+m.carb+' g','var(--water)')+
+     tile('Gordura',Math.round(totG)+'g','meta '+m.gord+' g','var(--warn)')+'</div>'+
+     (nJa?'<p class="xtiny muted" style="margin-top:8px;line-height:1.55">Este total soma as <b>'+
+       Math.round(ja.kcal)+' kcal que você já comeu</b> com as '+Math.round(sug.kcal)+
+       ' kcal sugeridas para o resto do dia.</p>':''))+
+   (function(){
+    /* Quantas refeições o app conseguiu montar, e por que não montou as
+       outras. Melhor dizer do que mostrar menos cartões sem explicação. */
+    const faltando=MEALS.length-nJa-MEALS.filter(r=>c.itens[r.k]).length;
+    if(!faltando||bateu||c.cheio)return '';
+    const n=RECIPES.filter(recPassa).length;
+    return '<p class="xtiny" style="margin-top:8px;line-height:1.55;color:var(--warn)">'+
+     'O app deixou '+faltando+(faltando===1?' refeição':' refeições')+' em branco: '+
+     (temFiltro()
+      ?'com as suas marcações sobram '+n+(n===1?' receita':' receitas')+', e repetir a mesma coisa várias vezes no dia não é cardápio.'
+      :'não sobrou receita diferente para encaixar sem repetir.')+'</p>';
+   })()+
+   (temFiltro()?'<p class="xtiny muted" style="margin-top:8px;line-height:1.55">'+
+     'Só entram receitas que passam no que você marcou em <b>"O que você não come"</b>.'+
+     (!oculto('kcal')&&tot.kcal<m.kcal*0.93
+      ?' Com as suas marcações sobram poucas receitas, e por isso esta soma fica abaixo da meta — '+
+       'o app prefere ficar abaixo a sugerir o que você disse que não come.'
+      :'')+'</p>'
+    :(!oculto('kcal')&&nJa&&tot.kcal<m.kcal*0.93
+      ?'<p class="xtiny muted" style="margin-top:8px;line-height:1.55">'+
+       'Esta soma fica abaixo da meta porque sobraram poucas refeições no dia para encaixar o que falta. '+
+       'Não é para compensar amanhã.</p>':''))+
+   (MEALS.some(r=>c.itens[r.k])
+    ?'<button class="btn acc bl" style="margin-top:12px" data-a="registrar-cardapio">Registrar o que falta no diário</button>'
+    :'')+
   '</div>'+
-  MEALS.map(r=>{const rec=RECIPES.find(z=>z.id===c.itens[r.k]);if(!rec)return '';
-   const s=pontuar(rec);
+  MEALS.map(r=>{
+   const t=ja.por[r.k];
+   /* Refeição que já foi comida: mostra o que foi, não uma sugestão. */
+   if(t.kcal>0){
+    const itens=((diaRO(d).ref||{})[r.k]||[]);
+    return '<div class="card" style="border-color:var(--ok)">'+
+     '<div class="ch"><div class="grow"><div class="lbl">'+r.n+' · '+r.h+'</div>'+
+      '<h3 style="margin-top:3px">'+esc(itens.map(x=>x.n).join(', ')||'Registrado')+'</h3>'+
+      '<div class="xtiny num" style="margin-top:2px;color:var(--ok)">'+
+       (oculto('kcal')?'já registrado':'já comido · '+Math.round(t.kcal)+' kcal · P '+Math.round(t.p))+'</div></div>'+
+      '<span class="tag o">feito</span></div>'+
+     '<button class="btn gh sm" data-a="go-sub" data-tab="nutri" data-st="diario">Ver no diário</button></div>';
+   }
+   const rec=RECIPES.find(z=>z.id===c.itens[r.k]);
+   if(!rec)return '';
+   const sc=pontuar(rec);
    return '<div class="card">'+
     '<div class="ch"><div class="grow"><div class="lbl">'+r.n+' · '+r.h+'</div>'+
      '<h3 style="margin-top:3px">'+esc(rec.nome)+'</h3>'+
      '<div class="xtiny muted num" style="margin-top:2px">'+
       (oculto('kcal')?'':rec.kcal+' kcal · P '+rec.p+' C '+rec.c+' G '+rec.g+' · ')+rec.t+' min</div>'+
-     (s?'<div class="xtiny" style="margin-top:4px;color:'+(s.falta?'var(--warn)':'var(--ok)')+'">'+
-      (s.falta?'falta comprar: '+esc(s.faltantes.join(', ')):'você tem todos os ingredientes')+'</div>':'')+'</div>'+
+     (sc?'<div class="xtiny" style="margin-top:4px;color:'+(sc.falta?'var(--warn)':'var(--ok)')+'">'+
+      (sc.falta?'falta comprar: '+esc(sc.faltantes.join(', ')):'você tem todos os ingredientes')+'</div>':'')+'</div>'+
      '<button class="btn gh xs" data-a="trocar-ref" data-m="'+r.k+'">trocar</button></div>'+
     '<div class="row" style="gap:6px">'+
      '<button class="btn gh sm grow" data-a="ver-receita" data-id="'+rec.id+'">Ver receita</button>'+
      '<button class="btn sm" data-a="comi" data-id="'+rec.id+'" data-m="'+r.k+'">Comi</button></div></div>';
-  }).join('');
+  }).join('')+
+  '<div class="card"><p class="xtiny muted" style="line-height:1.65">Isto é sugestão, não prescrição: '+
+  'o app montou a partir de peso, altura, idade e atividade que você digitou, e não sabe do seu exame nem da sua medicação. '+
+  'Trocar, ignorar ou comer outra coisa não quebra nada.</p></div>';
 }
 
 function stDespensa(){
  const des=S.despensa;
- const ranked=RECIPES.map(r=>({r,s:pontuar(r)})).filter(x=>x.s).sort((a,b)=>b.s.pct-a.s.pct||a.s.falta-b.s.falta);
+ const ranked=filtraRestr(RECIPES).map(r=>({r,s:pontuar(r)})).filter(x=>x.s).sort((a,b)=>b.s.pct-a.s.pct||a.s.falta-b.s.falta);
  const prontas=ranked.filter(x=>x.s.falta===0);
  const quase=ranked.filter(x=>x.s.falta>0&&x.s.pct>=50).slice(0,10);
  const faltaTudo=[...new Set(quase.slice(0,5).flatMap(x=>x.s.faltantes))];
@@ -4919,9 +5431,420 @@ function cardReceita(r,s){
    ic('star')+'</button>'+
  '</div></div>';
 }
+/* =====================================================================
+   RESTRIÇÕES ALIMENTARES
+   O app tinha dezenas de receitas e nenhum jeito de dizer "eu não como
+   carne". Agora tem — e a classificação não é escrita à mão receita por
+   receita: ela sai da lista de ingredientes, que já existia porque o
+   sistema de despensa usa essas mesmas chaves. Receita nova se
+   classifica sozinha, e não tem como eu esquecer de marcar.
+
+   O casamento é por token, não por pedaço de palavra: 'mel' não pode
+   casar com 'melancia', e 'carne moída' tem que casar com 'carne'.
+   ===================================================================== */
+const ING_GRUPO={
+ carne:['carne','frango','peixe','atum','sardinha','tilapia'],
+ ovo:['ovo'],
+ leite:['leite','queijo','iogurte','requeijao','ricota','cottage','whey'],
+ /* Trigo declarado. Aveia NÃO entra: ela é naturalmente sem glúten, mas
+    quase sempre tem contaminação cruzada — e isso está dito na tela, em
+    vez de resolvido por um filtro que daria falsa segurança. */
+ trigo:['pao','macarrao','farinha','granola','shoyu'],
+ mel:['mel']
+};
+/* Os 18 do Anexo da RDC 26/2015 da Anvisa — a norma que obriga o aviso
+   "Alérgicos: Contém" nos rótulos brasileiros. Transcritos na ordem e
+   com o nome que a norma usa. Dez são oleaginosas listadas UMA A UMA: a
+   norma não tem um item genérico de "castanhas". O item 18 é látex, que
+   não é comida, e está aqui porque está na lista.
+
+   'tok' são os termos procurados na chave E no nome de cada ingrediente,
+   com limite de palavra — 'amendoim' precisa pegar "Pasta de amendoim",
+   'soja' precisa pegar "Bebida de soja sem açúcar" e "Óleo de soja".
+   Alérgeno sem 'tok' não aparece em receita nenhuma do app, e a tela diz
+   isso em vez de fingir que filtrou alguma coisa. */
+const ALERGIAS=[
+ {id:'al1',n:'Trigo, centeio, cevada e aveia',tok:['trigo','centeio','cevada','aveia','pao','macarrao','farinha','granola','shoyu'],
+  d:'A norma junta os quatro num item só, e inclui a AVEIA. É a diferença para o filtro de preferência "sem trigo", que deixa a aveia de fora porque ela é naturalmente sem glúten — para alergia e para doença celíaca, a contaminação cruzada conta.'},
+ {id:'al2',n:'Crustáceos',tok:['camarao','caranguejo','siri','lagosta','lagostim','crustaceo'],
+  d:'Camarão, caranguejo, siri, lagosta.'},
+ {id:'al3',n:'Ovos',tok:['ovo','ovos','clara','gema']},
+ {id:'al4',n:'Peixes',tok:['peixe','atum','sardinha','tilapia','salmao','bacalhau','merluza']},
+ {id:'al5',n:'Amendoim',tok:['amendoim'],
+  d:'Amendoim é leguminosa, não é castanha — quem tem alergia a amendoim nem sempre tem a castanha, e o contrário também vale.'},
+ {id:'al6',n:'Soja',tok:['soja','shoyu','tofu','edamame'],
+  d:'Inclui shoyu, que é feito de soja, e o óleo de soja.'},
+ {id:'al7',n:'Leite de qualquer mamífero',tok:['leite','queijo','iogurte','requeijao','ricota','cottage','whey','manteiga','mussarela','coalhada','creme de leite'],
+  d:'A norma diz "leites de todas as espécies de animais mamíferos": vaca, cabra, búfala, ovelha. Whey é proteína do leite.'},
+ {id:'al8',n:'Amêndoa',tok:['amendoa','amendoas']},
+ {id:'al9',n:'Avelã',tok:['avela','avelas']},
+ {id:'al10',n:'Castanha-de-caju',tok:['caju','castanha-de-caju']},
+ {id:'al11',n:'Castanha-do-brasil, ou castanha-do-pará',tok:['castanha-do-para','castanha do para','castanha-do-brasil','castanha do brasil']},
+ {id:'al12',n:'Macadâmia',tok:['macadamia','macadamias']},
+ {id:'al13',n:'Nozes',tok:['noz','nozes'],nao:['noz-moscada','noz moscada'],
+  d:'Noz-moscada não conta: é semente, não é noz, e não está na lista da norma. O app a exclui da busca de propósito.'},
+ {id:'al14',n:'Pecã',tok:['peca','pecas','pecan']},
+ {id:'al15',n:'Pistache',tok:['pistache','pistaches']},
+ {id:'al16',n:'Pinoli',tok:['pinoli','pinhao']},
+ {id:'al17',n:'Castanha portuguesa',tok:['castanha portuguesa','castanea'],
+  d:'É a castanha de Castanea, a que se assa no inverno — outra coisa da castanha-de-caju e da castanha-do-pará.'},
+ {id:'al18',n:'Látex natural',tok:[],
+  d:'Está na lista porque aparece em rótulo, mas não é ingrediente de comida e o app não filtra receita por ele. Vale saber de uma coisa: parte de quem tem alergia a látex reage também a banana, abacate, kiwi e castanha — é a chamada síndrome látex-fruta. Quem tem isso precisa de avaliação, não de filtro de app.'}
+];
+
+const RESTRICOES=[
+ {id:'vegetariana',n:'Sem carne',exclui:['carne'],
+  d:'Tira carne, frango, peixe e frutos do mar. Ovo e leite continuam.'},
+ {id:'vegana',n:'Sem ingrediente animal',exclui:['carne','ovo','leite','mel'],
+  d:'Tira também ovo, leite e derivados, e mel.'},
+ {id:'semleite',n:'Sem leite e derivados',exclui:['leite'],
+  d:'Inclui queijo, iogurte, requeijão, ricota, cottage e whey, que é proteína do leite.'},
+ {id:'semtrigo',n:'Sem trigo',exclui:['trigo'],
+  d:'Tira pão, macarrão, farinha de trigo, granola e shoyu. Leia o aviso sobre aveia.'}
+];
+function tokenBate(chave,tok){
+ const k=nrm(chave);
+ return k===tok||k.indexOf(tok+' ')===0||k.indexOf(tok+'-')===0||k.indexOf(tok+' de ')===0;
+}
+function recTemGrupo(r,g){
+ const toks=ING_GRUPO[g]||[];
+ return r.ing.some(function(x){return toks.some(function(t){return tokenBate(x.k,t)})});
+}
+/* Para alergia o casamento é mais largo e mais cuidadoso ao mesmo tempo:
+   olha a chave E o nome do ingrediente, mas com limite de palavra, para
+   'ovo' não casar com 'novo' nem 'mel' com 'melancia'. */
+function palavraEm(txt,tok){
+ const t=nrm(txt), k=nrm(tok);
+ if(!k)return false;
+ const i2=t.indexOf(k);
+ if(i2<0)return false;
+ const antes=i2===0?'':t[i2-1], depois=(i2+k.length>=t.length)?'':t[i2+k.length];
+ const letra=function(c){return c&&/[a-z0-9]/.test(c)};
+ return !letra(antes)&&!letra(depois);
+}
+function ingCasa(ing,toks){
+ return toks.some(function(t){return palavraEm(ing.k,t)||palavraEm(ing.n,t)});
+}
+/* 'nao' tira falso positivo de palavra parecida. O caso real que me
+   obrigou a criar isto: o token 'noz' casava com 'noz-moscada', que é
+   semente e não está na lista da norma — a busca por palavra inteira não
+   resolve, porque 'noz' É palavra inteira dentro de 'noz-moscada'. */
+function recTemAlergia(r,a){
+ if(!a.tok.length)return false;
+ return r.ing.some(function(x){
+  if((a.nao||[]).some(function(t){return nrm(x.n).indexOf(nrm(t))>=0}))return false;
+  return ingCasa(x,a.tok);
+ });
+}
+function alergiasAtivas(){
+ const ids=S.perfil.alergias||[];
+ return ALERGIAS.filter(function(a){return ids.indexOf(a.id)>=0});
+}
+function semIngAtivos(){
+ return (S.perfil.semIng||[]).map(function(x){return String(x||'').trim()}).filter(Boolean);
+}
+/* Qual alergia ou ingrediente barrou esta receita. Devolve os nomes, para
+   a tela poder dizer o motivo em vez de só sumir com a receita. */
+function recBarrada(r){
+ const out=[];
+ alergiasAtivas().forEach(function(a){if(recTemAlergia(r,a))out.push(a.n.toLowerCase())});
+ semIngAtivos().forEach(function(t){
+  if(r.ing.some(function(x){return ingCasa(x,[t])}))out.push(t.toLowerCase());
+ });
+ gruposFora().forEach(function(g){
+  if(recTemGrupo(r,g))out.push({carne:'carne, frango ou peixe',ovo:'ovo',
+   leite:'leite ou derivado',trigo:'trigo',mel:'mel'}[g]);
+ });
+ return [...new Set(out)];
+}
+function restrAtivas(){
+ const ids=S.perfil.restricoes||[];
+ return RESTRICOES.filter(function(x){return ids.indexOf(x.id)>=0});
+}
+/* Os grupos proibidos pelo conjunto de restrições que estão ligadas. */
+function gruposFora(){
+ const out={};
+ restrAtivas().forEach(function(x){x.exclui.forEach(function(g){out[g]=1})});
+ return Object.keys(out);
+}
+function recPassa(r){
+ const fora=gruposFora();
+ if(fora.some(function(g){return recTemGrupo(r,g)}))return false;
+ const als=alergiasAtivas();
+ if(als.some(function(a){return recTemAlergia(r,a)}))return false;
+ const li=semIngAtivos();
+ if(li.length&&r.ing.some(function(x){return ingCasa(x,li)}))return false;
+ return true;
+}
+function temFiltro(){
+ return gruposFora().length>0||alergiasAtivas().length>0||semIngAtivos().length>0;
+}
+function filtraRestr(arr){
+ return temFiltro()?arr.filter(recPassa):arr;
+}
+/* Três níveis, com peso visual diferente de propósito: preferência é
+   escolha, alergia não é, e ingrediente livre existe porque alergia não
+   cabe em lista fechada. */
+/* A lista de receitas não muda enquanto o app roda, então contar quantas
+   cada alergênico tira é trabalho que se faz uma vez. Antes era refeito
+   a cada desenho da tela, dezoito vezes. */
+const _contaCache=new Map();
+function contaBarradas(fn,chave){
+ if(chave&&_contaCache.has(chave))return _contaCache.get(chave);
+ let n=0; RECIPES.forEach(function(r){if(fn(r))n++});
+ if(chave)_contaCache.set(chave,n);
+ return n;
+}
+function blocoRestricoes(){
+ const ativas=restrAtivas(), als=alergiasAtivas(), livres=semIngAtivos();
+ const total=RECIPES.length, passam=RECIPES.filter(recPassa).length;
+ const nFiltros=ativas.length+als.length+livres.length;
+
+ /* ---------------------------------------------------- alergia */
+ const dobraAlergia=dobra('nutri:alergia','Alergia alimentar','bell',
+  als.length?als.length+(als.length===1?' alergia marcada':' alergias marcadas')
+   :'os 18 da lista oficial da Anvisa, mais o que você escrever',function(){
+  return '<div class="card" style="border-color:var(--warn)">'+
+   chTtl('bell','Alergia alimentar')+
+   '<p class="tiny" style="line-height:1.7">Esta lista é a oficial: são os 18 alimentos do Anexo da '+
+   'Resolução RDC 26 de 2015 da Anvisa, que é a norma que obriga o aviso <b>"Alérgicos: Contém"</b> nos rótulos brasileiros. '+
+   'Dez deles são oleaginosas listadas uma a uma — a norma não tem um item genérico de "castanhas".</p>'+
+   '<div class="stack" style="gap:0;margin-top:12px">'+ALERGIAS.map(function(a){
+    const on=(S.perfil.alergias||[]).indexOf(a.id)>=0;
+    const n=a.tok.length?contaBarradas(function(r){return recTemAlergia(r,a)},'al:'+a.id):0;
+    return '<button class="ex'+(on?' done':'')+'" data-a="alergia" data-v="'+a.id+
+     '" style="width:100%;text-align:left"><div class="row top" style="gap:10px">'+
+     '<span class="chk '+(on?'on':'')+'" style="flex:none">'+ic('check')+'</span>'+
+     '<span class="grow"><span class="nm" style="display:block">'+esc(a.n)+'</span>'+
+     '<span class="meta" style="display:block;line-height:1.5">'+
+      (!a.tok.length?'Não é ingrediente das receitas daqui.'
+       :n?'Sai '+n+(n===1?' receita':' receitas')+' da lista.'
+         :'Nenhuma receita do app usa.')+
+      (a.d?' '+esc(a.d):'')+'</span></span></div></button>';
+   }).join('')+'</div>'+
+   '<p class="xtiny muted" style="margin-top:12px;line-height:1.65"><b>O que este filtro não é.</b> '+
+   'Ele lê a lista de ingredientes que eu escrevi em cada receita. Ele não lê o rótulo do que você comprou, '+
+   'não sabe de marca, não sabe de "pode conter" e não sabe de contaminação cruzada na fábrica — '+
+   'e a própria norma da Anvisa existe porque essas três coisas são o que realmente causa reação. '+
+   'Se a sua alergia é grave, o rótulo manda, e não esta tela.</p></div>';
+ });
+
+ /* ------------------------------------------- ingrediente livre */
+ const dobraLivre=dobra('nutri:seming','Outros ingredientes que você não come','x',
+  livres.length?livres.length+(livres.length===1?' ingrediente':' ingredientes')
+   :'o que não estiver nas duas listas acima',function(){
+  return '<div class="card">'+chTtl('x','Outros ingredientes que você não come')+
+   '<p class="tiny muted" style="line-height:1.65">Alergia e intolerância não cabem em lista fechada, e nem toda '+
+   'coisa que faz mal a você está numa norma. Escreva aqui: pimentão, camarão, pimenta, o que for.</p>'+
+   '<div class="row" style="gap:7px;margin-top:11px">'+
+    '<input type="text" id="semIngIn" class="grow" maxlength="24" '+
+    'aria-label="Ingrediente que você não come" placeholder="ex.: pimentão">'+
+    '<button class="btn sm" data-a="seming-add" aria-label="Acrescentar">'+ic('plus')+'</button></div>'+
+   (livres.length
+    ?'<div class="row wrap" style="gap:5px;margin-top:11px">'+livres.map(function(t,ix){
+      const n=contaBarradas(function(r){return r.ing.some(function(x){return ingCasa(x,[t])})},'li:'+nrm(t));
+      return '<button class="chip on" data-a="seming-rm" data-i="'+ix+'">'+esc(t)+
+       ' <span class="muted">('+n+')</span> '+ic('x')+'</button>';
+     }).join('')+'</div>'+
+     '<p class="xtiny muted" style="margin-top:9px">O número é quantas receitas cada um tira. Toque para remover.</p>'
+    :'')+
+   '<p class="xtiny muted" style="margin-top:11px;line-height:1.6">A busca é por palavra inteira no nome e no ingrediente: '+
+   '"ovo" não vai casar com "novo". Plural e singular contam separado, então vale escrever os dois se fizer diferença.</p></div>';
+ });
+
+ return '<div class="card">'+chTtl('leaf','O que você não come',
+   nFiltros?'<span class="tag o">'+passam+' de '+total+' receitas</span>':'<span class="tag n">nada marcado</span>')+
+  '<p class="tiny muted" style="line-height:1.65">Marque e o app para de te oferecer o que você não come — '+
+  'na lista de receitas, no cardápio sugerido, na despensa e na troca de refeição.</p>'+
+  '<div class="lbl" style="margin:14px 0 7px">Por escolha</div>'+
+  '<div class="row wrap" style="gap:5px">'+RESTRICOES.map(function(x){
+   const on=(S.perfil.restricoes||[]).indexOf(x.id)>=0;
+   return '<button class="chip'+(on?' on':'')+'" data-a="restr" data-v="'+x.id+'">'+esc(x.n)+'</button>';
+  }).join('')+'</div>'+
+  (ativas.length
+   ?'<div class="stack" style="gap:0;margin-top:11px">'+ativas.map(function(x){
+     return '<div class="li"><div class="grow"><div class="ttl">'+esc(x.n)+'</div>'+
+      '<div class="sub" style="line-height:1.55">'+esc(x.d)+'</div></div></div>';
+    }).join('')+'</div>'
+   :'')+
+  '<p class="xtiny muted" style="margin-top:11px;line-height:1.6">Isto sai da lista de ingredientes de cada receita, não de rótulo. '+
+  'Aveia não entra em "sem trigo" porque ela é naturalmente sem glúten — mas quase toda aveia de mercado é processada junto com trigo. '+
+  'Se o seu caso é alergia ou doença celíaca, e não preferência, use a lista de baixo: lá a aveia entra.</p>'+
+  '<hr class="sep">'+dobraAlergia+dobraLivre+
+  (nFiltros&&passam<12
+   ?'<p class="xtiny" style="margin-top:11px;line-height:1.6;color:var(--warn)">Com estas marcações sobram '+passam+
+    ' receitas, que é pouco para um cardápio variado — são seis refeições por dia. O app continua montando, mas vai repetir bastante, '+
+    'e repetição é um dos motivos reais de alguém largar a alimentação que estava tentando.</p>'
+   :'')+
+  '</div>';
+}
+
+/* =====================================================================
+   TROCAS
+   "Falta comprar: whey, abacate" é meia informação. A outra metade é o
+   que vai no lugar — e é a metade que decide se a pessoa cozinha hoje
+   ou desiste.
+
+   Cada troca diz o que acontece com a conta, porque "troque whey por
+   leite" sem dizer que a receita perde proteína é meia verdade de novo.
+   A chave é a mesma dos ingredientes, então a receita sabe sozinha
+   quais trocas mostrar.
+   ===================================================================== */
+const SUBST=[
+ {k:'whey',de:'Whey protein',pra:'Leite em pó, clara de ovo, ou nada',
+  n:'O item mais caro da despensa e o mais fácil de dispensar. Na vitamina, 25 g de whey trazem perto de 20 g de proteína; duas claras cozidas mais duas colheres de leite em pó chegam perto por uma fração do preço. Se tirar e não repor, a receita perde proteína de verdade — compense no resto do dia.'},
+ {k:'frango',de:'Peito de frango',pra:'Sobrecoxa sem pele, ovo, ou atum em lata',
+  n:'Sobrecoxa é mais barata, mais difícil de ressecar e tem proteína parecida. Peito é caro por moda, não por valor.'},
+ {k:'carne',de:'Carne moída',pra:'Lentilha cozida, proteína de soja, ou frango moído',
+  n:'Lentilha e carne moída se comportam igual em molho e recheio. Metade de cada também funciona, e corta o custo pela metade sem mudar o gosto muito.'},
+ {k:'atum',de:'Atum em lata',pra:'Sardinha em lata',
+  n:'Sardinha custa bem menos, tem mais ômega 3 e, com a espinha mole, tem cálcio de verdade.'},
+ {k:'peixe',de:'Peixe fresco',pra:'Sardinha ou atum em lata',
+  n:'Peixe fresco é o ingrediente mais caro das receitas do app. Em lata resolve a proteína e o ômega 3 pelo preço de um lanche.'},
+ {k:'ovo',de:'Ovo',pra:'Na massa, chia hidratada. Como proteína, não tem troca barata',
+  n:'Uma colher de chia em três de água, dez minutos, substitui o ovo que serve para LIGAR a massa. O que o ovo faz de proteína não tem substituto mais barato — ele é a proteína mais barata que existe no Brasil.'},
+ {k:'leite',de:'Leite',pra:'Bebida de soja sem açúcar, ou leite em pó com água',
+  n:'Entre as bebidas vegetais, só a de soja chega perto na proteína (2,6 g por 100 ml, contra 3,2 do leite). Amêndoa, arroz e aveia quase não têm proteína: a receita vira outra coisa.'},
+ {k:'iogurte',de:'Iogurte natural',pra:'Leite coalhado, kefir, ou iogurte de soja',
+  n:'Leite coalhado custa menos e faz o mesmo papel em molho e em tigela de fruta. O grego tem mais proteína que o natural; o de polpa de fruta tem bem menos e muito açúcar.'},
+ {k:'queijo',de:'Queijo minas',pra:'Ricota, cottage, ou tofu temperado',
+  n:'Ricota e cottage têm proteína parecida com bem menos gordura. Tofu funciona em recheio salgado e resolve para quem não come leite.'},
+ {k:'requeijao',de:'Requeijão',pra:'Ricota amassada com um fio de leite',
+  n:'Textura muito parecida, mais proteína e menos gordura. Bate no garfo mesmo.'},
+ {k:'pao',de:'Pão',pra:'Tapioca, cuscuz de milho, ou batata-doce cozida',
+  n:'Os três não têm trigo. Cuscuz e batata-doce são os mais baratos por caloria, e a batata-doce dá para cozinhar de uma vez e deixar na geladeira.'},
+ {k:'macarrao',de:'Macarrão',pra:'Arroz, cuscuz de milho, ou abobrinha em tiras',
+  n:'Abobrinha em tiras corta bastante caloria e acrescenta fibra, mas não sacia igual: vale combinar metade e metade em vez de trocar tudo.'},
+ {k:'farinha',de:'Farinha de trigo',pra:'Farinha de arroz, fubá, ou aveia batida no liquidificador',
+  n:'Aveia batida é a troca mais barata e acrescenta fibra. Em massa que precisa crescer, nenhuma das três se comporta como trigo.'},
+ {k:'aveia',de:'Aveia em flocos',pra:'Flocão de milho, ou pão amassado na vitamina',
+  n:'Flocão custa menos e engrossa igual. A aveia tem mais fibra solúvel, que é a parte que sacia.'},
+ {k:'tapioca',de:'Goma de tapioca',pra:'Flocão de milho ou farinha de arroz',
+  n:'Nenhuma das três tem proteína: o que segura a refeição é o recheio, não a massa.'},
+ {k:'quinoa',de:'Quinoa',pra:'Arroz integral, ou arroz com lentilha',
+  n:'Arroz com lentilha na mesma panela dá um perfil de aminoácidos parecido por uma fração do preço. Quinoa é boa e é cara.'},
+ {k:'granola',de:'Granola',pra:'Aveia com amendoim picado e uma colher de mel',
+  n:'Sai por menos de um terço, e você controla o açúcar — granola de mercado costuma levar a lupa de alto em açúcar adicionado.'},
+ {k:'castanha',de:'Castanha',pra:'Amendoim',
+  n:'Gordura e proteína bem parecidas, preço muito menor. Amendoim torrado sem sal faz o mesmo trabalho em quase toda receita.'},
+ {k:'abacate',de:'Abacate',pra:'Pasta de amendoim, em menos quantidade',
+  n:'Troca a gordura e acrescenta proteína, mas é bem mais calórica por colher: use metade do peso.'},
+ {k:'azeite',de:'Azeite de oliva',pra:'Óleo de soja ou de milho para cozinhar',
+  n:'Para refogar e assar, o óleo comum faz o mesmo e custa muito menos — o azeite perde boa parte do que tem de bom no calor alto. Guarde o azeite para o final, cru.'},
+ {k:'mel',de:'Mel',pra:'Melado de cana, açúcar mascavo, ou banana amassada',
+  n:'Banana amassada adoça e acrescenta fibra. Mel, melado e mascavo são açúcar: não existe açúcar saudável, existe açúcar que você escolheu pôr.'}
+];
+function substDe(r){
+ return SUBST.filter(function(x){
+  return r.ing.some(function(g){return tokenBate(g.k,x.k)});
+ });
+}
+function linhaSubst(x,falta){
+ return '<div class="li"'+(falta?' style="background:var(--surface-2);border-radius:9px;padding-left:9px;padding-right:9px"':'')+'>'+
+  '<div class="grow"><div class="ttl">'+esc(x.de)+' → '+esc(x.pra)+
+   (falta?' <span class="tag w">está faltando</span>':'')+'</div>'+
+  '<div class="sub" style="line-height:1.55">'+esc(x.n)+'</div></div></div>';
+}
+function blocoTrocas(){
+ return dobra('nutri:trocas','Acabou um ingrediente, e agora','redo',
+  SUBST.length+' trocas, e o que cada uma faz com a conta',function(){
+  return '<div class="card">'+chTtl('redo','Acabou um ingrediente, e agora')+
+   '<p class="tiny muted" style="line-height:1.65;margin-bottom:12px">Saber o que falta é metade. '+
+   'A outra metade é o que vai no lugar — e o que isso faz com a proteína e com o preço, que é o que ninguém diz.</p>'+
+   '<div class="stack" style="gap:0">'+SUBST.map(function(x){return linhaSubst(x,false)}).join('')+'</div>'+
+   '<p class="xtiny muted" style="margin-top:11px;line-height:1.6">Dentro de cada receita aparecem só as trocas dos ingredientes dela, '+
+   'com destaque no que está faltando na sua despensa.</p></div>';
+ });
+}
+
+/* =====================================================================
+   LER O RÓTULO
+   O app fala de ultraprocessado em várias telas, tem alvo de sódio no
+   painel de micronutrientes e tem uma tela inteira de bebida com açúcar
+   — e nunca ensinou a usar a ferramenta que já está na mão da pessoa
+   dentro do mercado, de graça.
+
+   Os limites são os do Anexo XV da Instrução Normativa 75 de 2020 da
+   Anvisa, lidos no texto da norma. Em vigor desde 9 de outubro de 2022.
+   ===================================================================== */
+const ROTULO_LIMITES=[
+ ['Açúcar adicionado','15 g por 100 g','7,5 g por 100 ml'],
+ ['Gordura saturada','6 g por 100 g','3 g por 100 ml'],
+ ['Sódio','600 mg por 100 g','300 mg por 100 ml']
+];
+const ROTULO=[
+ ['A lupa preta na frente','Desde outubro de 2022, todo alimento embalado no Brasil tem que trazer uma lupa preta em fundo branco, na metade de cima da frente, quando passa do limite de açúcar adicionado, gordura saturada ou sódio. Se a lupa está lá, o produto passou. Se não está, não passou. É a leitura mais rápida que existe, e não exige conta nenhuma.'],
+ ['Ela não quer dizer "não coma"','Quer dizer "está concentrado nisso". Azeite leva lupa de gordura saturada e continua sendo azeite; castanha leva, e continua sendo castanha. A lupa serve para comparar duas embalagens na prateleira, não para proibir comida.'],
+ ['A mudança que mais ajuda é a tabela','A tabela nutricional passou a ser obrigatoriamente por 100 g ou 100 ml, além da porção. Isso é o que finalmente permite comparar duas marcas sem fazer regra de três — antes cada uma escolhia a porção que mais a favorecia.'],
+ ['Ingredientes vêm em ordem de quantidade','O primeiro da lista é o que tem mais. Se açúcar, xarope de glicose ou gordura vegetal aparecem entre os três primeiros, o produto é sobretudo aquilo. Açúcar também se esconde em nomes: xarope de milho, maltodextrina, dextrose, melado, mel, sucrose.'],
+ ['"Zero", "light" e "integral" têm regra, "natural" não','Zero e light são definidos em norma e dá para confiar no que dizem. "Integral" exige que o grão inteiro seja o ingrediente principal. Já "natural", "artesanal", "fit" e "saudável" não têm definição legal nenhuma — são marketing, e costumam estar na embalagem de produtos que levam lupa.'],
+ ['Um produto com lupa não pode se gabar daquilo','Alimento marcado como alto em sódio não pode alegar que é reduzido em sódio na mesma embalagem. Se você vir as duas coisas, alguma está errada.'],
+ ['O que isto muda na prática','Duas marcas do mesmo produto lado a lado: olhe a lupa primeiro; se as duas tiverem ou nenhuma tiver, vá na coluna de 100 g e compare sódio e açúcar. Leva dez segundos e é a decisão de alimentação mais barata que existe.']
+];
+function blocoRotulo(){
+ return dobra('nutri:rotulo','Ler o rótulo no mercado','search',
+  'a lupa preta, a tabela por 100 g, e o que "natural" não quer dizer',function(){
+  return '<div class="card">'+chTtl('search','Ler o rótulo no mercado')+
+   '<p class="tiny muted" style="line-height:1.65;margin-bottom:12px">É a única ferramenta de alimentação que já está na sua mão, '+
+   'é de graça e funciona dentro do mercado, na hora de decidir.</p>'+
+   '<div class="stack" style="gap:0">'+ROTULO.map(function(x){
+    return '<div class="li"><div class="grow"><div class="ttl">'+esc(x[0])+'</div>'+
+     '<div class="sub" style="line-height:1.55">'+esc(x[1])+'</div></div></div>';
+   }).join('')+'</div>'+
+   '<hr class="sep"><div class="lbl" style="margin-bottom:7px">A partir de quanto aparece a lupa</div>'+
+   '<div class="stack" style="gap:0">'+ROTULO_LIMITES.map(function(x){
+    return '<div class="li"><div class="grow"><div class="ttl">'+esc(x[0])+'</div>'+
+     '<div class="sub num" style="line-height:1.55">sólido: '+esc(x[1])+' · líquido: '+esc(x[2])+'</div></div></div>';
+   }).join('')+'</div>'+
+   '<p class="xtiny muted" style="margin-top:10px;line-height:1.6">São os limites do Anexo XV da Instrução Normativa 75 de 2020 da Anvisa, '+
+   'em vigor desde 9 de outubro de 2022. Leite em pó é expressamente dispensado da lupa. '+
+   'O app não copia a tabela de nenhum produto: estes são os limites da norma, e o número do seu produto está na embalagem dele.</p>'+
+   blocoFonte('anvisa_in75')+blocoFonte('anvisa_rdc429')+
+   '<p class="xtiny muted" style="margin-top:9px;line-height:1.6">O alvo de sódio do painel "Além das calorias" é de 2000 mg por dia, '+
+   'que é mais ou menos 5 g de sal, e quase todo o excesso vem de embalagem — não do saleiro. '+
+   '<button class="selo" data-a="micro-ficha">'+ic('book')+'De onde vêm os alvos do painel</button></p></div>';
+ });
+}
+
+/* =====================================================================
+   COZINHAR DE UMA VEZ
+   O vídeo de marmita já estava na tela, e nada escrito sobre a parte que
+   estraga comida. Marmita mal guardada é um jeito caro de passar mal, e
+   quem cozinha uma vez por semana é justamente quem tem menos margem
+   para jogar comida fora.
+   ===================================================================== */
+const LOTE=[
+ ['Cozinhe a base, não o prato pronto','Arroz, feijão, uma proteína e um legume assado, separados em potes. Prato montado cansa até quinta; base solta vira três refeições diferentes com o que tiver na hora.'],
+ ['Esfriar rápido é o passo que ninguém faz','Comida quente no fundo de um pote grande demora horas para esfriar, e é nessas horas que bactéria se multiplica. Divida em porções pequenas e abertas, espere parar de sair vapor e feche na geladeira. Não deixe esfriando na pia a noite toda.'],
+ ['Quanto dura na geladeira','De três a quatro dias para comida cozida, em pote fechado. Arroz é o mais sensível de todos: se passou disso, vai para o lixo, não para o micro-ondas. Rotule o pote com a data — a memória sempre acha que foi ontem.'],
+ ['Congelar é o que estica a semana','Porção individual, pote raso, e deixe um dedo de folga porque a comida expande. Feijão, molho, carne moída e caldo congelam muito bem. Arroz congela razoável; batata cozida e folha crua não congelam.'],
+ ['Descongelado não volta para o congelador','Tire da noite anterior para a geladeira, ou use o micro-ondas e coma na sequência. Descongelar na pia em temperatura ambiente é o erro mais comum e o mais arriscado.'],
+ ['Requentar até sair vapor','Não é só esquentar: é passar do morno. Mexa no meio do caminho, porque micro-ondas esquenta desigual e o ponto frio é onde a bactéria sobrevive.'],
+ ['O que render mais por hora de panela','Uma panela de pressão com feijão, uma assadeira de legumes e uma bandeja de frango ou ovos cozidos resolvem a semana em menos de uma hora de trabalho de verdade. O resto é tempo de forno, que corre sozinho.'],
+ ['Se cozinhar uma vez por semana é demais','Cozinhe para dois dias. A versão possível feita é melhor que a versão completa que você não vai fazer no domingo.']
+];
+function blocoLote(){
+ return dobra('nutri:lote','Cozinhar de uma vez para a semana','pot',
+  LOTE.length+' passos, incluindo a parte que estraga comida',function(){
+  return '<div class="card">'+chTtl('pot','Cozinhar de uma vez para a semana')+
+   '<div class="stack" style="gap:0">'+LOTE.map(function(x){
+    return '<div class="li"><div class="grow"><div class="ttl">'+esc(x[0])+'</div>'+
+     '<div class="sub" style="line-height:1.55">'+esc(x[1])+'</div></div></div>';
+   }).join('')+'</div>'+
+   listaVideos([
+    ['Buli-hyLfU4','MARMITAS FIT PRA SEMANA | CARDÁPIO COMPLETO, SIMPLES, FÁCIL E DELICIOSO','Menino Prendado','Montar as refeições de uma vez e guardar sem estragar'],
+    ['zadQ5rfUw90','Como cozinhar uma batata doce na panela de pressão por 2 minutos','Dicas da Betinha','Cozinhar de uma vez e deixar pronta na geladeira']
+   ])+
+   '<p class="xtiny muted" style="margin-top:11px;line-height:1.6">Os prazos aqui são de conservação doméstica comum, não de norma — '+
+   'e são conservadores de propósito. Na dúvida sobre cheiro, aparência ou tempo, jogue fora: '+
+   'uma refeição perdida custa menos que um dia passando mal.</p></div>';
+ });
+}
+
 function stReceitas(){
  const f=S.ui.filtroRef||'todas',q=nrm(S.ui.buscaRef||'');
- let lista=RECIPES;
+ /* Tudo nesta tela parte das receitas que você come. */
+ let lista=filtraRestr(RECIPES);
  const REF_ESPECIAIS=['todas','favs','agora','poucos'];
  if(f==='favs')lista=lista.filter(r=>S.favs.includes(r.id));
  else if(REF_ESPECIAIS.indexOf(f)<0)lista=lista.filter(r=>r.ref.includes(f));
@@ -4930,7 +5853,7 @@ function stReceitas(){
     45% das pessoas que responderam não escolhem o que entra em casa — para elas,
     lista de compras não resolve; o que resolve é partir do que já está lá. */
  const temDespensa=S.despensa.filter(Boolean).length>0;
- if(f==='agora'){lista=RECIPES.filter(function(r){const pt=pontuar(r);return pt&&!pt.falta});
+ if(f==='agora'){lista=filtraRestr(RECIPES).filter(function(r){const pt=pontuar(r);return pt&&!pt.falta});
   if(q)lista=lista.filter(r=>nrm(r.nome).includes(q)||r.ing.some(x=>nrm(x.n).includes(q)));}
  else if(f==='poucos'){lista=lista.filter(r=>r.ing.length<=5);}
  if(temDespensa&&f!=='favs'){
@@ -4952,6 +5875,10 @@ function stReceitas(){
    'O que ajuda é montar o prato com o que já está na mesa.</p>'+
    '<button class="btn acc bl" style="margin-top:12px" data-a="prato-abrir" data-m="almoco">'+
    ic('plus')+' Registrar um prato que já veio pronto</button></div>'+
+  blocoRestricoes()+
+  blocoTrocas()+
+  blocoLote()+
+  blocoRotulo()+
   dobra('nutri:prato','Como montar o prato com o que tem','check',
    MONTAR_PRATO.length+' regras, sem balança',
    function(){return lista2('Como montar o prato com o que tem','check',MONTAR_PRATO)})+
@@ -5002,6 +5929,13 @@ function stReceitas(){
    deles é link morto. Título e canal são os que o YouTube devolveu, não
    escritos à mão: se o vídeo sair do ar, o nome continua dizendo o que era. */
 const RECVID={
+ /* As cinco receitas sem ingrediente animal que acharam vídeo que também
+    não tem ingrediente animal. As outras três caem no link de busca. */
+ r58:['fOkgTdh0eho','MINGAU de AVEIA VEGANO e SAUDÁVEL','Adriana Madeira - Cozinha Saudável na Prática'],
+ r59:['Vam4uPcp3D4','Couve Refogada no Alho e Outros Ingredientes','Edileide de Paiva'],
+ r63:['d24XthGA5Os','Cuscuz de Abobrinha com farinha de milho Vegano/Vegetariano - Fácil e Saboroso','Panela Descomplicada'],
+ r64:['enQ9Oq10Y0I','Salada de Quinoa com Legumes Assados','Receita da Ana'],
+ r65:['6EWIXtA_7ng','SOPA DE LENTILHA COM MACARRÃO/VEGANA | ITALIANO NA COZINHA','Cozinhando com um italiano'],
  r1:['UP1Nn0Ok0-M','Omelete de Queijo com Tomate e Orégano','Vida Memorial'],
  r2:['uPb6gDSjRFk','PANQUECA DE BANANA COM AVEIA FIT SEM AÇÚCAR SEM TRIGO SEM LEITE','Amor Pela Comida'],
  r3:['8_XIICKUqfg','Torta de tapioca com frango desfiado','Amante de sabores'],
@@ -5070,8 +6004,7 @@ function blocoVideoReceita(r){
  return '<div class="lbl" style="margin-bottom:7px">Ver alguém fazendo</div>'+
   '<div style="margin-bottom:15px">'+
    cardVideo(v[1],v[0])+
-   '<p class="xtiny muted" style="margin-top:7px;line-height:1.5">Canal: '+esc(v[2])+'. '+
-   'Não é do app, e o app não ganha nada com ele. '+
+   '<p class="xtiny muted" style="margin-top:7px;line-height:1.5">Vídeo do canal <b>'+esc(v[2])+'</b> no YouTube. '+
    '<a href="https://www.youtube.com/watch?v='+esc(v[0])+'" target="_blank" rel="noopener">abrir no YouTube</a>'+
    ' · <a href="'+esc(yt(r.nome+' receita'))+'" target="_blank" rel="noopener">ver outras</a></p>'+
   '</div>';
@@ -5110,6 +6043,12 @@ function sheetReceita(id){
   (s?'<p class="tiny" style="color:'+(s.falta?'var(--accent)':'var(--ok)')+';font-weight:600;margin-bottom:11px">'+
    (s.falta?'Você tem '+s.tem+' de '+r.ing.length+' ingredientes. Falta: '+esc(s.faltantes.join(', ')):
     'Você tem todos os ingredientes em casa.')+'</p>':'')+
+  /* Esta receita pode ser aberta pelo histórico do diário mesmo com uma
+     restrição ligada que a reprova. Então ela avisa, em vez de sumir. */
+  (recPassa(r)?'':'<p class="tiny" style="color:var(--warn);font-weight:600;margin-bottom:11px;line-height:1.55">'+
+   'Esta receita tem '+esc(recBarrada(r).join(', '))+
+   ', que você marcou que não come. As trocas estão logo abaixo — mas se for alergia, '+
+   'trocar o ingrediente não basta: o rótulo do que você usar manda mais que esta tela.</p>')+
   '<div class="lbl" style="margin-bottom:7px">Ingredientes</div><div class="stack" style="gap:0;margin-bottom:15px">'+
    r.ing.map(x=>'<div class="li" style="padding:7px 0"><div class="grow"><div class="ttl" style="font-size:13.5px">'+esc(x.n)+'</div></div>'+
    '<div class="num tiny" style="font-weight:600">'+x.g+' g</div></div>').join('')+'</div>'+
@@ -5118,6 +6057,22 @@ function sheetReceita(id){
    '<div class="grow tiny" style="line-height:1.55">'+esc(p)+'</div></div>').join('')+'</div>'+
   '<p class="tiny" style="background:var(--surface-2);border-radius:11px;padding:11px;margin-bottom:15px;line-height:1.5">'+
    '<b>Dica:</b> '+esc(r.dica)+'</p>'+
+  (function(){
+   /* Só as trocas desta receita. As dos ingredientes que estão faltando
+      na despensa vêm primeiro e em destaque: é a pergunta que a pessoa
+      está fazendo neste exato momento. */
+   const ts=substDe(r); if(!ts.length)return '';
+   const faltando=s?s.faltantes.map(nrm):[];
+   const falta=x=>r.ing.some(g=>tokenBate(g.k,x.k)&&faltando.indexOf(nrm(g.n))>=0);
+   const ord=ts.slice().sort((a,b)=>(falta(b)?1:0)-(falta(a)?1:0));
+   const n=ord.filter(falta).length;
+   return '<div class="lbl" style="margin-bottom:7px">Se faltar alguma coisa</div>'+
+    (n?'<p class="tiny" style="color:var(--accent);line-height:1.55;margin:0 0 9px">'+
+      n+(n===1?' ingrediente que falta na sua despensa tem troca aqui embaixo.':
+                ' ingredientes que faltam na sua despensa têm troca aqui embaixo.')+'</p>':'')+
+    '<div class="stack" style="gap:0;margin-bottom:15px">'+
+    ord.map(function(x){return linhaSubst(x,falta(x))}).join('')+'</div>';
+  })()+
   blocoVideoReceita(r)+
   '<div class="row" style="gap:6px;margin-bottom:13px">'+
    '<button class="btn gh sm grow" data-a="fav" data-id="'+r.id+'">'+ic('star')+(fav?' Remover dos favoritos':' Favoritar')+'</button>'+
@@ -5711,9 +6666,12 @@ function stVoz(){
    'O ciclo de voz tem 7 dias e acompanha o ciclo do treino físico, incluindo um dia de descanso vocal.</p></div>'+
 
   '<div class="card">'+chTtl('target','Medir a sua voz')+
-   '<p class="tiny muted">Baixe qualquer app de afinador (procure por "afinador" ou "tuner"), fale a vogal "a" '+
-   'em tom normal de conversa e anote a frequência em Hz que aparecer.</p>'+
-   '<div class="row" style="gap:7px;margin-top:11px">'+
+   '<p class="tiny muted" style="line-height:1.65">O próprio app mede, pelo microfone. '+
+   'O som não é gravado e não sai do aparelho — o que fica é o número.</p>'+
+   '<button class="btn acc bl" style="margin-top:11px" data-a="voz-medir">'+ic('mic')+' Medir agora pelo microfone</button>'+
+   '<p class="xtiny muted" style="margin-top:11px;line-height:1.6">Ou anote na mão, se preferir usar um afinador '+
+   '(procure por "afinador" ou "tuner") ou se o microfone não funcionar aqui.</p>'+
+   '<div class="row" style="gap:7px;margin-top:9px">'+
     '<input type="number" inputmode="numeric" id="hzIn" aria-label="Frequência da voz em hertz" '+
     'placeholder="'+(ult?ult.hz:'ex.: 165')+'" class="grow">'+
     '<input type="number" inputmode="numeric" id="minIn" aria-label="Minutos de treino de voz" '+
@@ -5747,6 +6705,237 @@ function stVoz(){
    'Se puder, acompanhamento com fonoaudiólogo especializado em voz trans acelera demais o processo e evita vícios difíceis de desfazer.</p></div>'+
   stVozVideos();
 }
+/* ---------------------------------------------------------------------
+   MEDIR A VOZ PELO MICROFONE
+   A conta é autocorrelação, a mesma de qualquer afinador: desliza uma
+   cópia do pedaço de som por cima dele mesmo e procura em que
+   deslocamento as duas mais combinam. Esse deslocamento é o período da
+   onda, e a frequência é um dividido por ele.
+
+   O som nunca é gravado, nunca sai do aparelho e o microfone é desligado
+   no fim. O que fica é um número.
+   --------------------------------------------------------------------- */
+const VOZ_MIN_HZ=70, VOZ_MAX_HZ=500;
+/* Abaixo deste volume é silêncio: sem isso o ruído da sala vira número
+   com cara de resultado. */
+const VOZ_RUIDO=0.012;
+/* O quanto as duas cópias precisam combinar para a leitura valer. */
+const VOZ_CONF=0.90;
+
+/* Reduzir a taxa por quatro antes de contar. Voz vai até 500 Hz, e 48
+   mil amostras por segundo são dezesseis vezes mais do que essa conta
+   precisa — a 12 mil, 500 Hz ainda tem 24 amostras por onda. A conta cai
+   por dezesseis: de 85 ms para cerca de 5. A média de quatro em quatro
+   serve de filtro simples contra o agudo que sobraria. */
+const VOZ_REDUZ=4;
+function reduz(buf,k){
+ const m=Math.floor(buf.length/k), out=new Float32Array(m);
+ for(let i=0;i<m;i++){
+  let s2=0;for(let j=0;j<k;j++)s2+=buf[i*k+j];
+  out[i]=s2/k;
+ }
+ return out;
+}
+function alturaDe(bufCru,taxaCrua){
+ let soma0=0;
+ for(let i=0;i<bufCru.length;i++)soma0+=bufCru[i]*bufCru[i];
+ const rms=Math.sqrt(soma0/bufCru.length);
+ if(rms<VOZ_RUIDO)return null;            /* silêncio */
+
+ const buf=reduz(bufCru,VOZ_REDUZ), taxa=taxaCrua/VOZ_REDUZ;
+ const n=buf.length;
+ const minA=Math.floor(taxa/VOZ_MAX_HZ), maxA=Math.floor(taxa/VOZ_MIN_HZ);
+ if(n<maxA*2)return null;                 /* pedaço curto para o grave */
+
+ /* Correlação NORMALIZADA. A versão crua — só somar x[i]*x[i+atraso] —
+    encolhe sozinha conforme o atraso cresce, porque sobram menos termos
+    para somar. Medindo confiança em cima dela, voz grave nunca passava:
+    não era a voz que estava ruim, era a régua que encolhia. Dividindo
+    pela energia dos dois pedaços comparados, 1,0 passa a querer dizer
+    "são a mesma forma de onda", em qualquer atraso. */
+ const r=new Float32Array(maxA+1);
+ const m=n-maxA;                          /* janela fixa, sem encolher */
+ let e0=0;
+ for(let i=0;i<m;i++)e0+=buf[i]*buf[i];
+ if(e0<=0)return null;
+ for(let atraso=minA;atraso<=maxA;atraso++){
+  let num=0,e1=0;
+  for(let i=0;i<m;i++){const b=buf[i+atraso];num+=buf[i]*b;e1+=b*b}
+  r[atraso]=(e1>0)?num/Math.sqrt(e0*e1):0;
+ }
+
+ /* O pico mais alto NÃO é o período: o dobro e o triplo dele também
+    combinam bem, e às vezes melhor. Período é o MENOR deslocamento que
+    já funciona — então pego o primeiro pico que chega perto do melhor. */
+ let melhorV=-1;
+ for(let a=minA;a<=maxA;a++)if(r[a]>melhorV)melhorV=r[a];
+ if(melhorV<VOZ_CONF)return null;
+ const corte=melhorV*0.92;
+ let melhor=-1;
+ for(let a=minA+1;a<maxA;a++){
+  if(r[a]>=corte&&r[a]>=r[a-1]&&r[a]>=r[a+1]){melhor=a;break}
+ }
+ if(melhor<0)return null;
+
+ /* Ruído aleatório devolvia 490 Hz com 96% de certeza: pior que não
+    medir, porque é número errado com cara de certo numa tela em que a
+    pessoa vai anotar e comparar daqui a meses.
+    Onda periódica de verdade combina consigo mesma em T, em 2T e em 3T.
+    Ruído combina num ponto por acaso e não combina no dobro. É o teste
+    mais barato que separa os dois. */
+ const dobro=melhor*2;
+ if(dobro<=maxA&&r[dobro]<melhorV*0.55)return null;
+
+ /* Parábola pelos três pontos em volta do pico: dá a casa decimal do
+    período, que em voz grave vale vários Hz. */
+ const y1=r[melhor-1],y2=r[melhor],y3=r[melhor+1];
+ const den=2*(2*y2-y1-y3);
+ let ajuste=den?(y3-y1)/den:0;
+ if(!isFinite(ajuste)||Math.abs(ajuste)>1)ajuste=0;
+ const hz=taxa/(melhor+ajuste);
+ if(!isFinite(hz)||hz<VOZ_MIN_HZ||hz>VOZ_MAX_HZ)return null;
+
+ /* CONFERIR NO SOM ORIGINAL.
+    Reduzir a taxa tirando média de quatro amostras é um filtro de agudo,
+    e filtrar ruído branco deixa ele correlacionado — eu fabricava a
+    periodicidade que depois encontrava. Era por isso que ruído puro dava
+    456 Hz com 99% de certeza, em vinte de vinte tentativas.
+
+    Confiança não separa (o ruído dava 99%) e estabilidade também não:
+    o ruído variava 7%, e fala humana de verdade varia MAIS que isso,
+    porque entonação mexe na altura o tempo todo. Uma regra de
+    estabilidade reprovaria a voz e aprovaria o ruído.
+
+    O que separa é voltar ao sinal cru e perguntar se ele se repete
+    naquele período. Onda periódica se repete; ruído branco não se repete
+    em atraso nenhum, por mais que a versão suavizada dele pareça. */
+ const atrasoCru=Math.round(taxaCrua/hz);
+ const mc=bufCru.length-atrasoCru;
+ if(mc<atrasoCru)return null;
+ let numC=0,eA=0,eB=0;
+ for(let i=0;i<mc;i++){
+  const a2=bufCru[i],b2=bufCru[i+atrasoCru];
+  numC+=a2*b2;eA+=a2*a2;eB+=b2*b2;
+ }
+ const confCru=(eA>0&&eB>0)?numC/Math.sqrt(eA*eB):0;
+ if(confCru<0.62)return null;
+
+ return{hz:hz,conf:confCru,rms:rms};
+}
+function mediana(v){
+ if(!v.length)return 0;
+ const o=v.slice().sort(function(a,b){return a-b});
+ const i=Math.floor(o.length/2);
+ return o.length%2?o[i]:(o[i-1]+o[i])/2;
+}
+const NOTAS=['dó','dó#','ré','ré#','mi','fá','fá#','sol','sol#','lá','lá#','si'];
+function notaDe(hz){
+ const n=Math.round(12*Math.log2(hz/440))+69;
+ return NOTAS[((n%12)+12)%12]+Math.floor(n/12-1);
+}
+
+let vozAudio=null,vozFluxo=null,vozLoop=null;
+function pararMedidor(){
+ if(vozLoop){cancelAnimationFrame(vozLoop);vozLoop=null}
+ if(vozFluxo){vozFluxo.getTracks().forEach(function(t){t.stop()});vozFluxo=null}
+ if(vozAudio){try{vozAudio.close()}catch(e){}vozAudio=null}
+}
+function sheetMedirVoz(){
+ const alvo=vozAlvo();
+ sheet('Medir a sua voz',
+  '<p class="tiny muted" style="line-height:1.65;margin-bottom:12px">Fale em tom normal de conversa, '+
+  'como se estivesse contando o seu dia para alguém — não a vogal esticada, que sai mais aguda que a sua fala. '+
+  'Uns dez segundos bastam.</p>'+
+  '<div id="vozMostra" class="card" style="text-align:center;padding:22px 14px">'+
+   '<div class="num" id="vozHz" style="font-size:40px;font-weight:800;line-height:1">—</div>'+
+   '<div class="tiny muted" id="vozNota" style="margin-top:4px">toque em começar</div>'+
+   '<div style="height:8px;border-radius:99px;background:var(--surface-2);margin-top:14px;overflow:hidden">'+
+    '<div id="vozBarra" style="height:100%;width:0;background:var(--blue);transition:width .1s"></div></div>'+
+   '<div class="xtiny muted" id="vozConta" style="margin-top:7px">0 leituras boas</div></div>'+
+  '<button class="btn acc bl" id="vozBt" style="margin-top:12px">Começar a medir</button>'+
+  '<div id="vozFim" style="margin-top:11px"></div>'+
+  '<p class="xtiny muted" style="margin-top:13px;line-height:1.65"><b>O som não é gravado.</b> '+
+  'Ele é analisado enquanto entra, nunca vira arquivo, nunca sai deste aparelho, e o microfone é desligado quando você fecha. '+
+  'O que fica guardado é um número em hertz.</p>'+
+  '<p class="xtiny muted" style="margin-top:9px;line-height:1.65">Isto mede <b>altura</b>, que é uma das quatro coisas '+
+  'que a tela de voz treina. Ressonância, peso vocal e entonação não têm número — e voz lida como '+esc(alvo.nome.toLowerCase())+
+  ' não é só hertz. A faixa alvo serve de referência, não de nota.</p>',
+  'Faixa alvo: '+alvo.hz);
+
+ const elHz=$('#vozHz'),elNota=$('#vozNota'),elBarra=$('#vozBarra'),elConta=$('#vozConta'),bt=$('#vozBt');
+ let lendo=false,leituras=[];
+ bt.onclick=function(){
+  if(lendo){pararMedidor();lendo=false;bt.textContent='Começar a medir';return fecharMedida()}
+  navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}})
+   .then(function(fluxo){
+    vozFluxo=fluxo;lendo=true;leituras=[];
+    bt.textContent='Parar e ver o resultado';
+    $('#vozFim').innerHTML='';
+    vozAudio=new (window.AudioContext||window.webkitAudioContext)();
+    const fonte=vozAudio.createMediaStreamSource(fluxo);
+    const an=vozAudio.createAnalyser();
+    /* 2048 amostras são 43 ms. Parece pouco, e é o melhor tamanho — medi.
+       Fala muda de altura o tempo todo, porque entonação existe; numa
+       janela longa a altura varre uma faixa inteira e a correlação num
+       atraso fixo cai. Com fala simulada com vibrato de 10%:
+
+           2048 (43 ms)    confiança 0,92 a 0,96   erro 4 a 6%
+           4096 (85 ms)    0,91 a 0,93             8 a 9%
+           8192 (170 ms)   0,81 a 0,86             7 a 9%
+
+       Com o corte de confiança em 0,90, a janela de 170 ms reprovava
+       TODA fala. Eu só não tinha visto antes porque testei com tom puro,
+       e tom puro não muda de altura. */
+    an.fftSize=2048;
+    fonte.connect(an);
+    const buf=new Float32Array(an.fftSize);
+    /* Oito leituras por segundo bastam: ninguém muda de altura de voz
+       em dezessete milissegundos, e a conta não precisa disputar quadro
+       com o desenho da tela. */
+    let ultima=0;
+    const passo=function(agora){
+     vozLoop=requestAnimationFrame(passo);
+     if(agora-ultima<125)return;
+     ultima=agora;
+     an.getFloatTimeDomainData(buf);
+     const r=alturaDe(buf,vozAudio.sampleRate);
+     if(r){
+      leituras.push(r.hz);
+      elHz.textContent=Math.round(r.hz);
+      elNota.textContent=notaDe(r.hz)+' · '+Math.round(r.conf*100)+'% de certeza nesta leitura';
+      elConta.textContent=leituras.length+(leituras.length===1?' leitura boa':' leituras boas');
+     }else{
+      elNota.textContent=leituras.length?'ouvindo…':'fale mais perto, ou mais alto';
+     }
+     elBarra.style.width=Math.min(100,Math.round((r?r.rms:0)/0.12*100))+'%';
+    };
+    vozLoop=requestAnimationFrame(passo);
+   }).catch(function(){
+    $('#vozFim').innerHTML='<p class="tiny" style="color:var(--warn);line-height:1.6">'+
+     'Não consegui usar o microfone. Pode ser permissão negada, outro app usando, ou navegador sem suporte. '+
+     'Dá para anotar o número na mão na tela de voz, como antes.</p>';
+   });
+ };
+ function fecharMedida(){
+  /* Mediana, não média: mediana ignora os dois ou três pedaços tortos
+     que sempre aparecem; média espalha o erro deles por tudo. */
+  if(leituras.length<12){
+   $('#vozFim').innerHTML='<p class="tiny muted" style="line-height:1.6">Poucas leituras boas para valer '+
+    '('+leituras.length+'). Tente num lugar mais silencioso, mais perto do celular, falando em vez de sustentar a vogal.</p>';
+   return;
+  }
+  const hz=Math.round(mediana(leituras));
+  const dentro=dentroAlvo(hz);
+  $('#vozFim').innerHTML='<div class="card" style="border-color:'+(dentro?'var(--ok)':'var(--blue)')+'">'+
+   '<div class="row spread"><span class="lbl" style="margin:0">Resultado</span>'+
+   '<span class="tag n">'+leituras.length+' leituras</span></div>'+
+   '<div class="num" style="font-size:30px;font-weight:800;margin-top:6px">'+hz+' Hz</div>'+
+   '<p class="tiny muted" style="line-height:1.6;margin-top:6px">Mediana das leituras boas, que é mais firme que a média. '+
+   'Faixa alvo da sua trilha: '+esc(vozAlvo().hz)+'.</p>'+
+   '<button class="btn acc bl" style="margin-top:11px" data-a="voz-medida-ok" data-v="'+hz+'">Guardar '+hz+' Hz de hoje</button></div>';
+ }
+}
+
 function dentroAlvo(hz){
  const f=(vozAlvo().hz.match(/\d+/g)||[]).map(Number);
  return f.length>1&&hz>=f[0]&&hz<=f[1];
@@ -5767,8 +6956,8 @@ function sheetVozEx(id){
   (VOZEXVID[id]
    ?'<div class="lbl" style="margin-bottom:7px">Ver sendo feito</div>'+
     '<div style="margin-bottom:12px">'+cardVideo(VOZEXVID[id][1],VOZEXVID[id][0])+
-     '<p class="xtiny muted" style="margin-top:6px;line-height:1.5">Canal: '+
-     esc(VOZEXVID[id][2])+'. Não é do app, e o app não ganha nada com ele.</p></div>'
+     '<p class="xtiny muted" style="margin-top:6px;line-height:1.5">Vídeo do canal <b>'+
+     esc(VOZEXVID[id][2])+'</b> no YouTube.</p></div>'
    :'<a class="btn gh bl sm" href="'+esc(yt(e2.n+' exercício vocal fonoaudiologia'))+'" target="_blank" rel="noopener" style="margin-bottom:9px">'+
     ic('play')+' Ver no YouTube</a>')+
   '<button class="btn '+(ok?'gh':'acc')+' bl" data-a="voz-ex" data-id="'+id+'" data-close="1">'+
@@ -6660,6 +7849,63 @@ const APOIO=[
  ['ANTRA e coletivos locais','A Associação Nacional de Travestis e Transexuais e os coletivos da sua cidade costumam saber quais serviços de fato atendem bem — informação que nenhuma portaria tem.'],
  ['Ouvidoria do SUS — 136','Para reclamar de atendimento, de fila parada e de recusa, com número de protocolo.']
 ];
+/* ---------------------------------------------------------------------
+   O QUE FALTA
+   A ficha de evidência sobre alimentação restritiva dizia "é o motivo de
+   'alimentação restrita' estar na lista do que falta" — e essa lista
+   nunca existiu. O app citava uma página dele mesmo que não foi escrita.
+
+   Escrever a lista é mais coerente do que apagar a frase: num app que
+   diz o tamanho da própria evidência, dizer o tamanho do próprio buraco
+   é a mesma postura. E a pessoa merece saber o que NÃO esperar daqui
+   antes de contar com isso.
+   --------------------------------------------------------------------- */
+const FALTA=[
+ ['Alimentação restritiva','Alimentação restritiva é muito mais comum em pessoas trans que na população geral — num serviço de transtorno alimentar, 16,7% das pessoas em tratamento para ARFID eram trans ou não binárias. O app não tem nada para isso, e não vai ter sem nutricionista: orientação alimentar errada piora ARFID em vez de ajudar. Por enquanto o que dá para fazer é esconder os números, que já existe no Perfil.','fila'],
+ ['Lembrete que toca sozinho','Os horários que você configura só aparecem enquanto o app está aberto. Notificação de verdade depende de permissão do navegador e de o aparelho deixar — funciona bem no Android e mal no iPhone, e eu não quero prometer aplicação de hormônio na hora e falhar.','fila'],
+ ['Treino com vídeo dentro do treino','Hoje o vídeo de cada movimento está na biblioteca. Durante a série, com o celular apoiado, você não vai procurar — ele tinha que estar ali.','fila'],
+ ['Mais receita sem ingrediente animal','São dez. Dez dá para montar o dia, mas repete. O certo é o dobro disso.','fila'],
+ ['Comunidade','Não é esquecimento, é decisão. O apoio de outras pessoas trans é o fator que mais aparece associado a saúde e bem-estar — mas a revisão que diz isso também diz que a versão ONLINE quase não foi estudada. E um espaço sem moderação de verdade, com 36% de menores de 18 anos, é perigoso de um jeito que eu não sei consertar sozinho. Prefiro não ter.','nao'],
+ ['Conta, nuvem e sincronizar','Também é decisão. No minuto em que existe servidor, existe um banco com dado de saúde e identidade de gênero de pessoas trans — e existe alguém que pode ser obrigado a entregar isso. A troca entre aparelhos é por arquivo, que é pior de usar e melhor de dormir.','nao'],
+ ['Qualquer tipo de nota ou pontuação de saúde mental','A tela de humor registra e desenha, e não soma nada. Transformar isso em escore seria diagnosticar sem ter direito.','nao'],
+ ['Dizer se o seu exame está bom','O app guarda o que veio no papel e não interpreta. Faixa de referência muda de laboratório e de pessoa, e quem lê exame é quem te acompanha.','nao']
+];
+const FEITO_AGORA=[
+ ['Instalar na tela inicial e abrir sem internet','Era o pedido mais votado da pesquisa.'],
+ ['O backup leva tudo','Antes deixava para trás ciclo, exames, histórico de hormônio, medicação e anotações — sem avisar.'],
+ ['Humor e cabeça','Três escalas por dia, o contexto, e gráfico de oito semanas.'],
+ ['Medir a voz pelo microfone','O app mede sozinho agora, em vez de mandar baixar um afinador. O som não é gravado.'],
+ ['Gráficos de caloria, proteína, água e constância','Semana a semana, com a sua meta atravessada.'],
+ ['Alergia alimentar','Os 18 da lista oficial da Anvisa, mais o que você escrever.'],
+ ['O app ficou rápido','Cada toque custava até 210 ms com um ano de registro. Agora custa menos de 35 ms.']
+];
+function blocoFalta(){
+ const fila=FALTA.filter(function(x){return x[2]==='fila'});
+ const nao=FALTA.filter(function(x){return x[2]==='nao'});
+ const li=function(x){
+  return '<div class="li"><div class="grow"><div class="ttl">'+esc(x[0])+'</div>'+
+   '<div class="sub" style="line-height:1.55">'+esc(x[1])+'</div></div></div>';
+ };
+ return dobra('guias:falta','O que este app não tem','info',
+  fila.length+' coisas na fila e '+nao.length+' que eu decidi não fazer',function(){
+  return '<div class="card">'+chTtl('info','O que este app não tem')+
+   '<p class="tiny muted" style="line-height:1.7">Um app que diz o tamanho da própria evidência devia dizer o tamanho do próprio buraco. '+
+   'Isto é para você saber o que <b>não</b> esperar daqui antes de contar com isso.</p>'+
+   '<div class="lbl" style="margin:14px 0 7px">Na fila</div>'+
+   '<div class="stack" style="gap:0">'+fila.map(li).join('')+'</div>'+
+   '<hr class="sep"><div class="lbl" style="margin-bottom:7px">Decidi não fazer, e por quê</div>'+
+   '<div class="stack" style="gap:0">'+nao.map(li).join('')+'</div>'+
+   '<hr class="sep"><div class="lbl" style="margin-bottom:7px">Entrou agora</div>'+
+   '<div class="stack" style="gap:0">'+FEITO_AGORA.map(function(x){
+    return '<div class="li"><div class="grow"><div class="ttl">'+esc(x[0])+'</div>'+
+     '<div class="sub" style="line-height:1.55">'+esc(x[1])+'</div></div></div>';
+   }).join('')+'</div>'+
+   '<p class="xtiny muted" style="margin-top:12px;line-height:1.65">Falta alguma coisa nesta lista que faria diferença para você? '+
+   '<a href="mailto:'+EMAIL_CONTATO+'">'+esc(EMAIL_CONTATO)+'</a>. '+
+   'Pedido de quem usa é o que moveu quase tudo que está construído aqui.</p></div>';
+ });
+}
+
 function stGuias(){
  const ab=S.ui.guiaAberto||'';
  $('#st-guias').innerHTML=
@@ -6667,6 +7913,7 @@ function stGuias(){
    '<p class="tiny" style="line-height:1.7">O caminho de cada processo, com a norma que o sustenta e o link do texto oficial.</p>'+
    '<p class="xtiny muted" style="margin-top:10px;line-height:1.6">As regras mudam e um app não é fonte legal: '+
    'confira no link oficial antes de ir. Nada aqui é orientação jurídica nem médica.</p></div>'+
+  blocoFalta()+
   GUIAS.map(function(g){
    const on=ab===g.id;
    return '<div class="card">'+
@@ -6689,7 +7936,7 @@ function stGuias(){
   }).join('')+
   '<div class="card">'+chTtl('heart','Onde pedir ajuda')+
    '<p class="tiny muted" style="line-height:1.65;margin-bottom:11px">Canais públicos e gratuitos. '+
-   'O app não indica clínica nem profissional aqui, e não ganha nada com nenhum deles.</p>'+
+   'O app não indica clínica nem profissional aqui.</p>'+
    '<div class="stack" style="gap:0">'+APOIO.map(function(x){
     return '<div class="li"><div class="grow"><div class="ttl">'+esc(x[0])+'</div>'+
      '<div class="sub" style="line-height:1.55">'+esc(x[1])+'</div></div></div>';
@@ -7363,13 +8610,9 @@ const PELE_TOM=[
  ['Pelo encravado da barba','A pseudofoliculite da barba atinge sobretudo pessoas de pele negra, porque pelo mais encaracolado volta a entrar na pele depois de cortado. O tratamento de base é tópico, e laser aparece nas revisões como a opção de longo prazo. Barbear a favor do pelo, não esticar a pele ao barbear e não cutucar — cada cutucada vira uma mancha que demora meses.']
 ];
 function blocoPeleTom(){
- return dobra('ap:tom','Pele parda e negra','sparkle',
-  PELE_TOM.length+' coisas que a lista de cima estava dizendo para uma pele só',function(){
+ return dobra('ap:tom','Pele parda e negra','sparkle','',function(){
   return '<div class="card">'+chTtl('sparkle','Pele parda e negra')+
-   '<p class="tiny muted" style="line-height:1.7;margin-bottom:12px">Boa parte do que se ensina de maquiagem foi escrita para pele clara, '+
-   'e este app estava repetindo isso: "corretivo alaranjado" e "um tom abaixo da sua pele" não querem dizer a mesma coisa em todo tom. '+
-   'Este bloco corrige o que a lista de cima simplificou.</p>'+
-   '<div class="stack" style="gap:0">'+PELE_TOM.map(function(x){
+   '<div class="stack" style="gap:0;margin-top:12px">'+PELE_TOM.map(function(x){
     return '<div class="li"><div class="grow"><div class="ttl">'+esc(x[0])+'</div>'+
      '<div class="sub" style="line-height:1.55">'+esc(x[1])+'</div></div></div>';
    }).join('')+'</div>'+
@@ -7425,7 +8668,7 @@ function blocoKit(dir){
    (dir==='masc'?'':listaVideos([
     ['bcwhJFiLhZ8','KIT DE MAQUIAGEM PARA INICIANTES (BARATO E COMPLETO!)','Jenyffer Make','Um kit inteiro montado do zero, com o preço na mesa']
    ]))+
-   '<p class="xtiny muted" style="margin-top:11px;line-height:1.6">O app não indica marca e não ganha nada com nada disso. '+
+   '<p class="xtiny muted" style="margin-top:11px;line-height:1.6">O app não indica marca. '+
    'Marca de farmácia e marca nacional resolvem tudo que está nesta lista.</p></div>';
  });
 }
@@ -7460,13 +8703,12 @@ function blocoMaqFora(){
 }
 
 function introAparencia(){
+ /* Era um parágrafo e um segundo sobre o estudo de passabilidade e
+    estigma. Ficou só o primeiro: a ficha daquele estudo continua
+    inteira na aba de Ciência, o que saiu foi o atalho daqui. */
  return '<div class="card">'+chTtl('info','Antes de tudo')+
   '<p class="tiny muted" style="line-height:1.7">Isto aqui é caixa de ferramentas, não lista de obrigações. '+
-  'Use o que te servir e ignore o resto.</p>'+
-  '<p class="tiny muted" style="line-height:1.7;margin-top:10px">Sobre ser '+esc(g('lid'))+' como você é: o estudo que existe encontrou '+
-  '<b>associação</b> entre isso e menos ansiedade e depressão, mas é um estudo transversal — mostra que as duas coisas andam juntas, '+
-  'não que uma causa a outra. E o mesmo campo mostra que o que mais pesa na saúde mental é <b>estigma</b>: '+
-  'violência, discriminação e rejeição. Nenhuma maquiagem resolve isso, e não passar não é falha sua. '+selo('passar','O que o estudo diz')+'</p></div>';
+  'Use o que te servir e ignore o resto.</p></div>';
 }
 
 /* A busca de cada passo leva a direcao junto: "sombra de barba" para quem
@@ -7496,8 +8738,8 @@ function listaMaquiagem(itens,titulo,sub,dir){
        mandar procurar do que mostrar um vídeo que ensina outra coisa. */
     (m.v
      ?'<div style="margin-top:9px">'+cardVideo(m.v[1],m.v[0])+
-      '<p class="xtiny muted" style="margin-top:5px;line-height:1.5">Canal <b>'+esc(m.v[2])+
-      '</b>. Não é do app, e o app não ganha nada com ele.</p></div>'
+      '<p class="xtiny muted" style="margin-top:5px;line-height:1.5">Vídeo do canal <b>'+esc(m.v[2])+
+      '</b> no YouTube.</p></div>'
      :'<a class="vid vid-mini" href="'+esc(yt(maqBusca(m.n,dir)))+'" target="_blank" rel="noopener">'+
       '<span class="pl">'+ic('play')+'</span>'+
       '<span class="grow" style="min-width:0;font-size:12px;font-weight:600;color:var(--ink-2)">procurar este passo no YouTube</span>'+
@@ -7911,8 +9153,9 @@ function stPrivacidade(){
     '<button class="btn gh sm" data-a="exportar">Baixar tudo que é seu</button>'+
     '<button class="btn gh sm" data-a="baixar-csv">Baixar como planilha</button>'+
     '<button class="btn gh sm rm" data-a="apagar-tudo">Apagar tudo deste aparelho</button></div>'+
-   '<p class="xtiny muted" style="margin-top:10px;line-height:1.6">Apagar é definitivo e não tem backup em lugar nenhum: '+
-   'exporte antes se quiser guardar.</p></div>'+
+   '<p class="xtiny muted" style="margin-top:10px;line-height:1.6">"Baixar tudo que é seu" é um arquivo com tudo mesmo: '+
+   'peso, medidas, cargas, diário, água, treino, voz, ciclo, medicação, exames, fotos, anotações e configuração. '+
+   'Apagar é definitivo e não tem backup em lugar nenhum — baixe antes se quiser guardar.</p></div>'+
 
   '<div class="card" style="border-color:var(--warn)">'+chTtl('info','O que este app não é')+
    '<div class="stack" style="gap:9px">'+[
@@ -8108,11 +9351,12 @@ const CU_BLOCOS=[
  ['corpo',    'Corpo',               'ruler',  'binder, tucking e postura, com os limites de uso',    ['corpo']],
  ['higiene',  'Higiene',             'drop',   'a sua lista, editável, e a versão de dia ruim',       ['higiene']],
  ['ciclo',    'Ciclo e hormônios',   'cal',    'calendário, remédios e o que esperar de cada fase',   ['ciclo']],
+ ['humor',    'Humor e cabeça',      'heart',  'ânimo, ansiedade e disforia, dia a dia',             ['humor']],
  ['servicos', 'Direitos e serviços', 'book',   'SUS, retificação, cirurgias e profissionais',         ['guias','profissionais']]
 ];
-const CU_SECOES_TODAS=['voz','pele','aparencia','corpo','higiene','ciclo','guias','profissionais'];
+const CU_SECOES_TODAS=['voz','pele','aparencia','corpo','higiene','ciclo','humor','guias','profissionais'];
 const CU_RENDER={higiene:stHigiene,corpo:stCorpo,ciclo:stCiclo,voz:stVoz,aparencia:stAparencia,
-  pele:stPele,profissionais:stProfissionais,guias:stGuias};
+  pele:stPele,profissionais:stProfissionais,guias:stGuias,humor:stHumor};
 
 /* Androginia e bem-estar nao tem binder nem treino de voz obrigatorio: o bloco
    simplesmente nao aparece, em vez de abrir vazio. */
@@ -8154,6 +9398,149 @@ function renderCuidados(){
  S.ui.sub.cuidados=b[0];
  $('#cuidTopo').innerHTML='<button class="voltar" data-a="cuid-hub">'+ic('left')+'Cuidados</button>';
  dentro.forEach(k=>CU_RENDER[k]());
+}
+
+/* =====================================================================
+   HUMOR E CABEÇA
+   O app dizia, em ficha de evidência, que o que mais pesa na saúde
+   mental de pessoas trans é estigma — e não tinha onde registrar nada
+   disso. Havia um campo de ânimo escondido numa lista de números do dia.
+
+   O que esta tela NÃO faz, e está escrito nela: não dá nota, não soma
+   pontuação e não diz nome de transtorno. Existe instrumento validado
+   para isso, e ele vale aplicado e lido por quem foi treinado. App que
+   soma pontos e devolve "depressão moderada" está diagnosticando sem ter
+   direito, e para quem já apanha do sistema de saúde esse erro custa
+   caro.
+
+   O campo 'humor' do dia já existia e continua sendo o ânimo: não criei
+   outro para não jogar fora o histórico de quem já usava.
+   ===================================================================== */
+const ESCALAS_MENTAL=[
+ {k:'humor',n:'Ânimo',ic:'sun',cor:'var(--ok)',
+  r:['—','No chão','Baixo','Normal','Bom','Ótimo']},
+ {k:'ans',n:'Ansiedade',ic:'flame',cor:'var(--warn)',
+  r:['—','Nenhuma','Pouca','Média','Alta','Não parava']},
+ {k:'dis',n:'Disforia',ic:'face',cor:'var(--pink)',
+  r:['—','Nenhuma','Pouca','Média','Alta','Tomou o dia']}
+];
+const GATILHOS=[
+ ['sono','Dormi mal'],['corpo','Corpo e espelho'],['fora','Ser lida errado na rua'],
+ ['familia','Família'],['trabalho','Trabalho ou escola'],['dinheiro','Dinheiro'],
+ ['saude','Consulta ou exame'],['sozinha','Solidão'],['transfobia','Transfobia direta'],
+ ['ciclo','Ciclo ou hormônio'],['bom','Foi um dia bom']
+];
+function mental(d){
+ const x=dia(d);
+ x.mental=x.mental||{ans:0,dis:0,gat:[],obs:''};
+ if(!Array.isArray(x.mental.gat))x.mental.gat=[];
+ return x.mental;
+}
+function mentalRO(d){
+ const x=diaRO(d)||{};
+ const m=x.mental||{};
+ return{ans:m.ans||0,dis:m.dis||0,gat:Array.isArray(m.gat)?m.gat:[],obs:m.obs||'',humor:x.humor||0};
+}
+function valorMental(d,k){return k==='humor'?(diaRO(d).humor||0):mentalRO(d)[k]}
+/* Ânimo no chão em metade ou mais dos últimos catorze dias REGISTRADOS.
+   O limiar é alto o bastante para não assustar por uma semana ruim, e
+   baixo o bastante para não esperar um mês. Não fala em doença: fala em
+   contar para alguém. */
+function animoPesado(){
+ const dias=[];for(let i=0;i<14;i++)dias.push(addDias(hoje(),-i));
+ const reg=dias.filter(function(d){return (diaRO(d).humor||0)>0});
+ if(reg.length<7)return null;
+ const baixos=reg.filter(function(d){return diaRO(d).humor<=2}).length;
+ return baixos>=7?{baixos:baixos,de:reg.length}:null;
+}
+function stHumor(){
+ const d=hoje(), m=mental(d);
+ const pesado=animoPesado();
+ const escala=function(e){
+  const v=valorMental(d,e.k);
+  return '<div style="margin-top:13px"><div class="row spread" style="margin-bottom:6px">'+
+   '<span class="lbl" style="margin:0">'+esc(e.n)+'</span>'+
+   '<span class="xtiny muted">'+esc(e.r[v]||'—')+'</span></div>'+
+   '<div class="row" style="gap:5px">'+[1,2,3,4,5].map(function(i){
+    return '<button class="chip'+(v===i?' on':'')+'" data-a="mental-esc" data-k="'+e.k+'" data-v="'+i+'" '+
+     'style="flex:1;justify-content:center" aria-label="'+esc(e.n+': '+e.r[i])+'">'+i+'</button>';
+   }).join('')+'</div></div>';
+ };
+ /* Oito semanas das três escalas. É em semana que padrão aparece. */
+ const sem=semanasDe(9);
+ const serie=function(k){
+  const pts=[];
+  sem.forEach(function(s2){
+   const vs=s2.dias.map(function(dd){return valorMental(dd,k)}).filter(function(v){return v>0});
+   if(vs.length)pts.push({x:s2.rot,y:Math.round(vs.reduce(function(a,b){return a+b},0)/vs.length*10)/10});
+  });
+  return pts;
+ };
+ const graf=ESCALAS_MENTAL.map(function(e){
+  const pts=serie(e.k);
+  if(pts.length<2)return '';
+  return '<div style="margin-top:14px"><div class="lbl" style="margin-bottom:6px">'+esc(e.n)+'</div>'+
+   lineChart(pts,'de 1 a 5',e.cor)+'</div>';
+ }).join('');
+
+ $('#st-humor').innerHTML=
+  '<div class="card hero">'+chTtl('heart','Humor e cabeça')+
+   '<p class="tiny" style="line-height:1.7">Três coisas por dia, e o que estava acontecendo. '+
+   'Não é para julgar o dia: é para, daqui a dois meses, você poder olhar e ver padrão — '+
+   'e levar isso para a consulta em vez de tentar lembrar.</p>'+
+   '<p class="tiny muted" style="line-height:1.7;margin-top:10px"><b>Isto não é teste e não dá nota.</b> '+
+   'O app não soma pontuação e não diz nome de transtorno. Existe instrumento certo para isso, '+
+   'e ele vale aplicado e lido por quem foi treinado — não por um app.</p></div>'+
+
+  '<div class="card">'+chTtl('sun','Hoje')+
+   ESCALAS_MENTAL.map(escala).join('')+
+   '<hr class="sep"><div class="lbl" style="margin-bottom:7px">O que pesou hoje <span class="muted">(ou aliviou)</span></div>'+
+   '<div class="row wrap" style="gap:5px">'+GATILHOS.map(function(g){
+    const on=m.gat.indexOf(g[0])>=0;
+    return '<button class="chip xs'+(on?' on':'')+'" data-a="mental-gat" data-v="'+g[0]+'">'+esc(g[1])+'</button>';
+   }).join('')+'</div>'+
+   '<label class="fld" style="margin-top:12px">Se quiser escrever'+
+    '<textarea id="mentalObs" maxlength="600" placeholder="Fica só neste aparelho, como todo o resto" '+
+    'style="min-height:80px">'+esc(m.obs)+'</textarea></label>'+
+   '<p class="xtiny muted" style="margin-top:8px;line-height:1.6">Dia em branco não vira zero em lugar nenhum: '+
+   'não registrar é diferente de estar no chão.</p></div>'+
+
+  (pesado
+   ?'<div class="card" style="border-color:var(--warn)">'+chTtl('bell','Faz semanas que está pesado')+
+    '<p class="tiny" style="line-height:1.7">Você marcou ânimo baixo em '+pesado.baixos+' dos últimos '+pesado.de+
+    ' dias que registrou. O app não sabe o que isso é e não vai dar nome a isso — mas vale contar para alguém: '+
+    'pessoa de confiança, CAPS da sua região, ou quem já te acompanha.</p>'+
+    '<p class="tiny" style="line-height:1.7;margin-top:9px">Se o dia estiver insuportável agora, '+
+    '<b>CVV, 188</b>: ligação gratuita, 24 horas, de qualquer lugar do país, e também por chat no site deles.</p>'+
+    '<button class="btn gh bl sm" style="margin-top:11px" data-a="cuid-ir" data-v="servicos">'+
+    ic('heart')+' Onde pedir ajuda</button></div>'
+   :'')+
+
+  (graf?'<div class="card">'+chTtl('chart','Semana a semana',
+    '<span class="tag n">últimas 8</span>')+
+    '<p class="tiny muted" style="line-height:1.65">A média de cada semana. Dia ruim todo mundo tem; '+
+    'o que esta tela serve para ver é o que não passa.</p>'+graf+'</div>':'')+
+
+  '<div class="card">'+chTtl('book','O que isto é, e o que não é')+
+   '<div class="stack" style="gap:0">'+[
+    ['Não é diagnóstico','O app não soma pontos, não calcula escore e não diz "depressão" nem "ansiedade generalizada". Isso é consulta, não app.'],
+    ['É memória','O que ele faz bem é lembrar por você. Chegar na consulta com dois meses de registro muda a conversa — é a diferença entre "acho que tenho estado mal" e mostrar quando começou e o que estava junto.'],
+    ['O contexto importa tanto quanto a nota','A literatura que este app cita aponta estigma — violência, discriminação e rejeição — como o que mais pesa na saúde mental de pessoas trans. Por isso as etiquetas existem: nem tudo que dói vem de dentro.'],
+    ['Hormônio não é antidepressivo','Se o humor piorou depois de começar, isso não é preço a pagar: é motivo de consulta. E se não melhorou como você esperava, isso não quer dizer que a transição não é sua.'],
+    ['Você pode parar de registrar','Acompanhar humor ajuda muita gente e atrapalha algumas. Se marcar nota todo dia estiver te deixando pior, pare — e isso não é desistir de nada.']
+   ].map(function(x2){
+    return '<div class="li"><div class="grow"><div class="ttl">'+esc(x2[0])+'</div>'+
+     '<div class="sub" style="line-height:1.55">'+esc(x2[1])+'</div></div></div>';
+   }).join('')+'</div>'+
+   '<div class="row wrap" style="gap:5px;margin-top:11px">'+selo('fat_mental','Hormonização e humor')+
+   selo('passar','O peso do estigma')+'</div></div>'+
+
+  '<div class="card"><p class="xtiny muted" style="line-height:1.7">Tudo isto fica neste aparelho, '+
+  'como o resto do app, e entra no arquivo quando você baixa os seus dados. '+
+  'Se você usa o app num celular que outras pessoas pegam, a senha no Perfil vale ainda mais para esta tela.</p></div>';
+
+ const ta=$('#mentalObs');
+ if(ta)ta.addEventListener('input',function(){mental(hoje()).obs=ta.value.slice(0,600);save()});
 }
 
 /* =====================================================================
@@ -8423,6 +9810,74 @@ function ligarFotos(){
   }).catch(()=>toast('Não consegui guardar a foto neste navegador'));
  });
 }
+/* ---------------------------------------------------------------------
+   TENDÊNCIA POR SEMANA
+   O app desenhava carga, peso, medida, Hz da voz e volume de treino, e
+   não desenhava nada do que a pessoa registra todo dia. Média de trinta
+   dias esconde a única coisa que interessa aqui, que é a direção.
+
+   Semana sem registro nenhum não vira zero: zero por não ter anotado é
+   diferente de zero por não ter feito, e desenhar um despenque que foi
+   só falta de anotação é mentir em forma de gráfico.
+   --------------------------------------------------------------------- */
+function semanasDe(n){
+ const out=[];
+ for(let k=n-1;k>=0;k--){
+  const fim=addDias(hoje(),-k*7), ini=addDias(fim,-6), dias=[];
+  for(let i=0;i<7;i++)dias.push(addDias(ini,i));
+  out.push({rot:fmtCurto(ini),dias:dias.filter(function(d){return d<=hoje()})});
+ }
+ return out.filter(function(s2){return s2.dias.length});
+}
+function blocoTendencia(){
+ const sem=semanasDe(13), m=metas();
+ const comer=[],prot=[],agua=[],const_=[];
+ sem.forEach(function(s2){
+  const comReg=s2.dias.filter(function(d){
+   return MEALS.some(function(x){return ((diaRO(d).ref||{})[x.k]||[]).length})});
+  if(comReg.length){
+   comer.push({x:s2.rot,y:Math.round(comReg.reduce(function(a,d){return a+totalDia(d).kcal},0)/comReg.length)});
+   prot.push({x:s2.rot,y:Math.round(comReg.reduce(function(a,d){return a+totalDia(d).p},0)/comReg.length)});
+  }
+  const comA=s2.dias.filter(function(d){return diaRO(d).agua>0});
+  if(comA.length)agua.push({x:s2.rot,y:Math.round(comA.reduce(function(a,d){return a+diaRO(d).agua},0)/comA.length)});
+  /* Constância conta os três hábitos diários que o app acompanha, sobre
+     o total possível da semana. Semana sem nada registrado fica de fora. */
+  let feitos=0;
+  s2.dias.forEach(function(d){
+   const x=diaRO(d);
+   if((x.treino||{}).feito)feitos++;
+   if((x.voz||{}).feito)feitos++;
+   if((x.pele||{}).manha&&(x.pele||{}).noite)feitos++;
+  });
+  if(feitos)const_.push({x:s2.rot,y:Math.round(feitos/(s2.dias.length*3)*100)});
+ });
+ const nada=!comer.length&&!agua.length&&!const_.length;
+ const um=function(tit,pts,unid,cor,meta,nota){
+  if(pts.length<2)return '';
+  return '<div style="margin-top:14px"><div class="lbl" style="margin-bottom:6px">'+esc(tit)+'</div>'+
+   lineChart(pts,unid,cor,meta)+
+   (nota?'<p class="xtiny muted" style="margin-top:6px;line-height:1.5">'+esc(nota)+'</p>':'')+'</div>';
+ };
+ return dobra('prog:tend','Como vem indo, semana a semana','chart',
+  nada?'precisa de pelo menos duas semanas com registro':'caloria, proteína, água e constância nos últimos três meses',
+  function(){
+  if(nada)return '<div class="card">'+chTtl('chart','Como vem indo, semana a semana')+
+   vazio('chart','Registre comida, água ou os hábitos do dia por duas semanas e os gráficos aparecem aqui.')+'</div>';
+  return '<div class="card">'+chTtl('chart','Como vem indo, semana a semana')+
+   '<p class="tiny muted" style="line-height:1.65">Média por semana, não por dia: dia a dia é ruído, e semana é o menor pedaço '+
+   'em que dá para ver direção. A linha atravessada é a sua meta.</p>'+
+   (oculto('kcal')?'':um('Caloria por dia',comer,'kcal','var(--accent)',m.kcal))+
+   (oculto('kcal')?'':um('Proteína por dia',prot,'g','var(--primary)',m.prot))+
+   um('Água por dia',agua,'ml','var(--water)',m.agua)+
+   um('Constância',const_,'%','var(--ok)',null,
+    'Quantos dos hábitos do dia — treino, voz e pele — você fechou, sobre o total possível da semana. '+
+    'É o gráfico que mostra progresso sem falar de peso.')+
+   '<p class="xtiny muted" style="margin-top:12px;line-height:1.6">Semana sem nada registrado não entra como zero: '+
+   'não anotar é diferente de não fazer, e um buraco no gráfico por falta de registro seria um gráfico mentindo.</p></div>';
+ });
+}
+
 function stResumo(){
  const dias=[];for(let i=29;i>=0;i--)dias.push(addDias(hoje(),-i));
  const m=metas();
@@ -8440,6 +9895,7 @@ function stResumo(){
  const peles=dias.filter(d=>(diaRO(d).pele||{}).manha&&(diaRO(d).pele||{}).noite).length;
  const ps=S.pesos.filter(p=>diffDias(p.d,hoje())<=30);
  $('#st-resumo').innerHTML=
+  blocoTendencia()+
   '<div class="card hero">'+chTtl('chart','Últimos 30 dias',
    '<span class="tag '+(ades>=80?'o':ades>=50?'w':'a')+'">'+ades+'% de adesão</span>')+
   '<div class="gauto">'+
@@ -8765,10 +10221,13 @@ function pf_guardar(){
    '<p class="tiny muted">Seus registros ficam neste navegador, neste aparelho. Não existe servidor nem conta, '+
     'e nada do que você registra é enviado para lugar nenhum. '+
     'Eles não somem ao fechar a aba, mas também não viajam sozinhos para outro celular: para isso use '+
-    '<b>Copiar meus dados</b> aqui e <b>Importar dados</b> do outro lado. Limpar os dados do site no navegador apaga tudo, '+
-    'então vale exportar de vez em quando.</p>'+
+    '<b>Baixar meus dados</b> aqui e <b>Importar dados</b> do outro lado. Limpar os dados do site no navegador apaga tudo, '+
+    'então vale baixar de vez em quando.</p>'+
+   '<p class="xtiny muted" style="line-height:1.65;margin-top:9px">O arquivo leva tudo: peso, medidas, cargas, diário de comida, '+
+   'água, treino, voz, ciclo, medicação, exames, fotos, anotações e o que você configurou. '+
+   'Ele fica no seu aparelho como qualquer download — e, como é tudo isso junto, trate o arquivo com o mesmo cuidado que você trata o app.</p>'+
    '<div class="row wrap" style="gap:7px;margin-top:11px">'+
-    '<button class="btn gh sm" data-a="exportar">Copiar meus dados</button>'+
+    '<button class="btn gh sm" data-a="exportar">Baixar meus dados</button>'+
     '<button class="btn gh sm" data-a="importar">Importar dados</button>'+
     '<button class="btn gh sm" data-a="baixar-csv">Baixar planilha</button>'+
     '<button class="btn gh sm" data-a="zerar-dia">Zerar o dia de hoje</button>'+
@@ -9227,7 +10686,14 @@ const FONTES={
  pih_davis:{r:'Davis e Callender. Revisão sobre mancha escura pós-inflamatória em pele de cor: quem atinge, como se apresenta e o que existe de tratamento. Journal of Clinical and Aesthetic Dermatology, 2010',
   u:'https://pubmed.ncbi.nlm.nih.gov/20725554/'},
  pfb_rev:{r:'Dalia e colegas. Revisão de tratamentos para pseudofoliculite da barba — o pelo encravado que atinge sobretudo pessoas de pele negra. Clinical and Experimental Dermatology, 2023',
-  u:'https://pubmed.ncbi.nlm.nih.gov/36840647/'}
+  u:'https://pubmed.ncbi.nlm.nih.gov/36840647/'},
+
+ /* Rótulo. Isto é norma brasileira, não estudo: não leva selo de força de
+    evidência, leva o link do texto oficial. */
+ anvisa_in75:{r:'Instrução Normativa nº 75 de 2020 da Anvisa, Anexo XV: os limites de açúcar adicionado, gordura saturada e sódio que obrigam a lupa preta na frente da embalagem. Em português',
+  u:'https://www.gov.br/anvisa/pt-br/assuntos/alimentos/rotulagem/rotulagem-nutricional'},
+ anvisa_rdc429:{r:'Resolução RDC nº 429 de 2020 da Anvisa: como a rotulagem nutricional frontal tem que ser impressa e onde, e a tabela obrigatória por 100 g. Em vigor desde 9 de outubro de 2022. Em português',
+  u:'https://bvsms.saude.gov.br/bvs/saudelegis/anvisa/2020/RDC_429_2020_.pdf'}
 };
 function linkFonte(k){const f=FONTES[k];if(!f)return '#';
  return f.u||'https://pubmed.ncbi.nlm.nih.gov/?term='+encodeURIComponent(f.q)}
@@ -9317,7 +10783,7 @@ const EVID=[
   fontes:['peitzmeier17']},
  {id:'arfid',area:'Comida',af:'Alimentação restritiva é muito mais comum em pessoas trans do que na população geral',forca:'media',
   por:'Num serviço de transtorno alimentar, 16,7% das pessoas em tratamento para ARFID se identificavam como trans, não binárias ou de gênero diverso — pessoas de gênero diverso são menos de 2% da população. Traços autistas e de TDAH são de 2 a 6 vezes mais comuns em pessoas de gênero diverso, e num estudo com 182 adultos de gênero diverso a hipersensibilidade sensorial previu sintomas de ARFID mesmo descontando esses traços. São estudos transversais e de amostra clínica.',
-  no:'Ainda não está construído. É o motivo de "alimentação restrita" estar na lista do que falta, e de estar marcado como coisa que precisa de nutricionista: orientação alimentar errada piora ARFID em vez de ajudar.',
+  no:'Ainda não está construído, e isso está dito com todas as letras em "O que este app não tem", dentro de Cuidados. Está lá marcado como coisa que precisa de nutricionista: orientação alimentar errada piora ARFID em vez de ajudar. O que existe hoje e ajuda é poder esconder os números, no Perfil.',
   fontes:['arfid25']},
  {id:'pares',area:'Humor e rotina',af:'Apoio de outras pessoas trans protege, mas a versão online quase não foi estudada',forca:'fraca',
   por:'Numa revisão sistemática sobre apoio social, o apoio vindo de outras pessoas trans foi o fator mais frequentemente associado a saúde e bem-estar. Mas uma revisão de escopo com 34 estudos sobre apoio entre pares e risco de suicídio encontrou que o apoio online entre pessoas trans é raramente examinado, e pediu pesquisa que dê conta disso. Ou seja: o que protege é apoio de pares, e justamente a forma que um app poderia oferecer é a que não tem evidência.',
@@ -9663,7 +11129,7 @@ function baixarCSV(){
  try{
   const blob=new Blob(['﻿'+csv],{type:'text/csv;charset=utf-8'});
   const url=URL.createObjectURL(blob),a=document.createElement('a');
-  a.href=url;a.download='rota-trans-'+hoje()+'.csv';
+  a.href=url;a.download='norte-'+hoje()+'.csv';
   document.body.appendChild(a);a.click();
   setTimeout(()=>{URL.revokeObjectURL(url);a.remove()},1500);
   toast((linhas.length-1)+' dias na planilha');
@@ -9676,7 +11142,9 @@ function aplicaTema(){
 }
 function sheetTrocar(meal){
  const ref=MEALS.find(m=>m.k===meal);
- const lista=RECIPES.filter(r=>r.ref.includes(meal));
+ /* Este era o último ponto que listava RECIPES direto e passava por cima
+    da restrição alimentar. */
+ const lista=filtraRestr(RECIPES).filter(r=>r.ref.includes(meal));
  sheet('Trocar '+ref.n.toLowerCase(),
   '<div class="stack" style="gap:8px">'+lista.map(r=>{const s=pontuar(r);
    return '<button class="ex" data-a="escolher-ref" data-m="'+meal+'" data-id="'+r.id+'">'+
@@ -9757,6 +11225,11 @@ document.addEventListener('click',ev=>{
     'Leia antes de confirmar');
    break;
   case 'apagar-confirma':
+   /* Gravar agora é adiado para o intervalo ocioso. Sem cancelar o que
+      está pendente, uma gravação atrasada escreveria o estado de volta
+      logo depois de apagar — e a tela diria "apagado" por cima de dados
+      que continuariam lá. */
+   lsPendente=false;clearTimeout(lsTimer);
    try{localStorage.removeItem(LS);localStorage.removeItem('rotaforte.v2')}catch(e){}
    try{if(window.indexedDB&&indexedDB.deleteDatabase)indexedDB.deleteDatabase(FOTO_DB)}catch(e){}
    closeSheet();
@@ -10176,6 +11649,47 @@ document.addEventListener('click',ev=>{
    if(!ont.length)return toast('Nada registrado ontem');
    ont.forEach(z=>addItem(df,d.m,{...z},true));render();toast(ont.length+' itens copiados de ontem');break}
   case 'filtro-ref':S.ui.refTudo=false;S.ui.filtroRef=d.v;render();break;
+  case 'alergia':{
+   const l=(S.perfil.alergias||[]).slice(),i2=l.indexOf(d.v);
+   if(i2>=0)l.splice(i2,1);else l.push(d.v);
+   S.perfil.alergias=l;S.ui.cardapio=null;S.ui.refTudo=false;save();render();
+   toast(RECIPES.filter(recPassa).length+' receitas combinam');break}
+  case 'seming-add':{
+   const el=$('#semIngIn'),v=(el&&el.value||'').trim();
+   if(!v)break;
+   const l=(S.perfil.semIng||[]).slice();
+   if(l.map(nrm).indexOf(nrm(v))<0)l.push(v);
+   S.perfil.semIng=l;S.ui.cardapio=null;S.ui.refTudo=false;save();render();
+   toast(RECIPES.filter(recPassa).length+' receitas combinam');break}
+  case 'seming-rm':{
+   const l=(S.perfil.semIng||[]).slice();l.splice(+d.i,1);
+   S.perfil.semIng=l;S.ui.cardapio=null;S.ui.refTudo=false;save();render();break}
+  case 'voz-medir':sheetMedirVoz();break;
+  case 'voz-medida-ok':{
+   const hz=Number(d.v);
+   if(hz>=VOZ_MIN_HZ&&hz<=VOZ_MAX_HZ){
+    S.vozLog=(S.vozLog||[]).filter(function(l){return l.d!==hj});
+    S.vozLog.push({d:hj,hz:hz});
+    pararMedidor();save();closeSheet();render();toast('Guardado: '+hz+' Hz');
+   }
+   break}
+  case 'mental-esc':{
+   const v=+d.v;
+   if(d.k==='humor'){const x=dia(hj);x.humor=(x.humor===v?0:v)}
+   else{const m=mental(hj);m[d.k]=(m[d.k]===v?0:v)}
+   save();render();break}
+  case 'mental-gat':{
+   const m=mental(hj),i2=m.gat.indexOf(d.v);
+   if(i2>=0)m.gat.splice(i2,1);else m.gat.push(d.v);
+   save();render();break}
+  case 'restr':{
+   const l=(S.perfil.restricoes||[]).slice(),i2=l.indexOf(d.v);
+   if(i2>=0)l.splice(i2,1);else l.push(d.v);
+   S.perfil.restricoes=l;
+   /* O cardápio de hoje foi montado com a regra antiga: refaz. */
+   S.ui.cardapio=null;S.ui.refTudo=false;save();render();
+   toast(l.length?RECIPES.filter(recPassa).length+' receitas combinam':'Sem restrição marcada');
+   break}
   case 'novo-cardapio':S.ui.cardapio=gerarCardapio(Math.floor(Math.random()*9999));render();toast('Novo cardápio');break;
   case 'trocar-ref':sheetTrocar(d.m);break;
   case 'escolher-ref':S.ui.cardapio.itens[d.m]=d.id;closeSheet();render();break;
@@ -10218,39 +11732,19 @@ document.addEventListener('click',ev=>{
   case 'copiar-resumo':copiar(($('#leituraTxt')||{}).textContent||'','Resumo copiado');break;
 
   /* dados */
-  case 'exportar':copiar(JSON.stringify({v:3,perfil:S.perfil,pesos:S.pesos,medidas:S.medidas,
-   cargas:S.cargas,vozLog:S.vozLog,despensa:S.despensa,compras:S.compras,favs:S.favs,
-   recentes:S.recentes,fotos:S.fotos,dias:S.dias},null,1),'Dados copiados');break;
+  case 'exportar':exportarTudo();break;
   case 'importar':sheet('Importar dados',
-   '<p class="tiny muted" style="margin-bottom:11px">Cole aqui o texto que você copiou no botão <b>Copiar meus dados</b>, '+
-   'em outro navegador ou na outra versão do app. O que já está aqui é mantido; o que vier no texto entra por cima.</p>'+
-   '<textarea id="impTxt" placeholder="Cole o texto aqui" style="min-height:190px;font-family:var(--f-m);font-size:11px"></textarea>'+
-   '<button class="btn acc bl" style="margin-top:11px" data-a="importar-ok">Importar</button>','Trazer dados de outro lugar');break;
-  case 'importar-ok':{
-   /* Texto colado é dado de fora: entra conferido, campo por campo, e nunca
-      direto por cima do estado. Depois passa pelas mesmas normalizações da
-      abertura do app — antes elas não rodavam e o estado ficava torto até
-      a próxima vez que a pessoa fechasse o app. */
-   let o;try{o=JSON.parse(($('#impTxt')||{}).value||'')}catch(e){return toast('Não consegui ler esse texto')}
-   if(!o||typeof o!=='object'||Array.isArray(o))return toast('Texto inválido');
-   if(o.perfil&&typeof o.perfil==='object'&&!Array.isArray(o.perfil)){
-    /* só as chaves que o perfil realmente tem, e nada do que vier junto */
-    Object.keys(DEF.perfil).forEach(function(k){
-     if(Object.prototype.hasOwnProperty.call(o.perfil,k))S.perfil[k]=o.perfil[k];
-    });
-   }
-   ['pesos','medidas','vozLog','despensa','compras','favs','recentes','fotos','notas','meds','higMeus']
-    .forEach(k=>{if(Array.isArray(o[k]))S[k]=o[k].slice(0,5000)});
-   if(o.cargas&&typeof o.cargas==='object'&&!Array.isArray(o.cargas))S.cargas={...S.cargas,...o.cargas};
-   let nd=0;
-   if(o.dias&&typeof o.dias==='object'&&!Array.isArray(o.dias))Object.keys(o.dias).forEach(dd=>{
-    if(/^\d{4}-\d{2}-\d{2}$/.test(dd)&&o.dias[dd]&&typeof o.dias[dd]==='object'){
-     S.dias[dd]=o.dias[dd];nd++}});
-   const corrigidos=normalizaTudo();
-   save('base');closeSheet();render();
-   toast(corrigidos.length
-    ?'Importado: '+nd+' dias. Ajustei '+corrigidos.join(', ')+' para valores possíveis.'
-    :'Importado: '+nd+' dias de registro');break}
+   '<p class="tiny muted" style="line-height:1.65;margin-bottom:11px">Escolha o arquivo <b>norte-....json</b> que você baixou '+
+   'no outro aparelho. O que já está aqui é mantido; o que vier no arquivo entra por cima.</p>'+
+   '<label class="btn gh bl sm" style="display:block;text-align:center;cursor:pointer">'+
+    ic('plus')+' Escolher o arquivo do backup'+
+    '<input type="file" id="impArq" accept="application/json,.json" style="display:none"></label>'+
+   '<hr class="sep"><p class="xtiny muted" style="line-height:1.6;margin-bottom:9px">Ou cole o texto, se o backup que você tem '+
+   'veio por mensagem em vez de arquivo. Backup colado não traz as fotos: elas só cabem no arquivo.</p>'+
+   '<textarea id="impTxt" placeholder="Cole o texto aqui" style="min-height:140px;font-family:var(--f-m);font-size:11px"></textarea>'+
+   '<button class="btn acc bl" style="margin-top:11px" data-a="importar-ok">Importar o texto colado</button>',
+   'Trazer dados de outro aparelho');break;
+  case 'importar-ok':importarTexto(($('#impTxt')||{}).value||'');break;
   case 'zerar-dia':{S.dias[hj]={d:hj,ref:{},agua:0,treino:{feito:false,sets:{}},voz:{feito:false,min:0,ex:{}},
    pele:{manha:false,noite:false},hab:{},sono:0,passos:0,humor:0,nota:''};
    save('dia',hj);render();toast('Dia de hoje zerado');break}
@@ -10258,6 +11752,15 @@ document.addEventListener('click',ev=>{
 });
 
 document.addEventListener('change',ev=>{
+ if(ev.target&&ev.target.id==='impArq'){
+  const f=ev.target.files&&ev.target.files[0];
+  if(!f)return;
+  const fr=new FileReader();
+  fr.onload=function(){importarTexto(String(fr.result||''))};
+  fr.onerror=function(){toast('Não consegui abrir esse arquivo')};
+  fr.readAsText(f);
+  return;
+ }
  const kg=ev.target.closest('[data-a="kg"]');
  if(kg){const nome=kg.dataset.n,v=Number(kg.value);
   if(!v||!isFinite(v)||v<0||v>1000)return;
@@ -10350,6 +11853,51 @@ if(foraDaFaixa.length)setTimeout(function(){
  toast('Ajustei '+foraDaFaixa.join(', ')+' para um valor possível.');
 },900);
 setInterval(()=>{if(S.ui.tab==='inicio'&&!$('#sheetBox'))renderInicio()},60000);
+
+/* =====================================================================
+   SERVICE WORKER
+   É o que faz o app abrir sem internet e instalar na tela inicial. Era o
+   pedido mais votado da pesquisa.
+
+   O cuidado que vale a pena ter: quando sai versão nova, o navegador
+   baixa por trás e fica esperando. Trocar na hora significaria a tela
+   mudar embaixo da pessoa no meio de um treino. Então o app avisa e
+   deixa ela trocar quando quiser.
+   ===================================================================== */
+if('serviceWorker' in navigator){
+ window.addEventListener('load',function(){
+  navigator.serviceWorker.register('./sw.js').then(function(reg){
+   function avisaNova(sw){
+    if(!sw)return;
+    sw.addEventListener('statechange',function(){
+     if(sw.state==='installed'&&navigator.serviceWorker.controller)mostraAtualizacao(reg);
+    });
+   }
+   if(reg.waiting&&navigator.serviceWorker.controller)mostraAtualizacao(reg);
+   avisaNova(reg.installing);
+   reg.addEventListener('updatefound',function(){avisaNova(reg.installing)});
+  }).catch(function(){/* sem service worker o app funciona igual, só precisa de rede */});
+
+  let recarregando=false;
+  navigator.serviceWorker.addEventListener('controllerchange',function(){
+   if(recarregando)return;recarregando=true;location.reload();
+  });
+  window.mostraAtualizacao=function(reg){
+   if(document.querySelector('#avisoVersao'))return;
+   const el=document.createElement('div');
+   el.id='avisoVersao';el.className='timerbar';
+   el.innerHTML='<span class="grow tiny">Tem uma versão nova do app pronta.</span>'+
+    '<button class="btn sm" id="btVersao">Atualizar</button>'+
+    '<button class="btn gh sm" id="btVersaoNao">Depois</button>';
+   document.body.appendChild(el);
+   el.querySelector('#btVersao').onclick=function(){
+    lsFlush();
+    if(reg.waiting)reg.waiting.postMessage('assumir');else location.reload();
+   };
+   el.querySelector('#btVersaoNao').onclick=function(){el.remove()};
+  };
+ });
+}
 </script>
 </body>
 </html>

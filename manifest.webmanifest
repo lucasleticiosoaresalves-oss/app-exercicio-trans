@@ -1,0 +1,23 @@
+{
+  "name": "Norte",
+  "short_name": "Norte",
+  "description": "Rotina de treino, comida, voz, pele e acompanhamento para pessoas trans. Tudo fica no seu aparelho.",
+  "lang": "pt-BR",
+  "dir": "ltr",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0e0b16",
+  "theme_color": "#123c53",
+  "categories": ["health", "fitness", "lifestyle"],
+  "icons": [
+    { "src": "./icone-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "./icone-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "./icone-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Treino de hoje", "short_name": "Treino", "url": "./index.html#treino" },
+    { "name": "Diário de comida", "short_name": "Comida", "url": "./index.html#nutri" }
+  ]
+}
