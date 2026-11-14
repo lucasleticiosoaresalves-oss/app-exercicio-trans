@@ -22,7 +22,7 @@
  media-src 'self' blob:;
  connect-src 'self' https://world.openfoodfacts.org;
  frame-src https://www.youtube-nocookie.com;
- manifest-src 'self';
+ manifest-src 'self' blob:;
  worker-src 'self';
  base-uri 'none';
  form-action 'none';
@@ -234,6 +234,10 @@ html{scroll-behavior:smooth}
 .hdr.mini .eyebrow,.hdr.mini .sub{display:none}
 .hdr.mini .wstrip{display:none}
 .hdr.mini .flagbar{margin-top:8px;height:3px;opacity:.8}
+/* Perfil, ciência e privacidade não falam do dia de hoje: o cabeçalho
+   fica só com o nome e a data, e devolve 90 px para o conteúdo. */
+.hdr.sodia #wstrip{display:none}
+.hdr.sodia{padding-block:14px 12px}
 .hpill{background:var(--hdr-chip);border-radius:999px;padding:6px 13px;font-size:11.5px;font-weight:700;
   white-space:nowrap;display:inline-flex;gap:5px;align-items:center;
   backdrop-filter:saturate(1.5) blur(3px);box-shadow:0 1px 2px rgba(0,0,0,.05)}
@@ -789,6 +793,10 @@ button.cday:active{transform:scale(.94)}
 
 <div id="modalRoot"></div>
 <div id="toastRoot" role="status" aria-live="polite" aria-atomic="true"></div>
+<!-- A camada do disfarce fica por cima de tudo e tem estilo próprio, de
+     propósito: ela não pode herdar nada do Norte, senão a cor, a fonte
+     ou um detalhe de espaçamento entregam que há outro app embaixo. -->
+<div id="disfarce" hidden></div>
 <script>
 /* =====================================================================
    DADOS DE TREINO
@@ -2511,11 +2519,14 @@ const DEF={
    lembretes:['09:00','11:00','14:00','16:30','19:00','21:00'],ocultar:[],alarmes:[],
    viuOcultar:false,disfarce:'',diaCheio:false,avisosOff:[],nivel:'zero',limites:[],higMin:[],
    corpoMeta:'',rampa:false,contador:'mes',hormAndro:'',pronome:'',identidade:'',senha:'',
-   restricoes:[],alergias:[],semIng:[]},
+   restricoes:[],alergias:[],semIng:[],ta:{}},
  dias:{},pesos:[],medidas:[],cargas:{},despensa:[],fotos:[],compras:[],recentes:[],favs:[],vozLog:[],
  salvos:[],trocas:{},ficha:{},externo:{ativo:false,fonte:'',treino:{},dieta:[]},th:{freq:14,hist:[]},
  ciclo:{regras:[],sintomas:{}},meds:[],notas:[],higMeus:[],exames:[],
- ui:{tab:'inicio',sub:{treino:'hoje',nutri:'diario',prog:'peso',cuidados:'corpo'},
+ /* O que a pessoa escrever DENTRO do disfarce. É conteúdo de verdade:
+    sem ele a tela fica vazia, e tela vazia entrega o disfarce. */
+ disf:{notas:[],lista:[],calc:''},
+ ui:{tab:'inicio',sub:{treino:'hoje',nutri:'diario',prog:'peso',cuidados:'corpo',perfil:null},
    calMes:null,diaSel:null,tema:'auto',filtroRef:'todas',cardapio:null,skinTipo:null,
    cienciaV:'fatos',fatoArea:'',calSaude:null,guiaAberto:'',dobras:[],refTudo:false}
 };
@@ -2647,7 +2658,7 @@ function normalizaTudo(){
  if(!CONTADORES.some(c=>c[0]===p.contador))p.contador='mes';
  if(!LOCAIS.some(l=>l[0]===p.local))p.local='casa';
  if(['perder','manter','ganhar'].indexOf(p.obj)<0)p.obj='manter';
- if(!DISFARCES.some(x=>x[0]===p.disfarce))p.disfarce='';
+ if(!DISFARCES.some(x=>x.id===p.disfarce))p.disfarce='';
  if(!TRILHAS[p.trilha])p.trilha='masc';
  if(['masc','fem'].indexOf(p.hormAndro)<0)p.hormAndro='';
  if(!PRONOMES.some(x=>x.id===(p.pronome||'')))p.pronome='';
@@ -3131,7 +3142,7 @@ const OCULTAVEIS=[['peso','Peso na balança'],['gordura','Percentual de gordura'
  ['graficos','Gráficos e números de treino']];
 function avisoOculto(texto){
  return '<p class="xtiny muted" style="margin-top:9px;line-height:1.6">'+texto+
-  ' <button class="btn gh xs" data-a="go" data-tab="perfil">mostrar de novo</button></p>';
+  ' <button class="btn gh xs" data-a="go-sub" data-tab="perfil" data-st="ver">mostrar de novo</button></p>';
 }
 function metas(d){
  const p=S.perfil,peso=pesoAtual();
@@ -3710,9 +3721,26 @@ function streak(){
 }
 /* Disfarce: troca só o nome visível e o título da aba. Não é senha e não
    esconde o endereço nem o histórico do navegador — está escrito na tela. */
-const DISFARCES=[['','Norte, normal'],['Notas','Notas'],['Lista','Lista'],
- ['Agenda','Agenda'],['Estudos','Estudos'],['Receitas','Receitas']];
-function nomeDoApp(){return S.perfil.disfarce||'Norte'}
+/* Cada disfarce é um app inteiro: nome, ícone, cor e uma tela que
+   funciona de verdade. Trocar só o nome não disfarça nada — o ícone é a
+   primeira coisa que alguém vê, e uma tela morta entrega na hora. */
+const DISFARCES=[
+ {id:'',n:'Norte, sem disfarce',app:'Norte',ic:'./icone-192.png',ic2:'./icone-512.png',gr:'512x512',
+  barra:'#123c53',fundo:'#0e0b16',d:'O app aparece como ele é.'},
+ {id:'notas',n:'Bloco de notas',app:'Notas',ic:'./icone-notas-192.png',ic2:'./icone-notas-384.png',gr:'384x384',
+  barra:'#f2b42a',fundo:'#faf7ef',
+  d:'Abre num bloco de recados que escreve e guarda nota de verdade.'},
+ {id:'calc',n:'Calculadora',app:'Calculadora',ic:'./icone-calc-192.png',ic2:'./icone-calc-384.png',gr:'384x384',
+  barra:'#2e3440',fundo:'#20242e',
+  d:'Abre numa calculadora que faz conta de verdade. Aqui a senha precisa ser só de números: é o que o teclado dela digita.',
+  soNumero:true},
+ {id:'lista',n:'Lista de compras',app:'Lista',ic:'./icone-lista-192.png',ic2:'./icone-lista-384.png',gr:'384x384',
+  barra:'#20965c',fundo:'#f2faf6',
+  d:'Abre numa lista de compras que marca e guarda item de verdade.'}
+];
+function disfarceDe(id){return DISFARCES.find(function(x){return x.id===(id||'')})||DISFARCES[0]}
+function disfarceAtual(){return disfarceDe(S.perfil.disfarce)}
+function nomeDoApp(){return disfarceAtual().app}
 /* Encolher o cabeçalho ao rolar. É só uma classe: sem isso o painel do dia
    ocupava quase um quinto da tela do celular o tempo inteiro. */
 /* Com oito sub-abas, a ativa pode estar fora do campo de visão depois de
@@ -3758,18 +3786,28 @@ function ligaCabecalhoMini(){
  ver();
 }
 
+/* As abas que não falam do dia de hoje. Nelas o cabeçalho fica só com o
+   nome e a data: contador, fase e a faixa da semana não respondem nada
+   do que está na tela, e custam 90 px num celular. */
+const SEM_PAINEL_DO_DIA=['perfil','ciencia','privacidade'];
 function renderHeader(){
  const p=S.perfil,se=sessaoDe(),n=se.n;
+ const semDia=SEM_PAINEL_DO_DIA.indexOf(S.ui.tab)>=0;
+ const hdr=document.querySelector('.hdr');
+ if(hdr)hdr.classList.toggle('sodia',semDia);
  if(document.title!==nomeDoApp())document.title=nomeDoApp();
  const disf=!!p.disfarce;
- $('#hdrTitle').textContent=disf?p.disfarce:(p.nome?'Olá, '+p.nome:'Sua jornada');
+ /* p.disfarce agora é o id ('notas'), não o nome visível. Sem isto o
+    cabeçalho mostraria 'notas' em minúscula. */
+ $('#hdrTitle').textContent=disf?nomeDoApp():(p.nome?'Olá, '+p.nome:'Sua jornada');
  $('#hdrSub').textContent=fmtLonga(hoje())+(!disf&&se.s?' · '+se.s.nome:'');
- $('#hdrDay').innerHTML=disf?'':(n>0?'Dia <b>'+n+'</b> · '+esc(se.fase.nome.split('—')[0].trim()):'Começa em <b>'+Math.abs(n-1)+'</b>d');
+ $('#hdrDay').innerHTML=(disf||semDia)?'':(n>0?'Dia <b>'+n+'</b> · '+esc(se.fase.nome.split('—')[0].trim()):'Começa em <b>'+Math.abs(n-1)+'</b>d');
  const mct=modoContador();
- $('#hdrStreak').innerHTML=(disf||mct==='off')?''
+ $('#hdrStreak').innerHTML=(disf||semDia||mct==='off')?''
   :(mct==='mes'?ic('check')+'<b>'+diasAtivosMes()+'</b><span class="xtiny" style="opacity:.7">/30</span>'
    :ic('flame')+'<b>'+streak()+'</b>');
- $('#hdrStreak').style.display=(disf||mct==='off')?'none':'';
+ $('#hdrStreak').style.display=(disf||semDia||mct==='off')?'none':'';
+ if(semDia){$('#wstrip').innerHTML='';return}
  const ini=addDias(hoje(),-se.idx);
  let h='';
  for(let i=0;i<7;i++){const ds=addDias(ini,i),s2=sessaoDe(ds),hj=ds===hoje();
@@ -4221,7 +4259,7 @@ function stHoje(){
    '. Você não precisa apagar nada na mão.</p>'+
    (semTroca.length?'<p class="xtiny muted" style="margin-top:7px;line-height:1.6">Fora hoje: '+
     esc(semTroca.join(', '))+'.</p>':'')+
-   '<button class="btn gh xs" style="margin-top:9px" data-a="go" data-tab="perfil">mudar as limitações</button>'+
+   '<button class="btn gh xs" style="margin-top:9px" data-a="go-sub" data-tab="perfil" data-st="metas">mudar as limitações</button>'+
    '</div></div></div>':'')+
   (foraTrilha.length?'<div class="card" style="border-color:var(--line-2)">'+
    '<div class="row top" style="gap:9px">'+ic('wave','color:var(--primary);font-size:18px;margin-top:1px')+
@@ -6026,10 +6064,7 @@ function sheetDestravar(){
   '<hr class="sep">'+
   '<label class="fld">Já tem a senha?<input type="text" id="senhaNum" autocomplete="off" '+
    'placeholder="digite aqui" inputmode="text"></label>'+
-  '<button class="btn gh bl sm" style="margin-top:9px" data-a="destravar">Liberar os números</button>'+
-  '<p class="xtiny muted" style="margin-top:11px;line-height:1.6"><b>O que esta trava não é:</b> segurança. '+
-  'A senha está no código do app, que é aberto, e quem souber procurar acha. '+
-  'Ela existe para atrapalhar o impulso, não para ser impossível.</p>',
+  '<button class="btn gh bl sm" style="margin-top:9px" data-a="destravar">Liberar os números</button>',
   'o registro continua acontecendo');
 }
 function sheetReceita(id){
@@ -6339,7 +6374,7 @@ function stAgua(){
   '<div class="card">'+chTtl('chart','Últimos 7 dias')+barChart(dias,m.agua,'var(--water)')+
    '<p class="xtiny muted" style="margin-top:7px">A linha tracejada é a meta diária em mililitros.</p></div>'+
   '<div class="card">'+chTtl('bell','Lembretes de hidratação',
-   '<button class="btn gh xs" data-a="go" data-tab="perfil">editar horários</button>')+
+   '<button class="btn gh xs" data-a="go-sub" data-tab="perfil" data-st="voce">editar horários</button>')+
    '<div class="stack" style="gap:0">'+(S.perfil.lembretes||[]).map((h,i)=>{
     const passou=hm2min(h)<agoraMin(),alvo=Math.round(m.agua*(i+1)/(S.perfil.lembretes.length));
     return '<div class="li"><div class="chk '+(a>=alvo?'on':'')+'">'+ic('check')+'</div>'+
@@ -6691,18 +6726,25 @@ function stVoz(){
    '<p class="xtiny muted" style="margin-top:7px">A linha mostra a altura média da sua fala ao longo do tempo. '+
    'Oscilações entre dias são normais — hora do dia, cansaço e hidratação mudam o número.</p></div>':'')+
 
-  '<div class="card">'+chTtl('info','Os três pilares da voz')+
-   '<div class="stack" style="gap:0">'+
-    [['Altura (pitch)','A frequência em que você fala. É o mais fácil de medir e o menos importante dos três.'],
-     ['Ressonância',alvo.res],['Peso vocal',alvo.peso],['Entonação',alvo.ent]].map(([t,dd])=>
-    '<div class="li"><div class="grow"><div class="ttl">'+t+'</div><div class="sub">'+esc(dd)+'</div></div></div>').join('')+
-   '</div></div>'+
-
-  '<div class="card">'+chTtl('bell','Segurança vocal')+
-   '<p class="tiny muted" style="line-height:1.65">Voz treinada nunca dói. Se aparecer dor, ardência, rouquidão que não passa '+
-   'ou cansaço ao falar, pare por alguns dias. Não cochiche — sussurrar força mais que falar normal. Beba água ao longo do dia: '+
-   'prega vocal hidratada aguenta treino. Evite pigarrear. Treino curto e diário rende muito mais que treino longo de vez em quando. '+
-   'Se puder, acompanhamento com fonoaudiólogo especializado em voz trans acelera demais o processo e evita vícios difíceis de desfazer.</p></div>'+
+  /* Estes dois são leitura de uma vez na vida, não coisa de hoje: ficam
+     dobrados para o exercício do dia e o medidor caberem na tela. */
+  dobra('voz:pilares','Os quatro pilares da voz','info',
+   'altura, ressonância, peso vocal e entonação',function(){
+   return '<div class="card">'+chTtl('info','Os quatro pilares da voz')+
+    '<div class="stack" style="gap:0">'+
+     [['Altura (pitch)','A frequência em que você fala. É o mais fácil de medir e o menos importante dos quatro.'],
+      ['Ressonância',alvo.res],['Peso vocal',alvo.peso],['Entonação',alvo.ent]].map(([t,dd])=>
+     '<div class="li"><div class="grow"><div class="ttl">'+t+'</div><div class="sub">'+esc(dd)+'</div></div></div>').join('')+
+    '</div></div>';
+  })+
+  dobra('voz:seguranca','Segurança vocal','bell',
+   'o que fazer se doer, e o que nunca fazer',function(){
+   return '<div class="card">'+chTtl('bell','Segurança vocal')+
+    '<p class="tiny muted" style="line-height:1.65">Voz treinada nunca dói. Se aparecer dor, ardência, rouquidão que não passa '+
+    'ou cansaço ao falar, pare por alguns dias. Não cochiche — sussurrar força mais que falar normal. Beba água ao longo do dia: '+
+    'prega vocal hidratada aguenta treino. Evite pigarrear. Treino curto e diário rende muito mais que treino longo de vez em quando. '+
+    'Se puder, acompanhamento com fonoaudiólogo especializado em voz trans acelera demais o processo e evita vícios difíceis de desfazer.</p></div>';
+  })+
   stVozVideos();
 }
 /* ---------------------------------------------------------------------
@@ -6966,17 +7008,25 @@ function sheetVozEx(id){
 }
 function stVozVideos(){
  const alvo=S.perfil.vozAlvo;
- const bloco=(t,icone,arr,sub)=>'<div class="card">'+chTtl(icone,t)+
-  (sub?'<p class="tiny muted" style="margin-bottom:10px">'+esc(sub)+'</p>':'')+
-  listaVideos(arr)+'</div>';
+ /* Os três blocos nasciam abertos e somavam quatro telas e meia — mais
+    da metade de toda a tela de voz. O resto do app já dobra bloco de
+    vídeo há tempo; aqui tinha ficado para trás. */
+ const bloco=(t,icone,arr,sub)=>dobra('vozvid:'+t,t,icone,
+  arr.length+(arr.length===1?' vídeo':' vídeos')+(sub?' · '+sub:''),
+  ()=>'<div class="card">'+chTtl(icone,t)+
+   (sub?'<p class="tiny muted" style="margin-bottom:10px">'+esc(sub)+'</p>':'')+
+   listaVideos(arr)+'</div>');
  return ''+
   '<div class="card hero">'+chTtl('play','Vídeos de treino de voz')+
    '<p class="tiny muted">Tocam aqui dentro. São de canais de fonoaudiólogos, que é o que importa: '+
    'treino de voz feito de ouvido, copiando imitação, costuma gerar aperto na garganta.</p></div>'+
-  bloco('Base para qualquer objetivo','wave',VIDEOS.voz_base,'Aquecimento, respiração e saúde vocal — servem para todo mundo.')+
+  /* A sua direção primeiro, a base depois, a direção oposta por último:
+     ela é "caso queira comparar", e ocupava quase duas telas de quem
+     nunca vai abrir. */
   (alvo==='masc'?bloco('Masculinização vocal','mic',VIDEOS.voz_masc):bloco('Feminilização vocal','mic',VIDEOS.voz_fem))+
-  (alvo==='masc'?bloco('Feminilização vocal','mic',VIDEOS.voz_fem,'Caso queira comparar as duas abordagens.')
-   :bloco('Masculinização vocal','mic',VIDEOS.voz_masc,'Caso queira comparar as duas abordagens.'));
+  bloco('Base para qualquer objetivo','wave',VIDEOS.voz_base,'servem para todo mundo')+
+  (alvo==='masc'?bloco('Feminilização vocal','mic',VIDEOS.voz_fem,'a outra direção, para comparar')
+   :bloco('Masculinização vocal','mic',VIDEOS.voz_masc,'a outra direção, para comparar'));
 }
 
 /* =====================================================================
@@ -7169,10 +7219,18 @@ const CORPO_ANDRO=[
 ];
 function stCorpoAndro(){
  const avisos=blocoAvisos('corpo');
- const lista=(titulo,icone,arr,dir)=>'<div class="card">'+chTtl(icone,titulo,dir||'')+
-  '<div class="stack" style="gap:0">'+arr.map(([t,dd])=>
-   '<div class="li"><div class="grow"><div class="ttl">'+esc(t)+'</div>'+
-   '<div class="sub" style="line-height:1.55">'+esc(dd)+'</div></div></div>').join('')+'</div></div>';
+ /* Mesmo ajudante das outras trilhas de Corpo: lista de referência vira
+    dobra, com o número de itens no resumo. 'Binder com segurança' é a
+    exceção e nasce aberta, porque é instrução de segurança física. */
+ const lista=(titulo,icone,arr,dir)=>{
+  const corpo=()=>'<div class="card">'+chTtl(icone,titulo,dir||'')+
+   '<div class="stack" style="gap:0">'+arr.map(([t,dd])=>
+    '<div class="li"><div class="grow"><div class="ttl">'+esc(t)+'</div>'+
+    '<div class="sub" style="line-height:1.55">'+esc(dd)+'</div></div></div>').join('')+'</div></div>';
+  if(/binder/i.test(titulo))return corpo();
+  return dobra('corpo:'+nrm(titulo).replace(/\s+/g,'-'),titulo,icone,
+   arr.length+(arr.length===1?' coisa que muda':' coisas que mudam')+' a leitura do corpo',corpo);
+ };
  $('#st-corpo').innerHTML=
   avisos+
   dobra('corpo:postura','Postura','ruler',
@@ -7194,10 +7252,20 @@ function stCorpoFem(){
  const avisos=blocoAvisos('corpo');
  const ms=S.medidas.slice().sort((a,b)=>a.d<b.d?-1:1),ult=ms[ms.length-1];
  const rel=ult&&ult.cintura&&ult.quadril?n1(ult.cintura/ult.quadril):null;
- const lista=(titulo,icone,arr)=>'<div class="card">'+chTtl(icone,titulo)+
-  '<div class="stack" style="gap:0">'+arr.map(([t,dd])=>
-   '<div class="li"><div class="grow"><div class="ttl">'+esc(t)+'</div>'+
-   '<div class="sub" style="line-height:1.55">'+esc(dd)+'</div></div></div>').join('')+'</div></div>';
+ /* Estas listas são leitura de referência, e eram o que fazia esta tela
+    ter sete telas e meia de rolagem. Viram dobra, com o número de itens
+    no resumo para dar para decidir se vale abrir sem abrir.
+    'Binder com segurança' é a exceção e nasce aberta: instrução de
+    segurança física não se esconde atrás de um toque. */
+ const lista=(titulo,icone,arr,dir)=>{
+  const corpo=()=>'<div class="card">'+chTtl(icone,titulo,dir||'')+
+   '<div class="stack" style="gap:0">'+arr.map(([t,dd])=>
+    '<div class="li"><div class="grow"><div class="ttl">'+esc(t)+'</div>'+
+    '<div class="sub" style="line-height:1.55">'+esc(dd)+'</div></div></div>').join('')+'</div></div>';
+  if(/binder/i.test(titulo))return corpo();
+  return dobra('corpo:'+nrm(titulo).replace(/\s+/g,'-'),titulo,icone,
+   arr.length+(arr.length===1?' coisa que muda':' coisas que mudam')+' a leitura do corpo',corpo);
+ };
  $('#st-corpo').innerHTML=
   avisos+
   dobra('corpo:postura','Postura','ruler',
@@ -7219,23 +7287,33 @@ function stCorpoFem(){
    '<p class="tiny muted">A voz é o outro grande marcador, e é o que o estrogênio <b>não</b> muda: a laringe já formada não volta atrás. '+
    'Aqui tudo vem de treino — altura, ressonância, peso vocal e entonação.</p>'+
    '<button class="btn bl sm" style="margin-top:11px" data-a="go-sub" data-tab="cuidados" data-st="voz">Abrir o treino de voz</button></div>'+
-  '<div class="card">'+chTtl('play','Vídeos')+
-   listaVideos(FEM_VIDEOS)+'</div>'+
+  /* Era um cartão aberto de quase duas telas. Vira dobra, como todo o
+     resto do app já faz com bloco de vídeo. */
+  dobra('corpo:videos',"Vídeos",'play',FEM_VIDEOS.length+' vídeos sobre esta trilha',
+   ()=>'<div class="card">'+chTtl('play','Vídeos')+listaVideos(FEM_VIDEOS)+'</div>')+
   blocoTH()+
   '<div class="card">'+chTtl('info','Hormonização')+
    '<p class="tiny muted" style="line-height:1.65">Este app não orienta nada sobre doses, marcas, vias de aplicação ou como começar — '+
    'isso é acompanhamento médico, com exames periódicos. O que ele faz é guardar o que <b>você</b> registrar e acompanhar, ao lado disso, '+
    'o que muda no corpo: peso, medidas, fotos, pele e voz.</p>'+
-   '<button class="btn gh bl sm" style="margin-top:11px" data-a="go" data-tab="perfil">Registrar data de início no Perfil</button></div>';
+   '<button class="btn gh bl sm" style="margin-top:11px" data-a="go-sub" data-tab="perfil" data-st="metas">Registrar data de início no Perfil</button></div>';
 }
 function stCorpoMasc(){
  const avisos=blocoAvisos('corpo');
  const ms=S.medidas.slice().sort((a,b)=>a.d<b.d?-1:1),ult=ms[ms.length-1];
  const rel=ult&&ult.ombro&&ult.cintura?n1(ult.ombro/ult.cintura):null;
- const lista=(titulo,icone,arr,dir)=>'<div class="card">'+chTtl(icone,titulo,dir||'')+
-  '<div class="stack" style="gap:0">'+arr.map(([t,dd])=>
-   '<div class="li"><div class="grow"><div class="ttl">'+esc(t)+'</div>'+
-   '<div class="sub" style="line-height:1.55">'+esc(dd)+'</div></div></div>').join('')+'</div></div>';
+ /* Mesmo ajudante das outras trilhas de Corpo: lista de referência vira
+    dobra, com o número de itens no resumo. 'Binder com segurança' é a
+    exceção e nasce aberta, porque é instrução de segurança física. */
+ const lista=(titulo,icone,arr,dir)=>{
+  const corpo=()=>'<div class="card">'+chTtl(icone,titulo,dir||'')+
+   '<div class="stack" style="gap:0">'+arr.map(([t,dd])=>
+    '<div class="li"><div class="grow"><div class="ttl">'+esc(t)+'</div>'+
+    '<div class="sub" style="line-height:1.55">'+esc(dd)+'</div></div></div>').join('')+'</div></div>';
+  if(/binder/i.test(titulo))return corpo();
+  return dobra('corpo:'+nrm(titulo).replace(/\s+/g,'-'),titulo,icone,
+   arr.length+(arr.length===1?' coisa que muda':' coisas que mudam')+' a leitura do corpo',corpo);
+ };
  $('#st-corpo').innerHTML=
   avisos+
   dobra('corpo:postura','Postura','ruler',
@@ -7267,14 +7345,16 @@ function stCorpoMasc(){
    '<p class="tiny muted">A voz é o outro grande marcador. Com testosterona ela desce sozinha nos primeiros meses, '+
    'mas ressonância, peso e entonação continuam sendo treino — e é o treino que evita o aperto na garganta enquanto a voz muda.</p>'+
    '<button class="btn bl sm" style="margin-top:11px" data-a="go-sub" data-tab="cuidados" data-st="voz">Abrir o treino de voz</button></div>'+
-  '<div class="card">'+chTtl('play','Vídeos')+
-   listaVideos(MASC_VIDEOS)+'</div>'+
+  /* Era um cartão aberto de quase duas telas. Vira dobra, como todo o
+     resto do app já faz com bloco de vídeo. */
+  dobra('corpo:videos',"Vídeos",'play',MASC_VIDEOS.length+' vídeos sobre esta trilha',
+   ()=>'<div class="card">'+chTtl('play','Vídeos')+listaVideos(MASC_VIDEOS)+'</div>')+
   blocoTH()+
   '<div class="card">'+chTtl('info','Hormonização')+
    '<p class="tiny muted" style="line-height:1.65">Este app não orienta nada sobre doses, marcas, vias de aplicação ou como começar a testosterona — '+
    'isso é acompanhamento médico, com exames periódicos. O que ele faz é guardar o que <b>você</b> registrar e acompanhar, ao lado disso, '+
    'o que muda no corpo: peso, medidas, fotos, pele e voz.</p>'+
-   '<button class="btn gh bl sm" style="margin-top:11px" data-a="go" data-tab="perfil">Registrar data de início no Perfil</button></div>';
+   '<button class="btn gh bl sm" style="margin-top:11px" data-a="go-sub" data-tab="perfil" data-st="metas">Registrar data de início no Perfil</button></div>';
 }
 /* =====================================================================
    HIGIENE — a tela é desenhada para o dia em que você não consegue.
@@ -7493,9 +7573,319 @@ function hashSenha(t){
 }
 let destravado=false;
 function precisaDestravar(){return temSenha()&&!destravado}
+/* O disfarce só vale a pena com senha: sem ela, qualquer toque abriria o
+   Norte por baixo e a fantasia duraria um segundo. */
+function disfarceLigado(){return !!S.perfil.disfarce&&temSenha()}
+function emDisfarce(){return disfarceLigado()&&!destravado}
+
+/* =====================================================================
+   DISFARCE
+   O app abre SENDO outro app. Não é tela de senha com outro nome: é um
+   bloco de notas, uma calculadora ou uma lista de compras que funcionam
+   — dá para escrever, calcular e marcar, e o que for escrito fica.
+
+   Uma tela de senha escrita "digite sua senha" anuncia que há coisa
+   escondida ali, e para quem precisa de discrição isso é o oposto de
+   ajuda. Aqui não existe campo de senha, nem cadeado, nem nada pedindo
+   nada: a senha é digitada onde a pessoa já digitaria naquele app.
+
+   O estilo é escrito na mão dentro da camada e não herda nada do Norte.
+   Cor, fonte ou espaçamento herdados entregam que há outro app embaixo.
+   ===================================================================== */
+function disfData(){
+ S.disf=S.disf||{};
+ if(!Array.isArray(S.disf.notas))S.disf.notas=[];
+ if(!Array.isArray(S.disf.lista))S.disf.lista=[];
+ if(typeof S.disf.calc!=='string')S.disf.calc='';
+ return S.disf;
+}
+function senhaBate(t){return temSenha()&&hashSenha(String(t||'').trim())===S.perfil.senha}
+function sairDoDisfarce(){
+ destravado=true;
+ const el=$('#disfarce');if(el){el.hidden=true;el.innerHTML=''}
+ document.body.style.overflow='';
+ ['#main','#tabbar','.hdr'].forEach(function(sel){
+  const el2=document.querySelector(sel);
+  if(el2){el2.removeAttribute('inert');el2.removeAttribute('aria-hidden')}
+ });
+ aplicaIdentidade();
+ render();
+}
+/* Volta a ser o outro app. Um toque, de qualquer lugar. */
+function entrarNoDisfarce(){
+ if(!disfarceLigado())return;
+ destravado=false;
+ closeSheet();
+ aplicaIdentidade();
+ telaDisfarce();
+}
+const DISF_CSS=
+ '#disfarce{position:fixed;inset:0;z-index:95;overflow:auto;'+
+ 'font:16px -apple-system,system-ui,"Segoe UI",Roboto,sans-serif;'+
+ '-webkit-text-size-adjust:100%;padding:env(safe-area-inset-top,0) 0 env(safe-area-inset-bottom,0)}'+
+ '#disfarce *{box-sizing:border-box;font-family:inherit}'+
+ '#disfarce .dtopo{display:flex;align-items:center;justify-content:space-between;'+
+ 'padding:16px 18px;font-size:21px;font-weight:700}'+
+ '#disfarce .dcampo{width:100%;border:0;outline:0;font-size:16px;padding:14px;border-radius:12px}'+
+ '#disfarce .dbt{border:0;cursor:pointer;font-size:16px;border-radius:12px;padding:14px}'+
+ '#disfarce ul{list-style:none;margin:0;padding:0}';
+
+function telaDisfarce(){
+ const box=$('#disfarce');
+ if(!box)return;
+ if(!emDisfarce()){
+  box.hidden=true;box.innerHTML='';document.body.style.overflow='';
+  ['#main','#tabbar','.hdr'].forEach(function(sel){
+   const el=document.querySelector(sel);
+   if(el){el.removeAttribute('inert');el.removeAttribute('aria-hidden')}
+  });
+  return;
+ }
+ const d=disfarceAtual();
+ box.hidden=false;
+ document.body.style.overflow='hidden';
+ box.style.background=d.fundo;
+ box.innerHTML='<style>'+DISF_CSS+'</style>'+
+  ({notas:telaNotas,calc:telaCalc,lista:telaLista}[d.id]||telaNotas)();
+ ligaDisfarce(d.id);
+ /* O Norte continua desenhado por baixo. A camada cobre a tela, mas sem
+    isto o Tab e o leitor de tela passeariam pelo app escondido — e um
+    leitor de tela anunciando "treino de hoje" é o disfarce caindo. */
+ ['#main','#tabbar','.hdr'].forEach(function(sel){
+  const el=document.querySelector(sel);
+  if(el){el.setAttribute('inert','');el.setAttribute('aria-hidden','true')}
+ });
+}
+
+/* ----------------------------------------------------- bloco de notas */
+function telaNotas(){
+ const ns=disfData().notas;
+ return '<div style="color:#2b2b2b">'+
+  '<div class="dtopo" style="background:#f2b42a;color:#3a2c00">Notas</div>'+
+  '<div style="padding:14px 16px 100px">'+
+   (ns.length
+    ?'<ul>'+ns.map(function(x,i){
+      return '<li style="background:#fff;border-radius:14px;padding:14px;margin-bottom:10px;'+
+       'box-shadow:0 1px 3px rgba(0,0,0,.08);display:flex;gap:10px;align-items:flex-start">'+
+       '<span style="flex:1;white-space:pre-wrap;word-break:break-word;line-height:1.5">'+esc(x.t)+
+       '<br><span style="color:#9a9a9a;font-size:12px">'+esc(x.d)+'</span></span>'+
+       '<button class="dbt" data-dn="'+i+'" style="background:none;color:#c0392b;padding:2px 6px;font-size:20px"'+
+       ' aria-label="Apagar">&times;</button></li>';
+     }).join('')+'</ul>'
+    :'<p style="color:#9a8a60;text-align:center;margin:60px 0;line-height:1.6">Nenhuma nota ainda.<br>'+
+     'Escreva a primeira aí embaixo.</p>')+
+  '</div>'+
+  '<div style="position:fixed;left:0;right:0;bottom:0;background:#fffdf7;padding:12px 14px;'+
+   'padding-bottom:calc(12px + env(safe-area-inset-bottom,0));border-top:1px solid #ece2c8;display:flex;gap:9px">'+
+   '<input id="dNotaIn" class="dcampo" style="background:#fff;border:1px solid #e4d9bd;color:#2b2b2b" '+
+    'placeholder="Nova nota" autocomplete="off" autocapitalize="sentences">'+
+   '<button id="dNotaBt" class="dbt" style="background:#f2b42a;color:#3a2c00;font-weight:700;padding:14px 20px">Salvar</button>'+
+  '</div></div>';
+}
+
+/* ------------------------------------------------------ calculadora */
+const CALC_TECLAS=[['C','±','%','÷'],['7','8','9','×'],['4','5','6','−'],['1','2','3','+'],['0','.','⌫','=']];
+function telaCalc(){
+ const v=disfData().calc||'0';
+ return '<div style="color:#fff;min-height:100%;display:flex;flex-direction:column">'+
+  '<div style="flex:1;display:flex;align-items:flex-end;justify-content:flex-end;padding:30px 22px 18px">'+
+   '<div id="dCalcVisor" style="font-size:44px;font-weight:300;word-break:break-all;text-align:right;'+
+   'line-height:1.1;max-width:100%">'+esc(v)+'</div></div>'+
+  '<div style="padding:0 12px calc(16px + env(safe-area-inset-bottom,0))">'+
+   CALC_TECLAS.map(function(linha){
+    return '<div style="display:flex;gap:10px;margin-bottom:10px">'+linha.map(function(t){
+     const fundo=(t==='=')?'#f28c3c':('÷×−+'.indexOf(t)>=0?'#4a5165':(('C±%'.indexOf(t)>=0)?'#5a6273':'#3b4150'));
+     return '<button class="dbt dcalc" data-dk="'+esc(t)+'" style="flex:1;height:62px;background:'+fundo+
+      ';color:#fff;font-size:21px">'+esc(t)+'</button>';
+    }).join('')+'</div>';
+   }).join('')+
+  '</div></div>';
+}
+
+/* --------------------------------------------------- lista de compras */
+function telaLista(){
+ const li=disfData().lista;
+ const faltam=li.filter(function(x){return !x.ok}).length;
+ return '<div style="color:#1f2d26">'+
+  '<div class="dtopo" style="background:#20965c;color:#fff">Lista'+
+   '<span style="font-size:14px;font-weight:500;opacity:.9">'+faltam+' '+(faltam===1?'item':'itens')+'</span></div>'+
+  '<div style="padding:12px 14px 100px">'+
+   (li.length
+    ?'<ul>'+li.map(function(x,i){
+      return '<li style="background:#fff;border-radius:12px;padding:13px 14px;margin-bottom:8px;'+
+       'box-shadow:0 1px 3px rgba(0,0,0,.06);display:flex;gap:12px;align-items:center">'+
+       '<button class="dbt" data-dm="'+i+'" style="width:24px;height:24px;padding:0;flex:none;border-radius:7px;'+
+       'background:'+(x.ok?'#20965c':'#fff')+';border:2px solid '+(x.ok?'#20965c':'#cfd8d3')+';color:#fff;'+
+       'font-size:14px;line-height:1" aria-label="Marcar">'+(x.ok?'&check;':'')+'</button>'+
+       '<span style="flex:1;word-break:break-word;'+(x.ok?'text-decoration:line-through;color:#9fb0a8':'')+'">'+
+       esc(x.t)+'</span>'+
+       '<button class="dbt" data-dr="'+i+'" style="background:none;color:#b94a3c;padding:2px 6px;font-size:19px"'+
+       ' aria-label="Remover">&times;</button></li>';
+     }).join('')+'</ul>'
+    :'<p style="color:#7f9a8d;text-align:center;margin:60px 0;line-height:1.6">Lista vazia.<br>'+
+     'Acrescente o que falta comprar.</p>')+
+  '</div>'+
+  '<div style="position:fixed;left:0;right:0;bottom:0;background:#fff;padding:12px 14px;'+
+   'padding-bottom:calc(12px + env(safe-area-inset-bottom,0));border-top:1px solid #e3ece7;display:flex;gap:9px">'+
+   '<input id="dListaIn" class="dcampo" style="background:#f4f8f6;border:1px solid #dde7e2;color:#1f2d26" '+
+    'placeholder="Acrescentar item" autocomplete="off">'+
+   '<button id="dListaBt" class="dbt" style="background:#20965c;color:#fff;font-weight:700;padding:14px 20px">+</button>'+
+  '</div></div>';
+}
+
+/* Os eventos de cada tela. O que todas têm em comum: o texto digitado é
+   comparado com a senha ANTES de virar nota, item ou conta. Acertou, o
+   Norte abre e nada do que foi digitado fica guardado. */
+function ligaDisfarce(id){
+ const salvarNota=function(){
+  const i=$('#dNotaIn');if(!i)return;
+  const t=i.value.trim();if(!t)return;
+  if(senhaBate(t)){i.value='';return sairDoDisfarce()}
+  disfData().notas.unshift({t:t.slice(0,2000),d:new Date().toLocaleDateString('pt-BR')});
+  i.value='';save('base');telaDisfarce();
+ };
+ const addItem=function(){
+  const i=$('#dListaIn');if(!i)return;
+  const t=i.value.trim();if(!t)return;
+  if(senhaBate(t)){i.value='';return sairDoDisfarce()}
+  disfData().lista.push({t:t.slice(0,120),ok:false});
+  i.value='';save('base');telaDisfarce();
+ };
+ if(id==='notas'){
+  const bt=$('#dNotaBt'),i=$('#dNotaIn');
+  if(bt)bt.onclick=salvarNota;
+  if(i)i.addEventListener('keydown',function(e){if(e.key==='Enter')salvarNota()});
+  $$('#disfarce [data-dn]').forEach(function(b){
+   b.onclick=function(){disfData().notas.splice(+b.dataset.dn,1);save('base');telaDisfarce()};
+  });
+ }else if(id==='lista'){
+  const bt=$('#dListaBt'),i=$('#dListaIn');
+  if(bt)bt.onclick=addItem;
+  if(i)i.addEventListener('keydown',function(e){if(e.key==='Enter')addItem()});
+  $$('#disfarce [data-dm]').forEach(function(b){
+   b.onclick=function(){const x=disfData().lista[+b.dataset.dm];x.ok=!x.ok;save('base');telaDisfarce()};
+  });
+  $$('#disfarce [data-dr]').forEach(function(b){
+   b.onclick=function(){disfData().lista.splice(+b.dataset.dr,1);save('base');telaDisfarce()};
+  });
+ }else if(id==='calc'){
+  const vis=$('#dCalcVisor');
+  let txt=disfData().calc||'0';
+  const mostra=function(){vis.textContent=txt;disfData().calc=txt;save('base')};
+  $$('#disfarce .dcalc').forEach(function(b){
+   b.onclick=function(){
+    const k=b.dataset.dk;
+    if(k==='C'){txt='0';return mostra()}
+    if(k==='⌫'){txt=txt.length>1?txt.slice(0,-1):'0';return mostra()}
+    if(k==='='){
+     /* É aqui que a senha entra: digitada no visor, confere antes de
+        tentar virar conta. */
+     if(senhaBate(txt)){txt='0';mostra();return sairDoDisfarce()}
+     try{
+      const conta=txt.replace(/÷/g,'/').replace(/×/g,'*').replace(/−/g,'-').replace(/%/g,'/100');
+      if(!/^[0-9+\-*/.() ]+$/.test(conta))throw 0;
+      /* Avaliador próprio: a CSP do app proíbe avaliar string como
+         código, e com razão. Isto lê número e operador na mão. */
+      txt=String(calcConta(conta));
+      if(txt==='Infinity'||txt==='NaN'||txt==='-Infinity')txt='Erro';
+     }catch(e){txt='Erro'}
+     return mostra();
+    }
+    if(k==='±'){txt=txt.charAt(0)==='-'?txt.slice(1):('-'+txt);return mostra()}
+    if(txt==='0'&&'0123456789'.indexOf(k)>=0)txt=k;
+    else if(txt==='Erro')txt=('0123456789'.indexOf(k)>=0)?k:'0';
+    else txt+=k;
+    mostra();
+   };
+  });
+ }
+}
+/* Conta na mão: precedência de × ÷ sobre + −, parênteses, e nada de
+   avaliar string como código. A CSP do app proíbe isso, e está certa. */
+function calcConta(e){
+ let i=0;
+ const esp=function(){while(e[i]===' ')i++};
+ const num=function(){
+  esp();
+  if(e[i]==='('){i++;const v=soma();esp();if(e[i]===')')i++;return v}
+  if(e[i]==='-'){i++;return -num()}
+  let ini=i;
+  while(i<e.length&&/[0-9.]/.test(e[i]))i++;
+  if(ini===i)throw 0;
+  return parseFloat(e.slice(ini,i));
+ };
+ const prod=function(){
+  let v=num();
+  for(;;){esp();
+   if(e[i]==='*'){i++;v*=num()}
+   else if(e[i]==='/'){i++;v/=num()}
+   else return v;}
+ };
+ const soma=function(){
+  let v=prod();
+  for(;;){esp();
+   if(e[i]==='+'){i++;v+=prod()}
+   else if(e[i]==='-'){i++;v-=prod()}
+   else return v;}
+ };
+ const v=soma();esp();
+ if(i<e.length)throw 0;
+ return Math.round(v*1e10)/1e10;
+}
+
+/* ---------------------------------------------------------------------
+   A IDENTIDADE DO APP: ícone, nome, cor da barra e manifesto.
+   Trocar só o nome deixava a bússola na tela inicial e na aba, que é a
+   primeira coisa que alguém vê. O manifesto é remontado como Blob para
+   que quem instalar com o disfarce ligado instale o ícone e o nome do
+   disfarce — já instalado, o ícone só muda reinstalando, e isso está
+   dito na tela.
+   --------------------------------------------------------------------- */
+function aplicaIdentidade(){
+ /* A identidade segue o disfarce ESCOLHIDO, não o estado de agora: com
+    o Norte aberto, a aba continua dizendo Notas e o ícone continua sendo
+    o do bloco de recados. Se a aba voltasse a dizer Norte ao destravar,
+    bastaria alguém olhar a barra do navegador por cima do ombro. */
+ const d=disfarceDe(S.perfil.disfarce);
+ const nome=d.app;
+ document.title=nome;
+ const icone=$('link[rel="icon"]'); if(icone)icone.href=d.ic;
+ const apple=$('link[rel="apple-touch-icon"]'); if(apple)apple.href=d.ic;
+ const mt=document.querySelector('meta[name="apple-mobile-web-app-title"]');
+ if(mt)mt.content=nome;
+ document.querySelectorAll('meta[name="theme-color"]').forEach(function(m){m.content=d.barra});
+ try{
+  const mf=$('link[rel="manifest"]');
+  if(mf){
+   const j={name:nome,short_name:nome,lang:'pt-BR',start_url:'./index.html',scope:'./',
+    display:'standalone',orientation:'portrait',background_color:d.fundo,theme_color:d.barra,
+    icons:[{src:d.ic,sizes:'192x192',type:'image/png',purpose:'any'},
+     {src:d.ic2,sizes:d.gr,type:'image/png',purpose:'any'},
+     {src:d.ic2,sizes:d.gr,type:'image/png',purpose:'maskable'}]};
+   if(aplicaIdentidade._url)URL.revokeObjectURL(aplicaIdentidade._url);
+   aplicaIdentidade._url=URL.createObjectURL(new Blob([JSON.stringify(j)],{type:'application/manifest+json'}));
+   mf.href=aplicaIdentidade._url;
+  }
+ }catch(e){}
+}
+/* Se o celular ficou com a tela apagada ou em outro app por mais de um
+   minuto, volta a ser o disfarce sozinho. É o caso que mais acontece:
+   deixar o app aberto e alguém pegar depois. */
+let saiuEm=0;
+document.addEventListener('visibilitychange',function(){
+ if(document.hidden){saiuEm=Date.now();return}
+ if(disfarceLigado()&&destravado&&saiuEm&&Date.now()-saiuEm>60000)entrarNoDisfarce();
+});
 function telaSenha(){
  const box=$('#trava');
  if(!box)return;
+ /* Com disfarce escolhido, é ele que aparece: uma tela escrita "digite
+    sua senha" anuncia que há coisa escondida, e é o contrário do que
+    quem escolheu disfarce está pedindo. */
+ if(disfarceLigado()){box.hidden=true;telaDisfarce();return}
+ /* Sem disfarce ligado, a camada tem que sumir: tirar o disfarce ou a
+    senha deixava a tela do outro app pendurada na frente de tudo. */
+ telaDisfarce();
  box.hidden=!precisaDestravar();
  if(!precisaDestravar()){document.body.style.overflow='';return}
  document.body.style.overflow='hidden';
@@ -8026,7 +8416,8 @@ function cardDesligar(){
   ['Treino de voz',p.vozAlvo==='off'?'desligado':'ligado'],
   ['Exercícios tirados por limitação',(p.limites||[]).length?(p.limites||[]).length+' limitações':'nenhuma'],
   ['Contador do topo',modoContador()==='off'?'desligado':(modoContador()==='mes'?'dias no mês':'dias seguidos')],
-  ['Nome e cara do app',p.disfarce?'disfarçado de '+p.disfarce:'Norte, normal']
+  ['Nome e cara do app',disfarceLigado()?'abre como '+disfarceAtual().app
+    :(p.disfarce?'disfarce escolhido, mas falta a senha':'Norte, normal')]
  ];
  return '<div class="card">'+chTtl('check','Resumo do que está ligado')+
   '<p class="tiny muted" style="line-height:1.7">Desligar não quebra nada: o registro continua por baixo, só não volta para a tela.</p>'+
@@ -8088,7 +8479,11 @@ function stHigiene(){
     t.filter(z=>z.nivel>0).length+'/'+t.length+'</span>')+
     '<div class="stack" style="gap:9px">'+t.map(cartao).join('')+'</div></div>':'';
   }).join('')+
-  '<div class="card">'+chTtl('info','Como esta lista funciona')+
+  /* Explicação de como a lista funciona: lê-se uma vez. As três listas
+     do dia, que são o que se marca hoje, continuam abertas. */
+  dobra('hig:comofunciona','Como esta lista funciona','info',
+   'por que nada fica vermelho, e por que o mínimo conta',function(){
+  return '<div class="card">'+chTtl('info','Como esta lista funciona')+
    '<div class="stack" style="gap:0">'+
    [['Qualquer nível conta','Bochechar água conta como dentes feitos. A diferença entre o mínimo e o nada é muito maior que a diferença entre o mínimo e o completo.'],
     ['A sequência não quebra por pouco','Basta uma coisa marcada no dia para a sequência continuar.'],
@@ -8099,7 +8494,8 @@ function stHigiene(){
    '<div class="sub" style="line-height:1.55">'+dd+'</div></div></div>').join('')+'</div>'+
    '<p class="xtiny muted" style="margin-top:10px;line-height:1.6">Esse desenho não é invenção: é ativação comportamental, '+
    'a ideia de fazer a versão pequena da tarefa antes de esperar a vontade aparecer. Tem meta-análise com 26 ensaios atrás. '+
-   selo('ativacao','A meta-análise')+'</p></div>'+
+   selo('ativacao','A meta-análise')+'</p></div>';
+  })+
   blocoVideos('Quando o básico está difícil',[
  ['','Higiene em dia de depressão','higiene pessoal depressao como fazer o minimo','Estratégias de quem já esteve nesse lugar'],
  ['VGnH5iZFOVw','BURLANDO A DEPRESSÃO: TRUQUES PARA ACABAR COM O CICLO DA INÉRCIA','CAMILLA IMPERA','Dividir em partes, sentar, água morna'],
@@ -8407,7 +8803,7 @@ function cicloHormonal(){
      tile('Intervalo',(th.freq||14)+'d','que você usa')+
      tile('Próxima',fmtCurto(prox),diffDias(hoje(),prox)>0?'em '+diffDias(hoje(),prox)+' dias':'hoje ou atrasada')+'</div>'
    :'<p class="tiny muted">Registre as aplicações no Perfil e os dias aparecem aqui.</p>')+
-  '<button class="btn gh bl sm" style="margin-top:12px" data-a="go" data-tab="perfil">Registrar dose no Perfil</button></div>'+
+  '<button class="btn gh bl sm" style="margin-top:12px" data-a="go-sub" data-tab="perfil" data-st="metas">Registrar dose no Perfil</button></div>'+
   blocoSintomas()+
   '<div class="card">'+chTtl('info','Por que isto está aqui')+
    '<p class="tiny muted" style="line-height:1.7">Quem usa estradiol injetável costuma sentir diferença entre o começo e o fim do intervalo, '+
@@ -9773,7 +10169,7 @@ function blocoGordura(){
     '<b>Qual equação está sendo usada:</b> a feminina. Esta estimativa é publicada separada por sexo e não tem versão do meio, '+
     'e no Perfil você escolheu não fixar uma referência fisiológica. A direção ao longo dos meses continua valendo; '+
     'o número solto depende dessa escolha. '+
-    '<button class="btn gh xs" data-a="go" data-tab="perfil">mudar no Perfil</button></p>')+
+    '<button class="btn gh xs" data-a="go-sub" data-tab="perfil" data-st="voce">mudar no Perfil</button></p>')+
   '</div>';
 }
 function blocoFotos(){
@@ -10279,6 +10675,94 @@ function pf_lembretes(){
       '<button class="chip rm" data-a="alarm-rm" data-i="'+i+'">'+ic('x')+'</button></div>').join('')+'</div>'
     :'<p class="xtiny muted" style="margin-top:10px">Nenhum lembrete seu ainda.</p>')+'</div>';
 }
+/* ---------------------------------------------------------------------
+   PERGUNTAS SOBRE COMIDA
+   O app já nascia com peso, gordura, medidas e caloria travados, e já
+   dizia por quê. O que faltava era perguntar — e deixar a resposta
+   valer.
+
+   Quem responde que tem, que já teve, que ver número faz mal ou que
+   contar comida já virou obsessão tem os números trancados na hora,
+   inclusive quem já tinha destravado antes. A porta de volta é a senha,
+   pedida por e-mail, e a demora da resposta é parte do desenho.
+
+   Isto NÃO é teste: não dá nota, não soma pontuação e não diz se
+   alguém tem alguma coisa. Existe instrumento validado para rastrear
+   transtorno alimentar e ele vale aplicado por quem foi treinado. Aqui
+   o app pergunta e acredita na resposta — que, para decidir o que
+   MOSTRAR, basta e não precisa de diagnóstico.
+   --------------------------------------------------------------------- */
+const PERG_TA=[
+ {k:'tem',p:'Você tem, ou já teve, transtorno alimentar?',
+  o:[['sim','Tenho'],['tive','Já tive'],['nao','Não'],['nd','Prefiro não dizer']],
+  trava:['sim','tive']},
+ {k:'num',p:'Ver número de caloria, de peso ou de medida te faz mal?',
+  o:[['sim','Faz'],['asvezes','Às vezes'],['nao','Não faz']],
+  trava:['sim','asvezes']},
+ {k:'obs',p:'Contar comida já virou obsessão em algum momento?',
+  o:[['sim','Já virou'],['nao','Nunca'],['nd','Prefiro não dizer']],
+  trava:['sim']},
+ {k:'acomp',p:'Tem alguém te acompanhando nisso hoje?',
+  o:[['sim','Tenho'],['nao','Não tenho'],['quero','Quero achar alguém']],
+  trava:[]}
+];
+function respTA(k){return (S.perfil.ta||{})[k]||''}
+/* Alguma resposta pede que os números fiquem trancados? */
+function travaPorTA(){
+ return PERG_TA.some(function(q){return q.trava.indexOf(respTA(q.k))>=0});
+}
+function motivosTA(){
+ return PERG_TA.filter(function(q){return q.trava.indexOf(respTA(q.k))>=0})
+  .map(function(q){
+   const o=q.o.find(function(x){return x[0]===respTA(q.k)});
+   return q.p+' '+(o?o[1].toLowerCase():'');
+  });
+}
+function pf_comida(){
+ const trava=travaPorTA(), respondeu=PERG_TA.some(function(q){return respTA(q.k)});
+ return '<div class="card'+(trava?'" style="border-color:var(--warn)':'')+'">'+
+  chTtl('heart','Sua relação com comida',
+   respondeu?(trava?'<span class="tag w">números trancados</span>':'<span class="tag o">respondido</span>'):'')+
+  '<p class="tiny" style="line-height:1.7">Este app conta caloria, pesa porção e desenha gráfico de peso. '+
+  'Para parte das pessoas isso ajuda, e para parte isso é o próprio problema. '+
+  'As respostas aqui decidem <b>o que o app mostra para você</b> — e nada mais.</p>'+
+  '<p class="tiny muted" style="line-height:1.7;margin-top:10px"><b>Não é teste e não dá nota.</b> '+
+  'O app não soma pontuação, não calcula escore e não diz se você tem alguma coisa. '+
+  'Ele pergunta e acredita na sua resposta. Para decidir o que mostrar, isso basta — '+
+  'diagnóstico é consulta, não app.</p>'+
+  '<div class="stack" style="gap:0;margin-top:13px">'+PERG_TA.map(function(q){
+   return '<div style="padding:11px 0;border-top:1px solid var(--line)">'+
+    '<div class="ttl" style="margin-bottom:7px">'+esc(q.p)+'</div>'+
+    '<div class="row wrap" style="gap:5px">'+q.o.map(function(o){
+     const on=respTA(q.k)===o[0];
+     return '<button class="chip'+(on?' on':'')+'" data-a="ta-resp" data-k="'+q.k+'" data-v="'+o[0]+'">'+
+      esc(o[1])+'</button>';
+    }).join('')+'</div></div>';
+  }).join('')+'</div>'+
+  (trava
+   ?'<p class="tiny" style="line-height:1.7;margin-top:12px;color:var(--warn);font-weight:600">'+
+    'Pelo que você respondeu, peso, percentual de gordura, medidas e caloria estão <b>trancados</b>. '+
+    'O app continua registrando e calculando tudo por baixo — porção, receita e plano seguem certos. '+
+    'Ele só não devolve o número para a tela.</p>'+
+    '<p class="xtiny muted" style="margin-top:8px;line-height:1.6">Para destravar é preciso a senha, '+
+    'que se pede por e-mail, no bloco logo abaixo. A demora da resposta é de propósito: '+
+    'num dia ruim, religar no impulso é o que a trava evita.</p>'
+   :'')+
+  (respTA('acomp')==='quero'
+   ?'<button class="btn acc bl" style="margin-top:12px" data-a="go-sub" data-tab="cuidados" data-st="servicos">'+
+    ic('heart')+' Onde achar profissional que atende pessoas trans</button>'
+   :'')+
+  (respTA('tem')==='sim'||respTA('obs')==='sim'
+   ?'<p class="xtiny muted" style="margin-top:11px;line-height:1.65">Se estiver difícil agora: '+
+    '<b>CVV, 188</b>, ligação gratuita, 24 horas, e também por chat. '+
+    'E o CAPS da sua região atende saúde mental pelo SUS sem precisar de encaminhamento.</p>'
+   :'')+
+  '<p class="xtiny muted" style="margin-top:11px;line-height:1.65">"Prefiro não dizer" não tranca nada e o app não insiste. '+
+  'Estas respostas ficam neste aparelho, como todo o resto, e você pode mudar ou apagar quando quiser.</p>'+
+  (respondeu?'<button class="btn gh bl sm" style="margin-top:11px" data-a="ta-limpar">Apagar estas respostas</button>':'')+
+  '</div>';
+}
+
 function pf_ocultar(){
  const p=S.perfil,m=metas();
  return   '<div class="card'+(p.viuOcultar?'':' hero')+'">'+chTtl('face','Números que você não quer ver')+
@@ -10294,6 +10778,10 @@ function pf_ocultar(){
     (travado(k)?' <span class="tag n" style="margin-left:4px">travado</span>':'')+'</button>').join('')+'</div>'+
    '<p class="xtiny muted" style="margin-top:9px">Marcado em cor = aparece. Apagado = escondido. '+
    'Travado = só com senha.</p>'+
+   (travaPorTA()
+    ?'<p class="xtiny" style="margin-top:9px;line-height:1.6;color:var(--warn)">A trava está firme por causa do que você '+
+     'respondeu logo acima: '+esc(motivosTA().join('; '))+'.</p>'
+    :'')+
    (numLiberado()
     ?'<button class="btn gh bl sm" style="margin-top:11px" data-a="travar-de-novo">'+
       ic('check')+' Desligar os números de novo</button>'
@@ -10302,17 +10790,50 @@ function pf_ocultar(){
    (p.viuOcultar?'':'<button class="btn acc bl" style="margin-top:12px" data-a="viu-ocultar">Pronto, pode continuar</button>')+'</div>';
 }
 function pf_disfarce(){
- const p=S.perfil,m=metas();
- return   '<div class="card">'+chTtl('face','Como o app aparece')+
-   '<p class="tiny muted" style="line-height:1.65">Dá para trocar o nome que aparece no topo e na aba do navegador, '+
-   'para quem bater o olho não saber do que se trata.</p>'+
-   '<div class="row wrap" style="gap:5px;margin-top:11px">'+DISFARCES.map(([v,n])=>
-    '<button class="chip '+((p.disfarce||'')===v?'on':'')+'" data-a="disfarce" data-v="'+esc(v)+'">'+esc(n)+'</button>').join('')+'</div>'+
-   '<p class="xtiny" style="margin-top:11px;line-height:1.6;background:var(--warn-soft);color:var(--warn);'+
-   'border-radius:11px;padding:10px;font-weight:600">Seja honesto consigo: isto troca o nome, e só. '+
-   'Não é senha, não esconde o endereço do site, não some do histórico do navegador e não protege se alguém abrir o app. '+
-   'Serve contra olhada de relance, não contra quem procura.</p></div>';
+ const p=S.perfil, d=disfarceAtual(), ligado=disfarceLigado();
+ return '<div class="card'+(p.disfarce&&!temSenha()?'" style="border-color:var(--warn)':'')+'">'+
+  chTtl('face','Como o app aparece',
+   ligado?'<span class="tag o">disfarçado</span>':(p.disfarce?'<span class="tag w">falta a senha</span>':''))+
+  '<p class="tiny" style="line-height:1.7">Com disfarce, o app <b>abre sendo outro app</b> — e um que funciona: '+
+  'dá para escrever nota, fazer conta e marcar item, e o que você escrever ali fica guardado. '+
+  'Não existe tela de senha, nem cadeado, nem nada pedindo nada.</p>'+
+  '<p class="tiny muted" style="line-height:1.7;margin-top:10px">Para abrir o Norte, você digita a <b>sua senha</b> '+
+  'onde já digitaria naquele app: no campo da nota, no visor da calculadora, no campo do item. '+
+  'Acertou, o Norte abre. O que você digitou não fica salvo.</p>'+
+  '<div class="stack" style="gap:7px;margin-top:13px">'+DISFARCES.map(function(x){
+   const on=(p.disfarce||'')===x.id;
+   return '<button class="ex'+(on?' done':'')+'" data-a="disfarce" data-v="'+esc(x.id)+'" style="width:100%;text-align:left">'+
+    '<div class="row top" style="gap:10px">'+
+    '<span class="chk '+(on?'on':'')+'" style="flex:none">'+ic('check')+'</span>'+
+    (x.id?'<img src="'+esc(x.ic)+'" alt="" width="34" height="34" style="border-radius:9px;flex:none">':'')+
+    '<span class="grow"><span class="nm" style="display:block">'+esc(x.n)+'</span>'+
+    '<span class="meta" style="display:block;line-height:1.5">'+esc(x.d)+'</span></span></div></button>';
+  }).join('')+'</div>'+
+  (p.disfarce&&!temSenha()
+   ?'<p class="tiny" style="margin-top:12px;line-height:1.7;color:var(--warn);font-weight:600">'+
+    'O disfarce não liga sem senha. Sem ela, qualquer toque abriria o Norte por baixo e a fantasia duraria um segundo. '+
+    'Ponha uma senha aqui embaixo e o disfarce passa a valer.</p>'+
+    '<button class="btn acc bl sm" style="margin-top:9px" data-a="senha-por">'+ic('check')+' Pôr uma senha</button>'
+   :'')+
+  (ligado
+   ?'<button class="btn acc bl" style="margin-top:13px" data-a="disfarcar-agora">'+
+    ic('face')+' Virar '+esc(d.app)+' agora</button>'+
+    '<p class="xtiny muted" style="margin-top:9px;line-height:1.6">E, se o celular ficar com a tela apagada ou em outro app '+
+    'por mais de um minuto, ele volta a ser '+esc(d.app)+' sozinho.</p>'
+   :'')+
+  '<hr class="sep"><div class="lbl" style="margin-bottom:7px">O que o disfarce faz, e o que não faz</div>'+
+  '<div class="stack" style="gap:0">'+[
+   ['Troca o ícone e o nome','Na aba do navegador e na cor da barra do topo. Se você instalar o app na tela inicial com o disfarce ligado, ele é instalado com o ícone e o nome do disfarce.'],
+   ['Já instalado, o ícone fica','Quem já instalou antes continua com o ícone antigo até desinstalar e instalar de novo. O navegador não deixa trocar isso depois.'],
+   ['Não é criptografia','Os seus dados continuam no armazenamento do navegador. Quem souber abrir as ferramentas de desenvolvedor lê tudo, disfarce ou não.'],
+   ['Não esconde o endereço','O endereço do site continua na barra e no histórico do navegador. Apagar o histórico é no navegador, não aqui.'],
+   ['Serve contra quem pega o celular','E não contra quem procura. É um atraso, não uma parede — e saber a diferença é o que te protege de verdade.']
+  ].map(function(x){
+   return '<div class="li"><div class="grow"><div class="ttl">'+esc(x[0])+'</div>'+
+    '<div class="sub" style="line-height:1.55">'+esc(x[1])+'</div></div></div>';
+  }).join('')+'</div></div>';
 }
+
 function pf_externo(){
  const p=S.perfil,m=metas();
  return   '<div class="card'+(S.externo.ativo?' hero':'')+'">'+chTtl('user','Já tem treino ou dieta de profissional?',
@@ -10430,43 +10951,57 @@ function pf_avisoFinal(){
    ===================================================================== */
 /* Tem o que preencher: campo de digitar, escolha para tocar ou chave para
    ligar. Esta é a ordem em que as coisas fazem sentido serem preenchidas. */
-const PF_FORM=[
- pf_dados,      /* nome, idade, altura, peso, meta, atividade, horários */
- pf_identidade, /* pronome e identidade */
- pf_refCalc,    /* qual referência entra na conta */
- pf_metas,      /* metas calculadas e ajuste na mão */
- pf_metaCorpo,  /* que corpo você quer */
- pf_transicao,  /* início da terapia hormonal */
- pf_nivel,
- pf_ritmo,
- pf_limites,
- pf_externo,
- pf_diaCheio,
- pf_ocultar,
- pf_contador,
- pf_lembAgua,
- pf_lembretes,
- pf_tema,
- pf_disfarce,
- pf_senha
+/* ---------------------------------------------------------------------
+   O PERFIL EM GRUPOS
+   Medido com o app cheio: 20 telas de rolagem, 30 blocos, 104 botões —
+   o dobro da segunda tela mais longa, e sem hierarquia nenhuma. Quem
+   queria mudar a hora do treino passava por alergia alimentar, disfarce
+   e base científica no caminho.
+
+   Agora é um menu de uma tela e páginas curtas, no mesmo componente de
+   hub que a aba de Cuidados já usava. Os grupos são montados pelo que a
+   pessoa está tentando fazer, não pelo nome que o código dá às coisas.
+   --------------------------------------------------------------------- */
+const PF_GRUPOS=[
+ ['voce',     'Você',           'user',    'corpo, identidade e o que entra na conta'],
+ ['metas',    'Suas metas',     'target',  'caloria, corpo, nível de treino e limitações'],
+ ['ver',      'O que você vê',  'face',    'números travados, comida, contador e tema'],
+ ['lembrete', 'Lembretes',      'bell',    'água e os horários do dia'],
+ ['privado',  'Privacidade',    'check',   'disfarce, senha e onde os seus dados ficam'],
+ ['sobre',    'Sobre o app',    'book',    'em que ele se baseia, e o que ele não é']
 ];
-/* Não se preenche: é o que o app faz com o que você preencheu, e o que ele
-   avisa. Fica embaixo, fora do caminho de quem está montando o perfil. */
-const PF_LEITURA=[
- pf_guardar,    /* exportar e apagar */
- pf_avisosAqui,
- pf_avisosDano,
- pf_desligar,
- pf_ciencia,
- pf_oQueE,
- pf_avisoFinal
-];
+const PF_BLOCOS={
+ voce:[pf_dados,pf_identidade,pf_refCalc],
+ metas:[pf_metas,pf_metaCorpo,pf_transicao,pf_nivel,pf_ritmo,pf_limites,pf_externo,pf_diaCheio],
+ ver:[pf_comida,pf_ocultar,pf_contador,pf_tema],
+ lembrete:[pf_lembAgua,pf_lembretes],
+ privado:[pf_disfarce,pf_senha,pf_guardar,pf_avisosAqui,pf_avisosDano],
+ sobre:[pf_ciencia,pf_oQueE,pf_desligar,pf_avisoFinal]
+};
+function pfGrupo(id){return PF_GRUPOS.find(function(g){return g[0]===id})||null}
 function renderPerfil(){
+ const g=pfGrupo(S.ui.sub.perfil||'');
+ if(!g){
+  S.ui.sub.perfil=null;
+  $('#perfilBox').innerHTML=
+   '<div class="card hero">'+chTtl('user',S.perfil.nome?'Olá, '+esc(S.perfil.nome):'Seu perfil')+
+    '<p class="tiny muted" style="line-height:1.65">Tudo que o app usa para montar o seu dia fica aqui, '+
+    'separado por assunto. Nada disto sai do aparelho.</p></div>'+
+   PF_GRUPOS.map(function(x){
+    return '<button class="hubc" data-a="perfil-ir" data-v="'+x[0]+'">'+
+     '<span class="hi">'+ic(x[2])+'</span>'+
+     '<span class="grow" style="min-width:0"><span class="ht">'+esc(x[1])+'</span>'+
+     '<span class="hs">'+esc(x[3])+'</span></span>'+
+     ic('right','color:var(--ink-3);flex:none')+'</button>';
+   }).join('');
+  return;
+ }
  $('#perfilBox').innerHTML=
-  PF_FORM.map(f=>f()).join('')+
-  '<div class="pfsep">'+ic('info')+'<span>Sobre o app</span></div>'+
-  PF_LEITURA.map(f=>f()).join('');
+  '<button class="voltar" data-a="perfil-hub">'+ic('left')+'Perfil</button>'+
+  '<div class="pfsep">'+ic(g[2])+'<span>'+esc(g[1])+'</span></div>'+
+  (PF_BLOCOS[g[0]]||[]).map(function(f){return f()}).join('');
 }
+
 function temTH(d){const n=diffDias(d,hoje());if(n<0)return '—';
  const me=Math.floor(n/30.44);return me+' m '+(n-Math.round(me*30.44))+' d'}
 
@@ -10774,8 +11309,8 @@ const EVID=[
   no:'É a lógica de toda a aba de Aparência. Maquiagem feminilizante aumenta o contraste em volta dos olhos e da boca e afina a sobrancelha; a masculinizante faz o contrário, engrossa a sobrancelha e marca o ângulo do maxilar. As dicas de roupa não vêm daqui: são convenção de alfaiataria, e isso está escrito na própria tela.',
   fontes:['brownperrett93','rosto18','luminancia09']},
  {id:'passar',area:'Aparência',af:'Ser lida ou lido como você é tem relação com ansiedade e depressão',forca:'fraca',
-  por:'Na coorte STRONG, ser percebida ou percebido conforme o gênero afirmado apareceu associado a menos ansiedade e depressão, e era mais comum em quem relatava mais aceitação e orgulho da própria identidade. O estudo é transversal: mostra que as coisas andam juntas, não que uma causa a outra, e os próprios autores pedem estudos prospectivos. Do outro lado, o que aparece com força como determinante de saúde mental é estigma — assédio, violência e discriminação —, em pesquisa com 1.178 pessoas trans. E "passar" é um conceito contestado dentro da própria comunidade, inclusive por ter sido usado para acusar pessoas trans de enganar os outros.',
-  no:'A aba de Aparência abre dizendo isso, nessa ordem: é caixa de ferramentas, a evidência é de associação e não de causa, o que mais pesa é estigma, e não passar não é falha de ninguém. Nenhuma tela do app mede passabilidade nem dá nota.',
+  por:'Na coorte STRONG, ser percebida ou percebido conforme o gênero afirmado apareceu associado a menos ansiedade e depressão, e era mais comum em quem relatava mais aceitação e orgulho da própria identidade. O estudo é transversal: mostra que as coisas andam juntas, não que uma causa a outra, e os próprios autores pedem estudos prospectivos. Do outro lado, o que aparece com força como determinante de saúde mental é estigma — assédio, violência e discriminação —, em pesquisa com 1.178 pessoas trans.',
+  no:'A aba de Aparência abre dizendo que é caixa de ferramentas e não lista de obrigações, e logo acima dela fica o aviso de que esta evidência é de associação e não de causa, de que o que mais pesa na saúde mental é estigma e não aparência, e de que não passar não é falha de ninguém. Nenhuma tela do app mede passabilidade, dá nota nem compara você com ninguém.',
   fontes:['to20','estigma_nz']},
  {id:'binder',area:'Corpo',af:'Binder tem risco físico real, e dia de folga importa',forca:'media',
   por:'No maior estudo sobre o assunto, com 1.800 pessoas, mais de 97% relataram pelo menos um efeito negativo: dor, calor excessivo, falta de ar. Cinquenta pessoas relataram fratura de costela. Curiosamente, binder comercial apareceu associado a mais desfechos que improviso, o que os autores não conseguiram explicar e levantaram como possível uso errado, tipo sobrepor dois ou usar um número abaixo. É autorrelato e transversal, então mostra associação. O que não está em dúvida: faixa, atadura, plástico filme e fita adesiva são os piores caminhos.',
@@ -11275,7 +11810,8 @@ document.addEventListener('click',ev=>{
    toast('De volta ao plano do app');break;
   case 'viu-ocultar':S.perfil.viuOcultar=true;S.ui.tab='inicio';save('base');render();
    toast('Pronto. Dá para mudar no Perfil quando quiser.');break;
-  case 'disfarce':S.perfil.disfarce=d.v||'';save('base');render();
+  case 'disfarcar-agora':entrarNoDisfarce();break;
+  case 'disfarce':S.perfil.disfarce=d.v||'';save('base');aplicaIdentidade();render();
    toast(d.v?'O app agora aparece como '+d.v:'Nome normal de volta');break;
   case 'prato-abrir':sheetPratoPronto(d.m||'almoco');break;
   case 'prato-set':{S.ui.prato=S.ui.prato||{prot:1,carb:1,veg:1,gord:0};
@@ -11514,6 +12050,8 @@ document.addEventListener('click',ev=>{
    dt.setMonth(dt.getMonth()+Number(d.v));S.ui.calSaude=ymd(dt).slice(0,7)+'-01';render();break}
   case 'dia-saude':sheetDiaSaude(d.d);break;
   case 'ref-tudo':{S.ui.refTudo=true;render();break}
+  case 'perfil-ir':{S.ui.tab='perfil';S.ui.sub.perfil=d.v;window.scrollTo(0,0);render();break}
+  case 'perfil-hub':{S.ui.sub.perfil=null;window.scrollTo(0,0);render();break}
   case 'cuid-ir':{S.ui.sub.cuidados=d.v;window.scrollTo(0,0);render();break}
   case 'cuid-hub':{S.ui.sub.cuidados=null;window.scrollTo(0,0);render();break}
   case 'dobra':{const L=S.ui.dobras=Array.isArray(S.ui.dobras)?S.ui.dobras:[];
@@ -11673,6 +12211,22 @@ document.addEventListener('click',ev=>{
     pararMedidor();save();closeSheet();render();toast('Guardado: '+hz+' Hz');
    }
    break}
+  case 'ta-resp':{
+   S.perfil.ta=S.perfil.ta||{};
+   const antes=travaPorTA();
+   S.perfil.ta[d.k]=(S.perfil.ta[d.k]===d.v?'':d.v);
+   const agora=travaPorTA();
+   /* Responder que tem tranca na hora, inclusive para quem já tinha
+      destravado. E tranca na frente da pessoa, com aviso, não em
+      silêncio. */
+   if(agora&&numLiberado()){S.perfil.numLiberado=false;save('base');render();
+    return toast('Números trancados. Para ver de novo, a senha.')}
+   save('base');render();
+   if(agora&&!antes)toast('Números trancados pelo que você respondeu.');
+   break}
+  case 'ta-limpar':{
+   S.perfil.ta={};save('base');render();
+   toast('Respostas apagadas. A trava continua como estava.');break}
   case 'mental-esc':{
    const v=+d.v;
    if(d.k==='humor'){const x=dia(hj);x.humor=(x.humor===v?0:v)}
@@ -11838,7 +12392,9 @@ telaSenha();
 /* última conferência antes de desenhar qualquer coisa: se o que estava
    gravado no navegador estiver torto, ele é consertado aqui. */
 const foraDaFaixa=normalizaTudo();
+aplicaIdentidade();
 render();
+telaDisfarce();
 ligaCabecalhoMini();
 /* marca a área no corpo: é o que faz a cor da tela trocar */
 (function(){const r2=window.render;window.render=function(){

@@ -35,7 +35,14 @@ const ESSENCIAIS = [
   './index.html',
   './manifest.webmanifest',
   './icone-192.png',
-  './icone-512.png'
+  './icone-512.png',
+  /* Os ícones dos disfarces entram aqui porque o disfarce é a PRIMEIRA
+     tela que aparece para quem o ligou: se o ícone faltar num primeiro
+     acesso sem rede, a aba abre com o ícone quebrado — e ícone quebrado
+     é exatamente o tipo de detalhe que chama atenção. */
+  './icone-notas-192.png',
+  './icone-calc-192.png',
+  './icone-lista-192.png'
 ];
 
 /* Domínios cujas respostas valem guardar: a tipografia e as miniaturas. */
