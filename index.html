@@ -1684,14 +1684,910 @@ const RECIPES=[
  dica:'A massa descansar não é frescura: hidrata a farinha e a panqueca para de rasgar.'}
 ];
 
+/* ---- cem receitas novas ----
+   O macro de cada uma e POR PORCAO e foi calculado a partir dos
+   ingredientes, nao estimado: a lista e da receita inteira e o
+   calculo divide por quanto ela rende. Fonte dos valores por 100 g:
+   TACO para o que e brasileiro, FoodData Central do USDA para o
+   resto. Tempero e erva entram com zero de proposito — em
+   quantidade de tempero eles nao mexem no macro da porcao. */
+RECIPES.push(
+{id:'r66',nome:'Cuscuz de milho com ovo mexido',ref:['cafe'],t:12,kcal:264,p:14,c:18,g:15,rende:'1 porção',
+ ing:[i('Flocão de milho (cuscuz)',60,'cuscuz'),i('Ovo inteiro',100,'ovo'),i('Tomate',50,'tomate'),i('Azeite de oliva',5,'azeite'),i('Sal',1,'tempero')],
+ modo:[
+  'Misture o flocão com 60 ml de água e uma pitada de sal. Espere 5 minutos para hidratar.',
+  'Aperte na cuscuzeira sem socar e cozinhe 8 minutos no vapor. Sem cuscuzeira, use uma peneira sobre a panela, tampada.',
+  'Bata os ovos com sal e mexa em fogo baixo com o azeite até formar cremes grandes.',
+  'Pique o tomate e junte ao ovo fora do fogo.',
+  'Sirva o ovo sobre o cuscuz.'],
+ dica:'Flocão hidratado demais empapa. A medida é água igual ao peso do flocão, não mais.'},
+
+{id:'r67',nome:'Pão integral com ovo cozido e tomate',ref:['cafe'],t:10,kcal:350,p:19,c:29,g:17,rende:'1 porção',
+ ing:[i('Pão integral (fatia)',60,'pao integral'),i('Ovo inteiro',100,'ovo'),i('Tomate',60,'tomate'),i('Azeite de oliva',5,'azeite'),i('Sal e orégano',1,'tempero')],
+ modo:[
+  'Cozinhe os ovos em água fervente por 8 minutos para gema firme, ou 6 para gema cremosa.',
+  'Passe os ovos por água fria, descasque e corte em rodelas.',
+  'Toste o pão.',
+  'Monte com o tomate em rodelas, o ovo, azeite, sal e orégano.'],
+ dica:'Cozinhe seis ovos de uma vez. Na geladeira, com casca, eles duram uma semana.'},
+
+{id:'r68',nome:'Cuscuz com queijo e azeite',ref:['cafe'],t:12,kcal:253,p:10,c:16,g:16,rende:'1 porção',
+ ing:[i('Flocão de milho (cuscuz)',60,'cuscuz'),i('Queijo minas frescal',50,'queijo minas'),i('Azeite de oliva',6,'azeite'),i('Sal',1,'tempero')],
+ modo:[
+  'Hidrate o flocão com 60 ml de água e sal por 5 minutos.',
+  'Cozinhe 8 minutos no vapor.',
+  'Desenforme, abra com o garfo e regue com o azeite.',
+  'Ponha o queijo em fatias por cima, ainda quente.'],
+ dica:'Esse é o café da manhã mais barato por grama de proteína que existe no Nordeste. Rende, enche e custa pouco.'},
+
+{id:'r69',nome:'Omelete de claras com espinafre',ref:['cafe'],t:10,kcal:226,p:25,c:5,g:12,rende:'1 porção',
+ ing:[i('Clara de ovo',150,'clara'),i('Ovo inteiro',50,'ovo'),i('Espinafre refogado',80,'espinafre'),i('Azeite de oliva',5,'azeite'),i('Sal',1,'tempero')],
+ modo:[
+  'Refogue o espinafre no azeite por 2 minutos e tempere.',
+  'Bata as claras com o ovo inteiro e o sal.',
+  'Despeje sobre o espinafre em fogo baixo e espere 3 minutos sem mexer.',
+  'Dobre ao meio e sirva.'],
+ dica:'Clara sozinha fica seca. Um ovo inteiro no meio das claras resolve o sabor e a textura sem pesar na gordura.'},
+
+{id:'r70',nome:'Tapioca com banana e canela',ref:['cafe','lanche1'],t:8,kcal:305,p:3,c:63,g:5,rende:'1 tapioca',
+ ing:[i('Goma de tapioca',50,'tapioca'),i('Banana',80,'banana'),i('Canela em pó',1,'tempero'),i('Pasta de amendoim',10,'pasta de amendoim')],
+ modo:[
+  'Peneire a goma sobre a frigideira quente formando um disco.',
+  'Quando a goma se unir, cerca de 1 minuto, vire.',
+  'Corte a banana em rodelas, distribua em metade do disco e polvilhe canela.',
+  'Espalhe a pasta de amendoim, dobre e sirva.'],
+ dica:'Peneirar a goma é o que faz a diferença entre tapioca macia e tapioca de borracha.'},
+
+{id:'r71',nome:'Smoothie de morango com iogurte grego',ref:['cafe','lanche2'],t:5,kcal:302,p:17,c:39,g:9,rende:'1 copo grande',
+ ing:[i('Morango',150,'morango'),i('Iogurte grego natural',150,'iogurte grego'),i('Aveia em flocos',20,'aveia'),i('Mel',10,'mel')],
+ modo:[
+  'Bata tudo no liquidificador.',
+  'Se quiser mais grosso, use o morango congelado e não ponha gelo.'],
+ dica:'Morango fora de época sai caro. Congelado em pacote tem o mesmo valor nutricional e custa metade.'},
+
+{id:'r72',nome:'Ovo poché sobre purê de abóbora',ref:['cafe'],t:15,kcal:292,p:15,c:23,g:16,rende:'1 porção',
+ ing:[i('Abóbora cabotiá cozida',200,'abobora'),i('Ovo inteiro',100,'ovo'),i('Azeite de oliva',6,'azeite'),i('Sal, pimenta e vinagre',3,'tempero')],
+ modo:[
+  'Amasse a abóbora cozida com sal, pimenta e metade do azeite.',
+  'Ferva água numa panela pequena com um fio de vinagre e baixe o fogo até parar de borbulhar.',
+  'Quebre o ovo numa xícara e deslize na água. Espere 3 minutos.',
+  'Tire com escumadeira, ponha sobre o purê e regue com o resto do azeite.'],
+ dica:'Ovo fresco mantém a clara junta no poché. Ovo velho espalha — para esse, use o cozido.'},
+
+{id:'r73',nome:'Aveia da noite com cacau e banana',ref:['cafe','lanche2'],t:5,kcal:358,p:14,c:70,g:5,rende:'1 pote',
+ ing:[i('Aveia em flocos',45,'aveia'),i('Leite desnatado',180,'leite desnatado'),i('Cacau em pó',8,'cacau'),i('Banana',80,'banana'),i('Mel',10,'mel')],
+ modo:[
+  'Misture a aveia, o leite, o cacau e o mel num pote com tampa.',
+  'Corte a banana em rodelas e distribua por cima.',
+  'Tampe e deixe na geladeira no mínimo 4 horas.',
+  'Coma gelado, direto do pote.'],
+ dica:'Cacau em pó não é achocolatado: achocolatado é dois terços açúcar. Na lista do cacau tem uma coisa só.'},
+
+{id:'r74',nome:'Pão integral com ricota e tomate',ref:['cafe'],t:10,kcal:291,p:13,c:31,g:13,rende:'1 porção',
+ ing:[i('Pão integral (fatia)',60,'pao integral'),i('Ricota',60,'ricota'),i('Tomate',60,'tomate'),i('Azeite de oliva',5,'azeite'),i('Sal e orégano',1,'tempero')],
+ modo:[
+  'Amasse a ricota com o azeite, o sal e o orégano até virar um creme.',
+  'Toste o pão.',
+  'Espalhe a ricota e cubra com o tomate em rodelas finas.'],
+ dica:'Ricota é o laticínio com mais proteína por real no Brasil. Leva bem sal, azeite e qualquer erva.'},
+
+{id:'r75',nome:'Bolo de caneca de aveia e banana',ref:['cafe','lanche1'],t:6,kcal:291,p:12,c:47,g:8,rende:'1 caneca',
+ ing:[i('Banana',100,'banana'),i('Ovo inteiro',50,'ovo'),i('Aveia em flocos',30,'aveia'),i('Cacau em pó',6,'cacau'),i('Fermento em pó e canela',4,'tempero')],
+ modo:[
+  'Amasse a banana na própria caneca.',
+  'Junte o ovo, a aveia, o cacau e a canela e misture bem.',
+  'Acrescente o fermento por último, mexendo de leve.',
+  'Micro-ondas em potência alta por 2 minutos e meio. Ele cresce e volta.'],
+ dica:'Sem fermento ele vira pudim de aveia, que também é bom — só não é bolo.'},
+
+{id:'r76',nome:'Mamão com granola e mel',ref:['cafe','lanche2'],t:5,kcal:306,p:6,c:62,g:6,rende:'1 tigela',
+ ing:[i('Mamão',250,'mamao'),i('Granola',30,'granola'),i('Mel',10,'mel'),i('Aveia em flocos',10,'aveia')],
+ modo:[
+  'Corte o mamão em cubos.',
+  'Espalhe a granola e a aveia por cima e regue com o mel.'],
+ dica:'Mamão é das frutas mais baratas do ano inteiro e resolve o intestino de quem come pouca fibra.'},
+
+{id:'r77',nome:'Pão de queijo de polvilho assado',ref:['cafe'],t:14,kcal:372,p:11,c:46,g:15,rende:'2 porções',
+ ing:[i('Polvilho doce',100,'polvilho'),i('Queijo minas frescal',80,'queijo minas'),i('Ovo inteiro',50,'ovo'),i('Leite desnatado',60,'leite desnatado'),i('Azeite de oliva',10,'azeite'),i('Sal',2,'tempero')],
+ modo:[
+  'Aqueça o leite com o azeite e o sal até quase ferver.',
+  'Despeje sobre o polvilho e mexa rápido: a massa fica grumosa, e é assim mesmo.',
+  'Espere amornar, junte o ovo e o queijo ralado e sove até ficar lisa.',
+  'Faça bolinhas e asse a 200 graus por 25 minutos, até dourar.'],
+ dica:'Escaldar o polvilho com líquido quente é o passo que não dá para pular: é o que faz a massa dar liga.'},
+
+{id:'r78',nome:'Ovos mexidos com couve e cuscuz',ref:['cafe','lanche1'],t:7,kcal:355,p:22,c:17,g:22,rende:'1 porção',
+ ing:[i('Ovo inteiro',150,'ovo'),i('Couve refogada',60,'couve'),i('Flocão de milho (cuscuz)',50,'cuscuz'),i('Azeite de oliva',6,'azeite'),i('Sal',1,'tempero')],
+ modo:[
+  'Hidrate o flocão com 50 ml de água e sal e cozinhe 8 minutos no vapor.',
+  'Corte a couve em tiras finas e refogue no azeite por 2 minutos.',
+  'Bata os ovos com sal, junte à couve e mexa em fogo baixo até dar ponto.',
+  'Sirva sobre o cuscuz.'],
+ dica:'Couve crua cortada fina e jogada no ovo no fim do fogo mantém a cor e a vitamina C.'},
+
+{id:'r79',nome:'Patê de atum com cenoura',ref:['lanche1','lanche2'],t:8,kcal:111,p:17,c:7,g:2,rende:'2 porções',
+ ing:[i('Atum em água (lata)',120,'atum'),i('Cenoura ralada',80,'cenoura'),i('Iogurte natural integral',60,'iogurte'),i('Cebola',30,'cebola'),i('Limão, sal e salsinha',8,'limao')],
+ modo:[
+  'Escorra bem o atum, apertando com o garfo.',
+  'Misture a cenoura ralada fina, a cebola picada miúda e o iogurte.',
+  'Tempere com limão, sal e salsinha.',
+  'Na geladeira, em pote fechado, dura 3 dias.'],
+ dica:'Iogurte natural no lugar da maionese corta metade da gordura e tira o gosto de óleo do patê.'},
+
+{id:'r80',nome:'Patê de sardinha com limão',ref:['lanche1','lanche2'],t:6,kcal:176,p:17,c:3,g:10,rende:'2 porções',
+ ing:[i('Sardinha em lata',120,'sardinha em lata'),i('Requeijão light',50,'requeijao'),i('Cebola',30,'cebola'),i('Limão, sal e pimenta',10,'limao')],
+ modo:[
+  'Escorra o óleo da sardinha e amasse os filés com a espinha junto, com o garfo.',
+  'Misture o requeijão e a cebola picada miúda.',
+  'Tempere com limão e pimenta. Prove antes de pôr sal: a lata já vem salgada.'],
+ dica:'A espinha da sardinha de lata é mole e é dela que vem o cálcio. Amasse e coma.'},
+
+{id:'r81',nome:'Hummus de grão-de-bico',ref:['lanche1','lanche2'],t:10,kcal:248,p:9,c:26,g:13,rende:'3 porções',
+ ing:[i('Grão-de-bico cozido',250,'grao-de-bico'),i('Gergelim',25,'gergelim'),i('Azeite de oliva',20,'azeite'),i('Alho',6,'alho'),i('Limão, sal e cominho',15,'limao')],
+ modo:[
+  'Torre o gergelim numa frigideira seca por 2 minutos e bata no liquidificador até virar pasta.',
+  'Junte o grão-de-bico, o alho, o limão, o sal e o cominho.',
+  'Bata acrescentando água da cozedura aos poucos, até ficar liso.',
+  'Regue com azeite na hora de servir.'],
+ dica:'Sem gergelim em pasta, bata o grão com o azeite: fica mais simples e continua bom.'},
+
+{id:'r82',nome:'Patê de ricota com cenoura e cebolinha',ref:['lanche1'],t:6,kcal:164,p:9,c:6,g:12,rende:'2 porções',
+ ing:[i('Ricota',150,'ricota'),i('Cenoura ralada',70,'cenoura'),i('Azeite de oliva',10,'azeite'),i('Sal e cebolinha',4,'tempero')],
+ modo:[
+  'Amasse a ricota com o azeite e o sal até virar creme.',
+  'Misture a cenoura ralada fina e a cebolinha picada.',
+  'Dura 3 dias na geladeira, em pote fechado.'],
+ dica:'Esse patê salva o pão da tarde e vai bem em palito de cenoura e pepino.'},
+
+{id:'r83',nome:'Mix de castanhas com uva-passa',ref:['lanche1','lanche2'],t:2,kcal:279,p:8,c:20,g:21,rende:'1 porção',
+ ing:[i('Castanha-do-pará',10,'castanha-do-para'),i('Amendoim',15,'amendoim'),i('Castanha-de-caju',15,'castanha-de-caju'),i('Uva-passa',15,'uva-passa')],
+ modo:[
+  'Misture tudo num pote pequeno.',
+  'Separe a porção do dia num saquinho: no pote grande, a porção vira o pote inteiro.'],
+ dica:'Duas castanhas-do-pará por dia dão o selênio do dia. Mais que isso não ajuda e a mais atrapalha.'},
+
+{id:'r84',nome:'Ovos cozidos temperados',ref:['lanche1','lanche2'],t:10,kcal:178,p:13,c:1,g:14,rende:'4 metades',
+ ing:[i('Ovo inteiro',200,'ovo'),i('Azeite de oliva',8,'azeite'),i('Sal, pimenta e orégano',3,'tempero')],
+ modo:[
+  'Cozinhe os ovos por 8 minutos em água fervente.',
+  'Passe por água fria e descasque.',
+  'Corte ao meio, regue com azeite e tempere.'],
+ dica:'Lanche de proteína mais barato do mercado. Faça seis no domingo e resolva a semana.'},
+
+{id:'r85',nome:'Sanduíche de presunto e queijo no pão integral',ref:['lanche1'],t:6,kcal:327,p:21,c:30,g:13,rende:'1 sanduíche',
+ ing:[i('Pão integral (fatia)',60,'pao integral'),i('Presunto magro',40,'presunto'),i('Queijo minas frescal',40,'queijo minas'),i('Tomate',40,'tomate'),i('Alface',20,'alface'),i('Mostarda',6,'mostarda')],
+ modo:[
+  'Passe a mostarda nas duas fatias de pão.',
+  'Monte com alface, tomate, presunto e queijo.',
+  'Aqueça 3 minutos na frigideira, apertando com uma panela por cima.'],
+ dica:'Presunto é carne processada e o ideal é não ser todo dia. Como lanche de uma ou duas vezes na semana, resolve.'},
+
+{id:'r86',nome:'Rolinho de alface com cottage',ref:['lanche1','lanche2'],t:8,kcal:112,p:7,c:6,g:7,rende:'4 rolinhos',
+ ing:[i('Alface',80,'alface'),i('Queijo cottage',120,'cottage'),i('Cenoura ralada',60,'cenoura'),i('Azeite de oliva',8,'azeite'),i('Sal e pimenta',2,'tempero')],
+ modo:[
+  'Separe folhas grandes e inteiras de alface e seque bem.',
+  'Misture o cottage com a cenoura, o azeite, o sal e a pimenta.',
+  'Ponha uma colher do creme em cada folha e enrole como charuto.',
+  'Prenda com palito e leve na marmita.'],
+ dica:'Folha molhada não enrola. Seque com pano de prato antes de montar.'},
+
+{id:'r87',nome:'Palitos de legume com pasta de grão-de-bico',ref:['lanche1','lanche2'],t:8,kcal:212,p:8,c:29,g:8,rende:'2 porções',
+ ing:[i('Cenoura',120,'cenoura'),i('Pepino',120,'pepino'),i('Grão-de-bico cozido',150,'grao-de-bico'),i('Azeite de oliva',12,'azeite'),i('Limão, sal e alho',12,'limao')],
+ modo:[
+  'Bata o grão-de-bico com o azeite, o limão, o alho e o sal, pingando água até ficar cremoso.',
+  'Corte a cenoura e o pepino em palitos.',
+  'Sirva a pasta num pote e os palitos ao lado.'],
+ dica:'Grão-de-bico de saco cozido em casa custa um quarto do de lata. Cozinhe um quilo e congele em porções.'},
+
+{id:'r88',nome:'Vitamina de abacate com cacau',ref:['lanche1','lanche2'],t:5,kcal:285,p:10,c:33,g:16,rende:'1 copo',
+ ing:[i('Abacate',100,'abacate'),i('Leite desnatado',200,'leite desnatado'),i('Cacau em pó',8,'cacau'),i('Mel',12,'mel')],
+ modo:[
+  'Bata tudo no liquidificador até ficar liso.',
+  'Beba na hora: o abacate escurece depois de batido.'],
+ dica:'Abacate no Brasil é fruta de vitamina, não só de salada. A gordura dele é a mesma do azeite.'},
+
+{id:'r89',nome:'Iogurte batido com maracujá',ref:['lanche2'],t:4,kcal:221,p:10,c:27,g:9,rende:'1 pote',
+ ing:[i('Iogurte natural integral',180,'iogurte'),i('Polpa de maracujá',50,'maracuja'),i('Mel',10,'mel'),i('Chia',10,'chia')],
+ modo:[
+  'Misture o iogurte com a polpa e o mel.',
+  'Junte a chia e espere 10 minutos: ela engrossa e vira quase mousse.'],
+ dica:'A semente do maracujá é fibra e pode ficar. Quem não gosta, passa a polpa na peneira.'},
+
+{id:'r90',nome:'Barrinha assada de aveia com amendoim',ref:['lanche1','lanche2'],t:30,kcal:198,p:6,c:30,g:7,rende:'8 barrinhas',
+ ing:[i('Aveia em flocos',200,'aveia'),i('Pasta de amendoim',80,'pasta de amendoim'),i('Mel',80,'mel'),i('Banana',100,'banana'),i('Canela e sal',3,'tempero')],
+ modo:[
+  'Amasse a banana e misture com a pasta de amendoim e o mel.',
+  'Junte a aveia, a canela e o sal e misture até dar liga.',
+  'Aperte numa forma forrada, numa camada de 1,5 cm.',
+  'Asse a 180 graus por 20 minutos. Corte só depois de esfriar, senão desmancha.'],
+ dica:'Guarde em pote fechado fora da geladeira por 5 dias, ou congele em porções.'},
+
+{id:'r91',nome:'Bolinho assado de abobrinha com queijo',ref:['lanche1','lanche2'],t:35,kcal:187,p:10,c:16,g:9,rende:'8 bolinhos',
+ ing:[i('Abobrinha',400,'abobrinha'),i('Ovo inteiro',100,'ovo'),i('Aveia em flocos',60,'aveia'),i('Queijo minas frescal',80,'queijo minas'),i('Cebola',50,'cebola'),i('Sal, pimenta e salsinha',4,'tempero')],
+ modo:[
+  'Rale a abobrinha, salgue e deixe 10 minutos. Aperte com as mãos e jogue a água fora.',
+  'Misture com o ovo, a aveia, o queijo ralado, a cebola picada e os temperos.',
+  'Faça bolinhos achatados numa forma forrada.',
+  'Asse a 200 graus por 25 minutos, virando na metade.'],
+ dica:'Tirar a água da abobrinha é o que separa o bolinho firme da papa. Não pule esse passo.'},
+
+{id:'r92',nome:'Crackers de linhaça e gergelim',ref:['lanche1','lanche2'],t:25,kcal:251,p:7,c:19,g:17,rende:'4 porções',
+ ing:[i('Linhaça',80,'linhaca'),i('Gergelim',40,'gergelim'),i('Farinha de trigo',60,'farinha de trigo'),i('Azeite de oliva',15,'azeite'),i('Sal e orégano',4,'tempero')],
+ modo:[
+  'Misture tudo com 80 ml de água até formar uma massa que solta da mão.',
+  'Abra entre duas folhas de papel-manteiga, bem fina.',
+  'Marque os quadrados com a faca sem separar.',
+  'Asse a 170 graus por 18 minutos. Ela endurece ao esfriar.'],
+ dica:'Fina é o segredo. Massa grossa sai borrachuda no meio e queimada na borda.'},
+
+{id:'r93',nome:'Banana assada com canela e aveia',ref:['lanche2','ceia'],t:12,kcal:211,p:4,c:48,g:2,rende:'1 porção',
+ ing:[i('Banana',150,'banana'),i('Aveia em flocos',20,'aveia'),i('Canela em pó',2,'tempero')],
+ modo:[
+  'Corte a banana ao meio no comprimento, com casca, e ponha numa forma.',
+  'Polvilhe canela e aveia.',
+  'Asse a 200 graus por 12 minutos, até a casca escurecer.'],
+ dica:'Assar concentra o açúcar da banana. Fica doce de sobremesa sem nada adicionado.'},
+
+{id:'r94',nome:'Salada de frutas com coco ralado',ref:['lanche1','lanche2'],t:8,kcal:179,p:2,c:37,g:5,rende:'2 porções',
+ ing:[i('Mamão',150,'mamao'),i('Banana',100,'banana'),i('Laranja',150,'laranja'),i('Maçã',100,'maca'),i('Coco ralado',20,'coco ralado')],
+ modo:[
+  'Corte tudo em cubos do mesmo tamanho.',
+  'Esprema o suco de meia laranja por cima: é o que impede a maçã e a banana de escurecerem.',
+  'Polvilhe o coco ralado na hora de comer.'],
+ dica:'Sem suco de laranja ou limão por cima, a salada de fruta fica marrom em meia hora.'},
+
+{id:'r95',nome:'Pão de forma com pasta de amendoim e banana',ref:['lanche1'],t:4,kcal:323,p:10,c:47,g:12,rende:'1 porção',
+ ing:[i('Pão de forma integral',50,'pao de forma'),i('Pasta de amendoim',20,'pasta de amendoim'),i('Banana',80,'banana'),i('Canela em pó',1,'tempero')],
+ modo:[
+  'Toste o pão.',
+  'Espalhe a pasta de amendoim e cubra com a banana em rodelas.',
+  'Polvilhe canela.'],
+ dica:'Esse é o lanche de antes do treino: carboidrato que entra rápido e gordura que segura a fome.'},
+
+{id:'r96',nome:'Chips de abobrinha assada',ref:['lanche1','lanche2'],t:30,kcal:123,p:2,c:8,g:9,rende:'2 porções',
+ ing:[i('Abobrinha',400,'abobrinha'),i('Azeite de oliva',12,'azeite'),i('Sal, páprica e alho em pó',4,'tempero')],
+ modo:[
+  'Corte a abobrinha em rodelas de 3 mm, de preferência com fatiador.',
+  'Misture com o azeite e os temperos numa tigela.',
+  'Espalhe numa assadeira sem empilhar.',
+  'Asse a 180 graus por 25 minutos, virando na metade.'],
+ dica:'Empilhar é o que impede de ficar crocante: o vapor fica preso e cozinha em vez de assar.'},
+
+{id:'r97',nome:'Feijoada leve de feijão preto com legumes',ref:['almoco','jantar'],t:50,kcal:403,p:33,c:45,g:11,rende:'3 porções',
+ ing:[i('Feijão preto cozido',600,'feijao preto'),i('Carne de porco (lombo) em cubos',250,'carne de porco'),i('Cenoura',150,'cenoura'),i('Abóbora cabotiá cozida',200,'abobora'),i('Cebola',100,'cebola'),i('Alho',10,'alho'),i('Azeite de oliva',20,'azeite'),i('Louro, sal e pimenta',5,'tempero')],
+ modo:[
+  'Doure o lombo em cubos no azeite, em panela grande, e reserve.',
+  'Refogue a cebola e o alho na mesma panela.',
+  'Volte a carne, junte o feijão com o caldo, o louro e cozinhe 20 minutos em fogo baixo.',
+  'Acrescente a cenoura e a abóbora em cubos e cozinhe mais 15 minutos.',
+  'Amasse um pouco da abóbora no caldo: é o que engrossa sem precisar de farinha.'],
+ dica:'Feijoada tradicional é gordurosa pelo embutido, não pelo feijão. Trocando por lombo, sobra o feijão e vai metade da gordura.'},
+
+{id:'r98',nome:'Arroz com lentilha e cebola dourada',ref:['almoco','jantar'],t:35,kcal:440,p:18,c:71,g:10,rende:'3 porções',
+ ing:[i('Arroz integral cozido',400,'arroz integral'),i('Lentilha cozida',450,'lentilha'),i('Cebola',200,'cebola'),i('Azeite de oliva',25,'azeite'),i('Cominho, sal e pimenta',6,'tempero')],
+ modo:[
+  'Corte a cebola em meia-lua fina e doure devagar no azeite, uns 15 minutos, até ficar escura e doce.',
+  'Tire metade da cebola e reserve para o final.',
+  'Junte o arroz e a lentilha já cozidos à cebola da panela, com o cominho e o sal.',
+  'Mexa em fogo baixo por 5 minutos e sirva com a cebola reservada por cima.'],
+ dica:'Arroz com lentilha tem proteína completa: o que falta num, o outro tem. Não precisa de carne para fechar.'},
+
+{id:'r99',nome:'Baião de dois com feijão-fradinho',ref:['almoco'],t:40,kcal:395,p:15,c:53,g:13,rende:'4 porções',
+ ing:[i('Arroz branco cozido',500,'arroz'),i('Feijão branco cozido',350,'feijao branco'),i('Queijo minas frescal',150,'queijo minas'),i('Cebola',80,'cebola'),i('Alho',10,'alho'),i('Azeite de oliva',20,'azeite'),i('Coentro, sal e pimenta',6,'tempero')],
+ modo:[
+  'Refogue a cebola e o alho no azeite.',
+  'Junte o feijão com um pouco do caldo e cozinhe 5 minutos.',
+  'Acrescente o arroz cozido e mexa até secar.',
+  'Desligue, misture o queijo em cubos e o coentro picado. O queijo derrete no calor da panela.'],
+ dica:'Arroz do dia anterior é melhor aqui que arroz fresco: ele não empapa.'},
+
+{id:'r100',nome:'Escondidinho de carne moída com abóbora',ref:['almoco','jantar'],t:45,kcal:406,p:36,c:26,g:18,rende:'4 porções',
+ ing:[i('Carne moída',400,'carne moida'),i('Abóbora cabotiá cozida',700,'abobora'),i('Cebola',100,'cebola'),i('Alho',10,'alho'),i('Extrato de tomate',60,'extrato de tomate'),i('Queijo minas frescal',100,'queijo minas'),i('Azeite de oliva',20,'azeite'),i('Sal, pimenta e cheiro-verde',6,'tempero')],
+ modo:[
+  'Amasse a abóbora cozida com metade do azeite e sal até virar purê firme.',
+  'Refogue a cebola e o alho no resto do azeite, junte a carne e deixe secar a água.',
+  'Acrescente o extrato de tomate e cozinhe 8 minutos. Tempere e junte o cheiro-verde.',
+  'Monte num refratário: carne embaixo, purê em cima, queijo ralado por último.',
+  'Asse a 200 graus por 15 minutos para gratinar.'],
+ dica:'Abóbora no lugar da mandioca dá metade do carboidrato e muito mais vitamina A. E gratina igual.'},
+
+{id:'r101',nome:'Tutu de feijão com couve',ref:['almoco'],t:30,kcal:485,p:16,c:79,g:13,rende:'2 porções',
+ ing:[i('Feijão carioca cozido',500,'feijao'),i('Farinha de mandioca',80,'farinha de mandioca'),i('Couve',150,'couve'),i('Cebola',80,'cebola'),i('Alho',10,'alho'),i('Azeite de oliva',20,'azeite'),i('Sal e pimenta',4,'tempero')],
+ modo:[
+  'Bata metade do feijão com o caldo no liquidificador.',
+  'Refogue a cebola e o alho em metade do azeite, junte o feijão batido e o inteiro.',
+  'Com o fogo baixo, chuvisque a farinha mexendo sem parar, até engrossar.',
+  'Em outra panela, refogue a couve em tiras finas no resto do azeite, 2 minutos.',
+  'Sirva o tutu com a couve por cima.'],
+ dica:'Chuvisque a farinha: jogada de uma vez ela empelota e não tem como desfazer.'},
+
+{id:'r102',nome:'Frango assado com batata-doce e brócolis',ref:['almoco','jantar'],t:45,kcal:513,p:52,c:43,g:15,rende:'2 marmitas',
+ ing:[i('Peito de frango',300,'frango'),i('Batata-doce',400,'batata-doce'),i('Brócolis cozido',200,'brocolis'),i('Azeite de oliva',18,'azeite'),i('Alho, páprica, sal e limão',12,'tempero')],
+ modo:[
+  'Tempere o frango com alho, páprica, sal e limão e deixe 20 minutos.',
+  'Corte a batata-doce em rodelas grossas, misture com metade do azeite e espalhe na assadeira.',
+  'Ponha o frango junto e asse a 200 graus por 30 minutos.',
+  'Cozinhe o brócolis no vapor por 5 minutos, até ficar verde-vivo e firme.',
+  'Monte as marmitas e deixe esfriar destampadas antes de fechar.'],
+ dica:'Marmita tampada quente embaça e a comida azeda mais rápido. Espere esfriar.'},
+
+{id:'r103',nome:'Tilápia na chapa com arroz e salada',ref:['almoco','jantar'],t:25,kcal:533,p:48,c:47,g:18,rende:'1 porção',
+ ing:[i('Filé de tilápia',160,'tilapia'),i('Arroz integral cozido',150,'arroz integral'),i('Alface',60,'alface'),i('Tomate',80,'tomate'),i('Pepino',60,'pepino'),i('Azeite de oliva',12,'azeite'),i('Limão, sal e pimenta',10,'limao')],
+ modo:[
+  'Tempere o filé com limão, sal e pimenta e deixe 10 minutos.',
+  'Aqueça a frigideira bem quente com um fio de azeite.',
+  'Ponha o filé e não mexa por 3 minutos. Vire e deixe 2 minutos.',
+  'Monte o prato com o arroz e a salada temperada com o resto do azeite e limão.'],
+ dica:'Peixe magro passa do ponto em segundos. Quando a carne solta em lascas com o garfo, já está.'},
+
+{id:'r104',nome:'Carne moída com quiabo e arroz',ref:['almoco'],t:35,kcal:490,p:35,c:55,g:14,rende:'3 porções',
+ ing:[i('Carne moída',300,'carne moida'),i('Quiabo',300,'quiabo'),i('Arroz branco cozido',450,'arroz'),i('Cebola',80,'cebola'),i('Alho',10,'alho'),i('Tomate',150,'tomate'),i('Azeite de oliva',18,'azeite'),i('Limão, sal e pimenta',10,'limao')],
+ modo:[
+  'Lave o quiabo, seque bem e corte em rodelas. Esfregue o limão nas rodelas.',
+  'Frite o quiabo no azeite em fogo alto, sem mexer muito, até secar a baba.',
+  'Em outra panela, refogue a cebola e o alho, junte a carne e deixe secar.',
+  'Acrescente o tomate picado, cozinhe 8 minutos e junte o quiabo.',
+  'Sirva com o arroz.'],
+ dica:'Quiabo molhado e mexido solta baba. Seco, em fogo alto e quase sem mexer, não solta.'},
+
+{id:'r105',nome:'Virado de feijão com ovo e couve',ref:['almoco'],t:25,kcal:639,p:24,c:93,g:19,rende:'2 porções',
+ ing:[i('Feijão carioca cozido',350,'feijao'),i('Ovo inteiro',150,'ovo'),i('Couve',120,'couve'),i('Farinha de mandioca',50,'farinha de mandioca'),i('Arroz branco cozido',300,'arroz'),i('Alho',8,'alho'),i('Azeite de oliva',18,'azeite'),i('Sal',4,'tempero')],
+ modo:[
+  'Refogue o alho no azeite e junte o feijão escorrido. Deixe secar 5 minutos.',
+  'Chuvisque a farinha mexendo, até dar liga.',
+  'Em outra frigideira, frite os ovos e refogue a couve em tiras finas.',
+  'Monte o prato: arroz, feijão virado, couve e o ovo por cima.'],
+ dica:'O prato que mais aparece na mesa brasileira é também um dos mais completos. Arroz, feijão, folha e ovo fecham proteína, ferro e fibra.'},
+
+{id:'r106',nome:'Macarrão ao molho de tomate caseiro com carne moída',ref:['almoco','jantar'],t:30,kcal:460,p:37,c:44,g:16,rende:'3 porções',
+ ing:[i('Macarrão integral cozido',400,'macarrao integral'),i('Carne moída',300,'carne moida'),i('Tomate',500,'tomate'),i('Cebola',100,'cebola'),i('Alho',12,'alho'),i('Azeite de oliva',20,'azeite'),i('Sal, orégano e manjericão',6,'tempero')],
+ modo:[
+  'Escalde os tomates em água fervente por 1 minuto, tire a pele e bata no liquidificador.',
+  'Refogue a cebola e o alho no azeite, junte a carne e deixe secar a água.',
+  'Acrescente o tomate batido e cozinhe 20 minutos em fogo baixo, destampado.',
+  'Tempere no fim com sal, orégano e manjericão e misture ao macarrão.'],
+ dica:'Molho de tomate de verdade leva 20 minutos e nenhum açúcar. O açúcar do pote existe para disfarçar tomate ruim.'},
+
+{id:'r107',nome:'Estrogonofe de champignon sem ingrediente animal',ref:['almoco','jantar'],t:25,kcal:421,p:22,c:30,g:28,rende:'2 porções',
+ ing:[i('Champignon em conserva',400,'champignon'),i('Tofu',200,'tofu'),i('Extrato de tomate',60,'extrato de tomate'),i('Cebola',100,'cebola'),i('Alho',10,'alho'),i('Castanha-de-caju',60,'castanha-de-caju'),i('Azeite de oliva',18,'azeite'),i('Mostarda, sal e pimenta',12,'mostarda')],
+ modo:[
+  'Deixe a castanha de molho em água quente por 20 minutos e bata com 120 ml de água até virar creme.',
+  'Doure o tofu em cubos no azeite até firmar e reserve.',
+  'Refogue a cebola e o alho, junte o champignon e deixe dourar.',
+  'Acrescente o extrato de tomate, a mostarda e o creme de castanha e cozinhe 5 minutos.',
+  'Volte o tofu, tempere e desligue.'],
+ dica:'Creme de castanha batido com água substitui creme de leite em qualquer molho, e não talha no fogo.'},
+
+{id:'r108',nome:'Quibe assado de abóbora com carne',ref:['almoco','jantar'],t:50,kcal:396,p:33,c:36,g:13,rende:'4 porções',
+ ing:[i('Carne moída',400,'carne moida'),i('Abóbora cabotiá cozida',400,'abobora'),i('Trigo para quibe',120,'farinha de trigo'),i('Cebola',100,'cebola'),i('Azeite de oliva',20,'azeite'),i('Hortelã, sal e pimenta',8,'tempero')],
+ modo:[
+  'Deixe o trigo de molho em água fria por 30 minutos e aperte para tirar a água.',
+  'Amasse a abóbora cozida e misture com o trigo, a carne, a cebola ralada e os temperos.',
+  'Sove com a mão até a massa ficar homogênea.',
+  'Espalhe num refratário untado, risque os losangos e regue com o azeite.',
+  'Asse a 200 graus por 35 minutos.'],
+ dica:'Abóbora na massa deixa o quibe úmido. Quibe assado seco é quibe com trigo demais.'},
+
+{id:'r109',nome:'Galinhada com arroz integral e cenoura',ref:['almoco'],t:45,kcal:500,p:46,c:53,g:11,rende:'4 porções',
+ ing:[i('Coxa de frango sem pele',500,'frango'),i('Arroz integral cozido',600,'arroz integral'),i('Cenoura',200,'cenoura'),i('Ervilha cozida',150,'ervilha'),i('Cebola',100,'cebola'),i('Alho',12,'alho'),i('Azeite de oliva',20,'azeite'),i('Colorau, sal e cheiro-verde',8,'tempero')],
+ modo:[
+  'Tempere o frango com alho, sal e colorau e doure no azeite, em panela grande.',
+  'Junte a cebola e a cenoura em cubos e refogue 5 minutos.',
+  'Acrescente 200 ml de água, tampe e cozinhe 15 minutos até o frango soltar do osso.',
+  'Misture o arroz cozido e a ervilha, mexa em fogo baixo por 5 minutos.',
+  'Finalize com cheiro-verde.'],
+ dica:'Coxa tem mais sabor e custa menos que peito. A diferença de gordura, sem pele, é pequena.'},
+
+{id:'r110',nome:'Moqueca simples de tilápia',ref:['almoco','jantar'],t:30,kcal:401,p:42,c:17,g:20,rende:'2 porções',
+ ing:[i('Filé de tilápia',300,'tilapia'),i('Tomate',250,'tomate'),i('Pimentão',150,'pimentao'),i('Cebola',120,'cebola'),i('Coco ralado',30,'coco ralado'),i('Azeite de oliva',18,'azeite'),i('Limão, coentro, sal e colorau',15,'limao')],
+ modo:[
+  'Tempere o peixe com limão, sal e colorau e deixe 15 minutos.',
+  'Numa panela larga, faça camadas de cebola, tomate e pimentão em rodelas, com o azeite.',
+  'Ponha o peixe por cima, junte o coco ralado e 100 ml de água.',
+  'Tampe e cozinhe 12 minutos em fogo baixo, sem mexer.',
+  'Finalize com coentro.'],
+ dica:'Moqueca não se mexe: sacuda a panela pelo cabo. Mexer desmancha o peixe.'},
+
+{id:'r111',nome:'Arroz de forno com frango e milho',ref:['almoco','jantar'],t:40,kcal:579,p:45,c:58,g:17,rende:'4 porções',
+ ing:[i('Peito de frango desfiado',400,'frango'),i('Arroz branco cozido',600,'arroz'),i('Milho verde (cozido)',200,'milho verde'),i('Requeijão light',120,'requeijao'),i('Cenoura',150,'cenoura'),i('Queijo mussarela',100,'queijo'),i('Azeite de oliva',15,'azeite'),i('Sal, pimenta e cheiro-verde',6,'tempero')],
+ modo:[
+  'Misture o frango desfiado, o arroz, o milho, a cenoura ralada e o requeijão.',
+  'Tempere e acerte o sal.',
+  'Espalhe num refratário untado com o azeite e cubra com a mussarela.',
+  'Asse a 200 graus por 20 minutos, até gratinar.'],
+ dica:'Isso é o destino certo do frango e do arroz que sobraram. Rende quatro marmitas e congela bem.'},
+
+{id:'r112',nome:'Frango ao molho de mostarda com arroz',ref:['almoco','jantar'],t:30,kcal:509,p:48,c:45,g:14,rende:'3 porções',
+ ing:[i('Peito de frango em cubos',400,'frango'),i('Arroz integral cozido',450,'arroz integral'),i('Iogurte natural integral',150,'iogurte'),i('Mostarda',30,'mostarda'),i('Cebola',80,'cebola'),i('Alho',10,'alho'),i('Azeite de oliva',18,'azeite'),i('Sal, pimenta e salsinha',6,'tempero')],
+ modo:[
+  'Doure o frango em cubos no azeite, em fogo alto, e reserve.',
+  'Refogue a cebola e o alho na mesma panela.',
+  'Volte o frango com 80 ml de água e cozinhe 5 minutos.',
+  'Desligue, misture a mostarda e o iogurte e acerte o sal.',
+  'Sirva sobre o arroz, com salsinha.'],
+ dica:'Mostarda comum de mesa serve. A de dijon é mais forte: use metade.'},
+
+{id:'r113',nome:'Lentilha ensopada com cenoura e arroz',ref:['almoco','jantar'],t:35,kcal:464,p:18,c:82,g:8,rende:'3 porções',
+ ing:[i('Lentilha cozida',400,'lentilha'),i('Cenoura',200,'cenoura'),i('Arroz branco cozido',450,'arroz'),i('Tomate',200,'tomate'),i('Cebola',100,'cebola'),i('Alho',12,'alho'),i('Azeite de oliva',20,'azeite'),i('Louro, sal, pimenta e salsinha',8,'tempero')],
+ modo:[
+  'Refogue a cebola e o alho no azeite.',
+  'Junte a cenoura em cubos e o tomate picado e cozinhe 5 minutos.',
+  'Acrescente a lentilha com um pouco do caldo e o louro. Cozinhe 15 minutos em fogo baixo.',
+  'Acerte o sal, junte a salsinha e sirva com o arroz.'],
+ dica:'Lentilha cozinha em 20 minutos sem molho de véspera. É a leguminosa mais rápida que existe.'},
+
+{id:'r114',nome:'Abobrinha recheada com carne moída',ref:['almoco','jantar'],t:50,kcal:348,p:31,c:14,g:18,rende:'4 porções',
+ ing:[i('Abobrinha',800,'abobrinha'),i('Carne moída',350,'carne moida'),i('Tomate',200,'tomate'),i('Cebola',100,'cebola'),i('Alho',10,'alho'),i('Queijo minas frescal',80,'queijo minas'),i('Azeite de oliva',18,'azeite'),i('Sal, pimenta e orégano',6,'tempero')],
+ modo:[
+  'Corte as abobrinhas ao meio no comprimento e cave o miolo com a colher. Guarde o miolo.',
+  'Refogue a cebola e o alho, junte a carne e deixe secar.',
+  'Acrescente o tomate e o miolo picado e cozinhe 10 minutos. Tempere.',
+  'Recheie as abobrinhas, cubra com o queijo ralado e regue com o azeite.',
+  'Asse a 200 graus por 30 minutos.'],
+ dica:'Jogar o miolo fora é jogar comida fora. Ele dá corpo ao recheio e some dentro dele.'},
+
+{id:'r115',nome:'Peixe assado com farofa de mandioca',ref:['almoco','jantar'],t:40,kcal:424,p:41,c:35,g:14,rende:'2 porções',
+ ing:[i('Filé de tilápia',300,'tilapia'),i('Farinha de mandioca',60,'farinha de mandioca'),i('Cebola',100,'cebola'),i('Alface',60,'alface'),i('Tomate',100,'tomate'),i('Azeite de oliva',20,'azeite'),i('Limão, sal, alho e coentro',15,'limao')],
+ modo:[
+  'Tempere o peixe com limão, alho e sal e deixe 15 minutos.',
+  'Asse a 200 graus por 18 minutos, regado com metade do azeite.',
+  'Doure a cebola picada no resto do azeite e chuvisque a farinha, mexendo até ficar dourada.',
+  'Junte o coentro à farofa e sirva com o peixe e a salada.'],
+ dica:'Farofa queima em segundos depois que doura. Fogo baixo e mexendo sem parar.'},
+
+{id:'r116',nome:'Fígado acebolado com arroz e couve',ref:['almoco'],t:25,kcal:706,p:53,c:64,g:25,rende:'2 porções',
+ ing:[i('Fígado de boi em bifes',300,'figado de boi'),i('Arroz branco cozido',300,'arroz'),i('Couve',150,'couve'),i('Cebola',200,'cebola'),i('Alho',10,'alho'),i('Azeite de oliva',20,'azeite'),i('Limão, sal e pimenta',12,'limao')],
+ modo:[
+  'Deixe o fígado 20 minutos no limão com água: tira o gosto forte.',
+  'Seque bem, salgue e sele em frigideira bem quente, 2 minutos de cada lado. Não passe disso.',
+  'Tire o fígado e doure a cebola em meia-lua na mesma frigideira.',
+  'Refogue a couve em tiras finas com o alho.',
+  'Sirva o fígado com a cebola por cima, o arroz e a couve.'],
+ dica:'Fígado é o alimento com mais ferro por real no Brasil, e passou do ponto fica duro como sola. Dois minutos por lado, nem mais.'},
+
+{id:'r117',nome:'Tofu grelhado com arroz integral e legumes',ref:['almoco','jantar'],t:30,kcal:470,p:20,c:55,g:21,rende:'2 porções',
+ ing:[i('Tofu',300,'tofu'),i('Arroz integral cozido',300,'arroz integral'),i('Brócolis cozido',150,'brocolis'),i('Cenoura',120,'cenoura'),i('Shoyu',20,'shoyu'),i('Azeite de oliva',18,'azeite'),i('Alho, gengibre e gergelim',12,'gergelim')],
+ modo:[
+  'Aperte o tofu entre dois pratos com peso por 15 minutos para sair a água.',
+  'Corte em cubos, tempere com o shoyu, o alho e o gengibre e deixe 10 minutos.',
+  'Doure no azeite em fogo alto, sem mexer muito, até formar casca.',
+  'Refogue a cenoura e o brócolis rapidamente na mesma panela.',
+  'Sirva sobre o arroz com o gergelim por cima.'],
+ dica:'Tofu molhado não doura, cozinha. Prensar antes é o passo que decide se ele fica bom.'},
+
+{id:'r118',nome:'Soja texturizada ao molho de tomate com macarrão',ref:['almoco','jantar'],t:30,kcal:398,p:28,c:56,g:9,rende:'3 porções',
+ ing:[i('Soja texturizada hidratada',350,'soja texturizada'),i('Macarrão integral cozido',400,'macarrao integral'),i('Tomate',400,'tomate'),i('Cebola',100,'cebola'),i('Alho',12,'alho'),i('Azeite de oliva',20,'azeite'),i('Sal, orégano e manjericão',6,'tempero')],
+ modo:[
+  'Hidrate a soja em água quente por 15 minutos, aperte bem e jogue a água fora.',
+  'Refogue a cebola e o alho no azeite e junte a soja. Deixe dourar 5 minutos.',
+  'Acrescente o tomate batido e cozinhe 15 minutos destampado.',
+  'Tempere e misture ao macarrão.'],
+ dica:'Apertar a soja depois de hidratar tira o gosto de papelão. Quem acha soja ruim quase sempre pulou esse passo.'},
+
+{id:'r119',nome:'Panqueca de forno recheada de frango e espinafre',ref:['almoco','jantar'],t:45,kcal:532,p:49,c:41,g:18,rende:'4 porções',
+ ing:[i('Peito de frango desfiado',400,'frango'),i('Espinafre refogado',200,'espinafre'),i('Farinha de trigo',150,'farinha de trigo'),i('Leite desnatado',350,'leite desnatado'),i('Ovo inteiro',100,'ovo'),i('Molho de tomate',300,'molho de tomate'),i('Queijo mussarela',100,'queijo'),i('Azeite de oliva',20,'azeite'),i('Sal, pimenta e orégano',6,'tempero')],
+ modo:[
+  'Bata a farinha, o leite, o ovo, metade do azeite e o sal no liquidificador. Descanse 10 minutos.',
+  'Faça os discos em frigideira antiaderente, 1 minuto de cada lado. Rende cerca de 8.',
+  'Misture o frango com o espinafre e tempere.',
+  'Recheie, enrole e arrume num refratário. Cubra com o molho e a mussarela.',
+  'Asse a 200 graus por 20 minutos.'],
+ dica:'A massa descansada fica mais macia: o descanso hidrata a farinha e tira as bolhas.'},
+
+{id:'r120',nome:'Sopa de feijão com macarrão',ref:['jantar'],t:35,kcal:295,p:12,c:46,g:8,rende:'3 tigelas',
+ ing:[i('Feijão carioca cozido',500,'feijao'),i('Macarrão comum cozido',150,'macarrao'),i('Cenoura',150,'cenoura'),i('Couve',80,'couve'),i('Cebola',80,'cebola'),i('Alho',10,'alho'),i('Azeite de oliva',18,'azeite'),i('Sal, louro e pimenta',6,'tempero')],
+ modo:[
+  'Bata metade do feijão com o caldo no liquidificador.',
+  'Refogue a cebola e o alho no azeite, junte a cenoura em cubos e cozinhe 5 minutos.',
+  'Acrescente o feijão batido, o inteiro e 400 ml de água. Cozinhe 15 minutos.',
+  'Junte o macarrão já cozido e a couve em tiras finas, desligue e tampe por 2 minutos.'],
+ dica:'Macarrão cozido dentro da sopa continua inchando e no dia seguinte bebe o caldo todo. Cozinhe separado.'},
+
+{id:'r121',nome:'Caldo verde de batata com feijão branco',ref:['jantar'],t:30,kcal:441,p:16,c:65,g:14,rende:'2 tigelas',
+ ing:[i('Batata inglesa cozida',500,'batata'),i('Feijão branco cozido',300,'feijao branco'),i('Couve',150,'couve'),i('Cebola',100,'cebola'),i('Alho',12,'alho'),i('Azeite de oliva',24,'azeite'),i('Sal e pimenta',6,'tempero')],
+ modo:[
+  'Refogue a cebola e o alho em metade do azeite.',
+  'Junte a batata cozida e 600 ml de água e bata no liquidificador até ficar liso.',
+  'Volte à panela com o feijão branco inteiro, acerte o sal e ferva.',
+  'Corte a couve em tiras muito finas, jogue no caldo fervendo e desligue na hora.',
+  'Regue cada tigela com o resto do azeite.'],
+ dica:'O feijão branco é o que faz isso virar jantar e não entrada: sem ele, são 5 g de proteína na tigela.'},
+
+{id:'r122',nome:'Creme de abóbora com gengibre e castanha',ref:['jantar'],t:30,kcal:481,p:14,c:63,g:22,rende:'2 tigelas',
+ ing:[i('Abóbora cabotiá cozida',800,'abobora'),i('Cebola',100,'cebola'),i('Alho',10,'alho'),i('Gengibre',8,'tempero'),i('Leite desnatado',200,'leite desnatado'),i('Castanha-de-caju',50,'castanha-de-caju'),i('Azeite de oliva',20,'azeite'),i('Sal, pimenta e noz-moscada',6,'tempero')],
+ modo:[
+  'Refogue a cebola, o alho e o gengibre ralado no azeite.',
+  'Junte a abóbora cozida, a castanha e 400 ml de água e bata até ficar liso.',
+  'Volte à panela com o leite, acerte o sal e aqueça sem ferver.',
+  'Finalize com pimenta e um ralado de noz-moscada.'],
+ dica:'Abóbora cabotiá tem mais polpa e menos água que a moranga. É a que dá creme sem precisar de farinha.'},
+
+{id:'r123',nome:'Cuscuz recheado de frango',ref:['jantar'],t:20,kcal:392,p:37,c:25,g:16,rende:'1 porção',
+ ing:[i('Flocão de milho (cuscuz)',70,'cuscuz'),i('Peito de frango desfiado',100,'frango'),i('Tomate',60,'tomate'),i('Cebola',40,'cebola'),i('Requeijão light',30,'requeijao'),i('Azeite de oliva',8,'azeite'),i('Sal e cheiro-verde',3,'tempero')],
+ modo:[
+  'Hidrate o flocão com 70 ml de água e sal por 5 minutos.',
+  'Refogue a cebola no azeite, junte o frango desfiado e o tomate e tempere.',
+  'Na cuscuzeira, ponha metade do flocão, o recheio no meio e o resto por cima.',
+  'Cozinhe 10 minutos no vapor, desenforme e sirva com o requeijão.'],
+ dica:'O recheio no meio não desmancha porque o flocão de cima cola no vapor. Não aperte, só acomode.'},
+
+{id:'r124',nome:'Salada morna de batata com atum e ovo',ref:['jantar','almoco'],t:25,kcal:427,p:33,c:28,g:20,rende:'2 porções',
+ ing:[i('Batata inglesa cozida',400,'batata'),i('Atum em água (lata)',160,'atum'),i('Ovo inteiro',150,'ovo'),i('Cebola',60,'cebola'),i('Azeitona verde',30,'azeitona'),i('Azeite de oliva',20,'azeite'),i('Limão, sal, pimenta e salsinha',15,'limao')],
+ modo:[
+  'Cozinhe as batatas em cubos até o garfo entrar, e os ovos por 8 minutos.',
+  'Escorra o atum e misture com a batata ainda morna: ela absorve o tempero melhor quente.',
+  'Junte o ovo em rodelas, a cebola picada e a azeitona.',
+  'Tempere com azeite, limão, sal, pimenta e salsinha.'],
+ dica:'Temperar a batata morna, e não fria, é o que faz a salada ter gosto em vez de ter tempero por cima.'},
+
+{id:'r125',nome:'Wrap de folha de couve com frango',ref:['jantar','lanche1'],t:15,kcal:304,p:36,c:10,g:13,rende:'2 wraps',
+ ing:[i('Couve',120,'couve'),i('Peito de frango desfiado',200,'frango'),i('Cenoura ralada',100,'cenoura'),i('Requeijão light',50,'requeijao'),i('Azeite de oliva',10,'azeite'),i('Limão, sal e pimenta',10,'limao')],
+ modo:[
+  'Escalde as folhas de couve inteiras em água fervente por 30 segundos e passe por água fria.',
+  'Seque as folhas e corte o cabo mais grosso.',
+  'Misture o frango com a cenoura, o requeijão, o azeite e os temperos.',
+  'Recheie e enrole dobrando as laterais.'],
+ dica:'Escaldar deixa a folha maleável sem rasgar. Crua ela quebra na dobra.'},
+
+{id:'r126',nome:'Tortilha de batata e ovo',ref:['jantar'],t:30,kcal:346,p:15,c:27,g:20,rende:'2 porções',
+ ing:[i('Batata inglesa cozida',350,'batata'),i('Ovo inteiro',200,'ovo'),i('Cebola',120,'cebola'),i('Azeite de oliva',20,'azeite'),i('Sal e pimenta',5,'tempero')],
+ modo:[
+  'Corte a batata cozida em rodelas finas e doure a cebola em meia-lua no azeite.',
+  'Bata os ovos com sal e pimenta e misture a batata e a cebola.',
+  'Volte à frigideira em fogo baixo e deixe 8 minutos, sem mexer.',
+  'Vire com ajuda de um prato e deixe mais 4 minutos do outro lado.'],
+ dica:'Fogo baixo e paciência. No fogo alto ela queima embaixo e fica crua no meio.'},
+
+{id:'r127',nome:'Sopa de legumes com lentilha, sem ingrediente animal',ref:['jantar'],t:30,kcal:354,p:14,c:58,g:9,rende:'3 tigelas',
+ ing:[i('Chuchu',250,'chuchu'),i('Cenoura',200,'cenoura'),i('Batata inglesa cozida',250,'batata'),i('Abobrinha',200,'abobrinha'),i('Lentilha cozida',300,'lentilha'),i('Macarrão comum cozido',120,'macarrao'),i('Cebola',80,'cebola'),i('Alho',12,'alho'),i('Azeite de oliva',20,'azeite'),i('Sal, louro e cheiro-verde',6,'tempero')],
+ modo:[
+  'Refogue a cebola e o alho no azeite com o louro.',
+  'Junte todos os legumes em cubos e 800 ml de água. Cozinhe 20 minutos.',
+  'Acrescente a lentilha com o caldo dela e cozinhe 5 minutos.',
+  'Amasse um pouco da batata no caldo para engrossar.',
+  'Junte o macarrão cozido e o cheiro-verde e desligue.'],
+ dica:'Sopa de legume sem caldo de tabletinho fica com gosto se você dourar bem a cebola antes da água.'},
+
+{id:'r128',nome:'Peixe ao forno com tomate e cebola',ref:['jantar','almoco'],t:35,kcal:426,p:45,c:30,g:15,rende:'2 porções',
+ ing:[i('Filé de tilápia',320,'tilapia'),i('Tomate',250,'tomate'),i('Cebola',150,'cebola'),i('Batata inglesa cozida',300,'batata'),i('Azeite de oliva',20,'azeite'),i('Limão, sal, alho e orégano',15,'limao')],
+ modo:[
+  'Tempere o peixe com limão, alho e sal e deixe 15 minutos.',
+  'Num refratário, faça uma cama de batata em rodelas, cebola e tomate.',
+  'Ponha o peixe por cima, regue com o azeite e salpique orégano.',
+  'Asse a 200 graus por 25 minutos, coberto com papel-alumínio nos primeiros 15.'],
+ dica:'Coberto no começo, o peixe cozinha no próprio vapor e não seca. Descobrir no fim é o que dá cor.'},
+
+{id:'r129',nome:'Salada de quinoa com legumes e grão-de-bico',ref:['jantar','almoco'],t:20,kcal:470,p:17,c:67,g:16,rende:'2 porções',
+ ing:[i('Quinoa cozida',300,'quinoa'),i('Grão-de-bico cozido',200,'grao-de-bico'),i('Tomate',150,'tomate'),i('Pepino',120,'pepino'),i('Cebola',60,'cebola'),i('Azeite de oliva',20,'azeite'),i('Limão, sal, pimenta e hortelã',15,'limao')],
+ modo:[
+  'Deixe a quinoa cozida esfriar completamente.',
+  'Pique o tomate, o pepino e a cebola em cubos pequenos.',
+  'Misture tudo com o grão-de-bico, o azeite, o limão e os temperos.',
+  'Fica melhor depois de uma hora na geladeira.'],
+ dica:'Quinoa quente na salada cozinha o pepino e solta água. Espere esfriar de verdade.'},
+
+{id:'r130',nome:'Hambúrguer assado de lentilha',ref:['jantar','almoco'],t:40,kcal:343,p:16,c:52,g:9,rende:'3 hambúrgueres',
+ ing:[i('Lentilha cozida',400,'lentilha'),i('Aveia em flocos',80,'aveia'),i('Cebola',100,'cebola'),i('Alho',10,'alho'),i('Cenoura ralada',100,'cenoura'),i('Azeite de oliva',18,'azeite'),i('Sal, cominho, páprica e salsinha',8,'tempero')],
+ modo:[
+  'Escorra bem a lentilha e amasse com o garfo, deixando parte inteira.',
+  'Refogue a cebola, o alho e a cenoura no azeite por 5 minutos e junte à lentilha.',
+  'Misture a aveia e os temperos e deixe descansar 10 minutos: a aveia dá a liga.',
+  'Faça discos, ponha numa forma forrada e asse a 200 graus por 25 minutos, virando na metade.'],
+ dica:'Lentilha molhada não dá liga. Escorra de verdade, apertando na peneira.'},
+
+{id:'r131',nome:'Escondidinho de frango com couve-flor',ref:['jantar','almoco'],t:45,kcal:338,p:40,c:15,g:13,rende:'4 porções',
+ ing:[i('Peito de frango desfiado',400,'frango'),i('Couve-flor cozida',700,'couve-flor'),i('Leite desnatado',100,'leite desnatado'),i('Cebola',100,'cebola'),i('Extrato de tomate',60,'extrato de tomate'),i('Queijo mussarela',80,'queijo'),i('Azeite de oliva',20,'azeite'),i('Sal, pimenta e cheiro-verde',6,'tempero')],
+ modo:[
+  'Bata a couve-flor cozida com o leite e metade do azeite até virar purê. Acerte o sal.',
+  'Refogue a cebola no resto do azeite, junte o frango e o extrato de tomate e cozinhe 8 minutos.',
+  'Monte num refratário: frango embaixo, purê em cima, queijo por último.',
+  'Asse a 200 graus por 15 minutos.'],
+ dica:'Purê de couve-flor tem um quinto do carboidrato do purê de batata e gratina do mesmo jeito.'},
+
+{id:'r132',nome:'Tapioca recheada de ovo, queijo e tomate',ref:['jantar','lanche1'],t:10,kcal:434,p:15,c:47,g:20,rende:'1 tapioca',
+ ing:[i('Goma de tapioca',50,'tapioca'),i('Ovo inteiro',50,'ovo'),i('Queijo minas frescal',50,'queijo minas'),i('Tomate',60,'tomate'),i('Azeite de oliva',5,'azeite'),i('Sal e orégano',2,'tempero')],
+ modo:[
+  'Peneire a goma na frigideira quente e espalhe em disco.',
+  'Quando a goma se unir, vire.',
+  'Frite o ovo à parte e ponha em metade do disco, com o queijo em cima.',
+  'Espere o queijo derreter e junte o tomate em rodelas.',
+  'Regue com azeite, tempere e dobre.'],
+ dica:'Jantar de dez minutos para noite de cansaço. Não é o jantar ideal, é o jantar que acontece.'},
+
+{id:'r133',nome:'Sopa de abóbora com carne desfiada',ref:['jantar'],t:40,kcal:429,p:34,c:35,g:17,rende:'3 tigelas',
+ ing:[i('Abóbora cabotiá cozida',700,'abobora'),i('Músculo em cubos',300,'carne em cubos'),i('Cebola',100,'cebola'),i('Alho',12,'alho'),i('Cenoura',150,'cenoura'),i('Azeite de oliva',20,'azeite'),i('Louro, sal e pimenta',6,'tempero')],
+ modo:[
+  'Doure a carne em cubos no azeite, em panela de pressão.',
+  'Junte a cebola, o alho, o louro e 600 ml de água e cozinhe 25 minutos na pressão.',
+  'Abra, desfie a carne com dois garfos e volte ao caldo.',
+  'Acrescente a abóbora e a cenoura em cubos e cozinhe 15 minutos.',
+  'Amasse parte da abóbora no caldo para engrossar.'],
+ dica:'Músculo é um dos cortes mais baratos e o que fica melhor desfiado. Só precisa de tempo, não de técnica.'},
+
+{id:'r134',nome:'Legumes assados com ovo',ref:['jantar','almoco'],t:40,kcal:394,p:14,c:43,g:19,rende:'2 porções',
+ ing:[i('Batata-doce',250,'batata-doce'),i('Cenoura',150,'cenoura'),i('Abobrinha',200,'abobrinha'),i('Pimentão',120,'pimentao'),i('Cebola',100,'cebola'),i('Ovo inteiro',150,'ovo'),i('Azeite de oliva',20,'azeite'),i('Sal, alho e alecrim',8,'tempero')],
+ modo:[
+  'Corte todos os legumes em pedaços grandes e parecidos.',
+  'Misture com o azeite, o sal, o alho picado e o alecrim numa assadeira.',
+  'Asse a 200 graus por 30 minutos, mexendo na metade.',
+  'Abra dois espaços entre os legumes, quebre os ovos ali e volte ao forno por 7 minutos.'],
+ dica:'Pedaço grande assa e doura. Pedaço pequeno vira purê antes de pegar cor.'},
+
+{id:'r135',nome:'Chuchu ensopado com carne moída',ref:['jantar'],t:35,kcal:305,p:30,c:15,g:14,rende:'3 porções',
+ ing:[i('Chuchu',600,'chuchu'),i('Carne moída',300,'carne moida'),i('Tomate',200,'tomate'),i('Cebola',80,'cebola'),i('Alho',10,'alho'),i('Azeite de oliva',18,'azeite'),i('Sal, pimenta e cheiro-verde',6,'tempero')],
+ modo:[
+  'Refogue a cebola e o alho no azeite, junte a carne e deixe secar a água.',
+  'Acrescente o tomate picado e cozinhe 5 minutos.',
+  'Junte o chuchu em cubos e 150 ml de água. Tampe e cozinhe 15 minutos.',
+  'Acerte o sal e finalize com cheiro-verde.'],
+ dica:'Chuchu é o legume mais barato do Brasil e quase todo água. Ele pega o gosto do que estiver na panela.'},
+
+{id:'r136',nome:'Repolho refogado com ovo e arroz',ref:['jantar'],t:20,kcal:479,p:18,c:59,g:20,rende:'2 porções',
+ ing:[i('Repolho',400,'repolho'),i('Ovo inteiro',150,'ovo'),i('Arroz integral cozido',300,'arroz integral'),i('Cenoura ralada',100,'cenoura'),i('Alho',12,'alho'),i('Shoyu',15,'shoyu'),i('Azeite de oliva',18,'azeite'),i('Sal, pimenta e gergelim',8,'gergelim')],
+ modo:[
+  'Corte o repolho em tiras finas.',
+  'Doure o alho no azeite em fogo alto, junte o repolho e a cenoura e mexa por 4 minutos.',
+  'Tempere com o shoyu e a pimenta. O repolho deve ficar firme.',
+  'Empurre para o lado, quebre os ovos e mexa junto por 1 minuto.',
+  'Sirva sobre o arroz com gergelim.'],
+ dica:'Repolho em fogo alto e pouco tempo fica doce e crocante. Em fogo baixo e tampado, murcha e amarga.'},
+
+{id:'r137',nome:'Salada de repolho e cenoura com frango e amendoim',ref:['jantar','almoco'],t:20,kcal:469,p:47,c:20,g:24,rende:'2 porções',
+ ing:[i('Repolho',300,'repolho'),i('Cenoura ralada',150,'cenoura'),i('Peito de frango desfiado',250,'frango'),i('Amendoim',40,'amendoim'),i('Azeite de oliva',18,'azeite'),i('Shoyu',10,'shoyu'),i('Limão, sal e pimenta',10,'limao')],
+ modo:[
+  'Corte o repolho em tiras muito finas e misture com a cenoura ralada.',
+  'Faça o tempero com azeite, limão, um fio de shoyu, sal e pimenta.',
+  'Misture o frango desfiado e o tempero ao repolho.',
+  'Junte o amendoim torrado e picado só na hora de comer.'],
+ dica:'O amendoim é o que torna isso um jantar e não uma salada: ele dá gordura e sensação de refeição.'},
+
+{id:'r138',nome:'Leite morno com canela',ref:['ceia'],t:4,kcal:88,p:8,c:12,g:0,rende:'1 caneca',
+ ing:[i('Leite desnatado',250,'leite desnatado'),i('Canela em pó',2,'tempero')],
+ modo:[
+  'Aqueça o leite sem deixar ferver.',
+  'Polvilhe a canela e mexa.'],
+ dica:'Sem açúcar a canela já adoça a sensação. Com açúcar vira sobremesa e sobremesa antes de dormir atrapalha.'},
+
+{id:'r139',nome:'Iogurte natural com chia',ref:['ceia','lanche2'],t:4,kcal:166,p:9,c:14,g:9,rende:'1 pote',
+ ing:[i('Iogurte natural integral',180,'iogurte'),i('Chia',12,'chia'),i('Canela em pó',1,'tempero')],
+ modo:[
+  'Misture a chia no iogurte.',
+  'Espere 10 minutos: ela absorve o líquido e engrossa.',
+  'Polvilhe canela.'],
+ dica:'Chia hidratada é fibra que ajuda o intestino da manhã seguinte. Seca, ela puxa água de você.'},
+
+{id:'r140',nome:'Maçã assada com canela',ref:['ceia'],t:15,kcal:152,p:2,c:35,g:1,rende:'1 porção',
+ ing:[i('Maçã',180,'maca'),i('Canela em pó',2,'tempero'),i('Aveia em flocos',15,'aveia')],
+ modo:[
+  'Tire o miolo da maçã com a faca, sem cortar ela ao meio.',
+  'Encha o buraco com a aveia e a canela.',
+  'Asse a 200 graus por 25 minutos, ou 5 minutos no micro-ondas coberta.'],
+ dica:'No micro-ondas fica mole e boa, no forno fica melhor. Depende do que a noite permite.'},
+
+{id:'r141',nome:'Mingau rápido de aveia',ref:['ceia'],t:6,kcal:180,p:10,c:29,g:2,rende:'1 tigela pequena',
+ ing:[i('Aveia em flocos',30,'aveia'),i('Leite desnatado',180,'leite desnatado'),i('Canela em pó',1,'tempero')],
+ modo:[
+  'Misture a aveia e o leite numa tigela.',
+  'Micro-ondas por 90 segundos, mexendo na metade.',
+  'Polvilhe canela.'],
+ dica:'Aveia tem triptofano e carboidrato, que é a combinação que ajuda o sono. Em porção pequena, não pesa.'},
+
+{id:'r142',nome:'Vitamina leve de mamão',ref:['ceia','lanche2'],t:4,kcal:117,p:6,c:24,g:1,rende:'1 copo',
+ ing:[i('Mamão',150,'mamao'),i('Leite desnatado',150,'leite desnatado')],
+ modo:[
+  'Bata os dois no liquidificador.',
+  'Beba sem açúcar: mamão maduro já é doce.'],
+ dica:'Para quem acorda com o intestino travado, essa é a ceia que mais resolve.'},
+
+{id:'r143',nome:'Cottage com tomate e orégano',ref:['ceia','lanche2'],t:4,kcal:214,p:17,c:8,g:13,rende:'1 porção',
+ ing:[i('Queijo cottage',150,'cottage'),i('Tomate',80,'tomate'),i('Azeite de oliva',6,'azeite'),i('Sal, pimenta e orégano',3,'tempero')],
+ modo:[
+  'Ponha o cottage numa tigela pequena.',
+  'Cubra com o tomate em cubos, regue com azeite e tempere.'],
+ dica:'Cottage é a proteína de digestão lenta mais barata do mercado. Boa para noite depois de treino.'},
+
+{id:'r144',nome:'Ovo cozido com sal e pimenta',ref:['ceia'],t:10,kcal:143,p:13,c:1,g:10,rende:'2 ovos',
+ ing:[i('Ovo inteiro',100,'ovo'),i('Sal e pimenta',2,'tempero')],
+ modo:[
+  'Cozinhe em água fervente por 8 minutos.',
+  'Passe por água fria, descasque e tempere.'],
+ dica:'Se você treinou à noite e não vai comer mais nada, dois ovos fecham a conta da proteína do dia.'},
+
+{id:'r145',nome:'Castanha-do-pará com tangerina',ref:['ceia','lanche2'],t:2,kcal:145,p:3,c:21,g:7,rende:'1 porção',
+ ing:[i('Castanha-do-pará',10,'castanha-do-para'),i('Tangerina',150,'tangerina')],
+ modo:[
+  'Duas castanhas e uma tangerina.',
+  'Mais castanha que isso não ajuda: o selênio do dia está em duas.'],
+ dica:'Porção pequena de propósito. Castanha é calórica e à noite a mão continua no pote.'},
+
+{id:'r146',nome:'Iogurte com cacau',ref:['ceia','lanche2'],t:4,kcal:151,p:8,c:20,g:6,rende:'1 pote',
+ ing:[i('Iogurte natural integral',180,'iogurte'),i('Cacau em pó',8,'cacau'),i('Mel',8,'mel')],
+ modo:[
+  'Misture o cacau com o mel primeiro, para não empelotar.',
+  'Junte o iogurte e mexa bem.'],
+ dica:'Cacau tem cafeína em quantidade pequena. Se você é sensível, troque por canela nessa hora.'},
+
+{id:'r147',nome:'Leite com cacau sem açúcar',ref:['ceia'],t:5,kcal:110,p:10,c:18,g:2,rende:'1 copo',
+ ing:[i('Leite desnatado',250,'leite desnatado'),i('Cacau em pó',10,'cacau'),i('Canela em pó',1,'tempero')],
+ modo:[
+  'Misture o cacau com duas colheres do leite frio até virar pasta.',
+  'Junte o resto do leite e aqueça sem ferver.',
+  'Polvilhe canela.'],
+ dica:'Dissolver o cacau no frio primeiro é o que evita os grumos que não desfazem depois.'},
+
+{id:'r148',nome:'Banana com pasta de amendoim e canela',ref:['ceia','lanche2'],t:5,kcal:195,p:5,c:31,g:8,rende:'1 porção',
+ ing:[i('Banana',120,'banana'),i('Pasta de amendoim',15,'pasta de amendoim'),i('Canela em pó',1,'tempero')],
+ modo:[
+  'Corte a banana ao meio no comprimento.',
+  'Espalhe a pasta de amendoim e polvilhe canela.'],
+ dica:'Ceia de uma colher e um garfo. Para noite de cansaço, essa é a que de fato acontece.'},
+
+{id:'r149',nome:'Mingau de fubá com canela',ref:['cafe'],t:10,kcal:327,p:11,c:52,g:9,rende:'1 tigela',
+ ing:[i('Fubá de milho',40,'fuba'),i('Leite integral',250,'leite'),i('Canela em pó',2,'tempero'),i('Mel',10,'mel')],
+ modo:[
+  'Dissolva o fubá em 60 ml de leite frio, mexendo até não ter grumo.',
+  'Aqueça o resto do leite e junte a mistura, mexendo sem parar.',
+  'Cozinhe 6 minutos em fogo baixo, até engrossar e perder o gosto de cru.',
+  'Adoce com o mel e polvilhe canela.'],
+ dica:'Fubá jogado no leite quente empelota e não tem como desfazer. Dissolver no frio primeiro resolve.'},
+
+{id:'r150',nome:'Vitamina de goiaba com leite',ref:['cafe','lanche1'],t:4,kcal:284,p:12,c:51,g:3,rende:'1 copo grande',
+ ing:[i('Goiaba',200,'goiaba'),i('Leite desnatado',200,'leite desnatado'),i('Aveia em flocos',20,'aveia')],
+ modo:[
+  'Corte a goiaba em pedaços, com casca.',
+  'Bata com o leite e a aveia por 1 minuto.',
+  'Coe se não quiser as sementes.'],
+ dica:'Goiaba tem mais vitamina C que laranja, por grama, e costuma custar menos na feira.'},
+
+{id:'r151',nome:'Cuscuz com leite',ref:['lanche2','ceia'],t:4,kcal:159,p:6,c:22,g:5,rende:'1 porção',
+ ing:[i('Flocão de milho (cuscuz)',60,'cuscuz'),i('Leite integral',150,'leite'),i('Sal',1,'tempero')],
+ modo:[
+  'Hidrate o flocão com 60 ml de água e sal por 5 minutos.',
+  'Cozinhe 8 minutos no vapor.',
+  'Desenforme na tigela, abra com o garfo e cubra com o leite.'],
+ dica:'A ceia do Nordeste. Custa centavos, enche e não pesa para dormir.'},
+
+{id:'r152',nome:'Salada de feijão-fradinho com tomate',ref:['almoco','jantar'],t:15,kcal:382,p:14,c:41,g:20,rende:'2 porções',
+ ing:[i('Feijão-fradinho cozido',350,'feijao fradinho'),i('Tomate',200,'tomate'),i('Cebola',80,'cebola'),i('Pimentão',100,'pimentao'),i('Castanha-de-caju',40,'castanha-de-caju'),i('Azeite de oliva',20,'azeite'),i('Limão, sal, pimenta e coentro',18,'limao')],
+ modo:[
+  'Escorra o feijão-fradinho cozido e deixe esfriar.',
+  'Pique o tomate, a cebola e o pimentão em cubos pequenos.',
+  'Misture tudo com o azeite, o limão e os temperos.',
+  'Junte a castanha picada só na hora de servir, para não murchar.'],
+ dica:'Fradinho cozinha em 25 minutos sem molho de véspera e é o feijão que fica melhor frio.'},
+
+{id:'r153',nome:'Vagem com ovo e arroz',ref:['jantar'],t:25,kcal:448,p:18,c:56,g:18,rende:'2 porções',
+ ing:[i('Vagem',400,'vagem'),i('Ovo inteiro',150,'ovo'),i('Arroz integral cozido',300,'arroz integral'),i('Cebola',80,'cebola'),i('Alho',12,'alho'),i('Azeite de oliva',18,'azeite'),i('Sal e pimenta',5,'tempero')],
+ modo:[
+  'Corte a vagem em pedaços de 3 cm e cozinhe no vapor por 6 minutos: tem que ficar firme.',
+  'Refogue a cebola e o alho no azeite.',
+  'Junte a vagem e deixe pegar cor por 3 minutos.',
+  'Empurre para o lado, quebre os ovos e mexa junto até dar ponto.',
+  'Sirva sobre o arroz.'],
+ dica:'Vagem cozida demais fica mole e perde a cor. Seis minutos no vapor e choque de água fria mantêm ela verde.'},
+
+{id:'r154',nome:'Arroz doce de leite desnatado',ref:['ceia'],t:30,kcal:220,p:8,c:45,g:1,rende:'2 porções',
+ ing:[i('Arroz branco cozido',200,'arroz'),i('Leite desnatado',350,'leite desnatado'),i('Mel',20,'mel'),i('Canela e casca de limão',3,'tempero')],
+ modo:[
+  'Leve o arroz cozido com o leite e a casca de limão ao fogo baixo.',
+  'Cozinhe 15 minutos mexendo de vez em quando, até engrossar.',
+  'Desligue, tire a casca e adoce com o mel.',
+  'Polvilhe canela. Ele engrossa mais na geladeira.'],
+ dica:'Arroz doce com leite desnatado e mel em vez de leite condensado tem um terço do açúcar e o mesmo gosto de infância.'},
+
+{id:'r155',nome:'Mamão com iogurte grego e linhaça',ref:['cafe','lanche2'],t:4,kcal:320,p:17,c:38,g:13,rende:'1 tigela',
+ ing:[i('Mamão',200,'mamao'),i('Iogurte grego natural',150,'iogurte grego'),i('Linhaça',12,'linhaca'),i('Mel',8,'mel')],
+ modo:[
+  'Corte o mamão em cubos.',
+  'Cubra com o iogurte, regue o mel e polvilhe a linhaça.',
+  'Use a linhaça moída: inteira ela passa inteira.'],
+ dica:'Linhaça inteira não é absorvida. Moa no liquidificador e guarde na geladeira, que ela rança rápido.'},
+
+{id:'r156',nome:'Suflê de chuchu com queijo',ref:['jantar'],t:50,kcal:357,p:18,c:27,g:20,rende:'3 porções',
+ ing:[i('Chuchu',700,'chuchu'),i('Ovo inteiro',200,'ovo'),i('Leite desnatado',150,'leite desnatado'),i('Queijo minas frescal',100,'queijo minas'),i('Farinha de trigo',40,'farinha de trigo'),i('Cebola',80,'cebola'),i('Azeite de oliva',18,'azeite'),i('Sal, pimenta e noz-moscada',6,'tempero')],
+ modo:[
+  'Cozinhe o chuchu em cubos até ficar macio e aperte para tirar a água.',
+  'Refogue a cebola no azeite e junte o chuchu. Amasse grosseiramente.',
+  'Separe as claras das gemas. Misture as gemas, o leite, a farinha e o queijo ao chuchu.',
+  'Bata as claras em neve e incorpore de baixo para cima, sem bater.',
+  'Asse a 180 graus por 35 minutos. Não abra o forno antes de 25.'],
+ dica:'Clara em neve incorporada mexendo vira massa pesada. De baixo para cima, com a espátula, e pouco.'},
+
+{id:'r157',nome:'Macarrão ao alho e óleo com brócolis',ref:['jantar','almoco'],t:20,kcal:490,p:17,c:57,g:24,rende:'2 porções',
+ ing:[i('Macarrão integral cozido',320,'macarrao integral'),i('Brócolis cozido',300,'brocolis'),i('Alho',20,'alho'),i('Azeite de oliva',25,'azeite'),i('Amendoim',40,'amendoim'),i('Sal, pimenta e orégano',5,'tempero')],
+ modo:[
+  'Fatie o alho fino e doure no azeite em fogo baixo, até dourado claro.',
+  'Junte o brócolis cozido e picado e refogue 2 minutos.',
+  'Misture o macarrão com meia xícara da água do cozimento dele.',
+  'Tempere e finalize com o amendoim torrado e picado.'],
+ dica:'O amendoim aqui faz o papel do queijo: dá gordura e crocância num prato sem ingrediente animal.'},
+
+{id:'r158',nome:'Isca de carne com pimentão e arroz',ref:['almoco'],t:30,kcal:660,p:51,c:55,g:25,rende:'2 porções',
+ ing:[i('Alcatra em tiras',300,'carne em cubos'),i('Pimentão',200,'pimentao'),i('Cebola',150,'cebola'),i('Arroz branco cozido',300,'arroz'),i('Shoyu',15,'shoyu'),i('Azeite de oliva',18,'azeite'),i('Alho, sal e pimenta',12,'tempero')],
+ modo:[
+  'Corte a carne em tiras finas no sentido contrário das fibras.',
+  'Frigideira bem quente com metade do azeite. Sele a carne em duas vezes, sem lotar a panela, e reserve.',
+  'Refogue a cebola e o pimentão em tiras no resto do azeite, por 4 minutos.',
+  'Volte a carne, tempere com shoyu, alho e pimenta e desligue na hora.',
+  'Sirva com o arroz.'],
+ dica:'Panela lotada não sela, cozinha. Faça em duas vezes, mesmo que dê preguiça.'},
+
+{id:'r159',nome:'Cuscuz de milho com sardinha',ref:['jantar'],t:25,kcal:308,p:20,c:22,g:16,rende:'2 porções',
+ ing:[i('Flocão de milho (cuscuz)',120,'cuscuz'),i('Sardinha em lata',150,'sardinha em lata'),i('Tomate',150,'tomate'),i('Cebola',80,'cebola'),i('Azeite de oliva',12,'azeite'),i('Limão, sal e coentro',12,'limao')],
+ modo:[
+  'Hidrate o flocão com 120 ml de água e sal por 5 minutos e cozinhe 10 minutos no vapor.',
+  'Escorra a sardinha e amasse os filés com a espinha, com o garfo.',
+  'Refogue a cebola no azeite, junte o tomate picado e cozinhe 5 minutos.',
+  'Misture a sardinha, tempere com limão e coentro e sirva sobre o cuscuz.'],
+ dica:'Jantar de dois reais por pessoa com 18 g de proteína e o cálcio da espinha. Difícil achar melhor que isso.'},
+
+{id:'r160',nome:'Frango desfiado ao molho de tomate com polenta',ref:['almoco'],t:35,kcal:497,p:47,c:48,g:13,rende:'3 porções',
+ ing:[i('Peito de frango desfiado',400,'frango'),i('Fubá de milho',150,'fuba'),i('Tomate',350,'tomate'),i('Cebola',100,'cebola'),i('Alho',12,'alho'),i('Azeite de oliva',20,'azeite'),i('Sal, pimenta e manjericão',6,'tempero')],
+ modo:[
+  'Dissolva o fubá em 250 ml de água fria e leve ao fogo com mais 500 ml, mexendo.',
+  'Cozinhe a polenta 25 minutos em fogo baixo, mexendo de vez em quando. Salgue no fim.',
+  'Em outra panela, refogue a cebola e o alho, junte o tomate batido e cozinhe 15 minutos.',
+  'Acrescente o frango desfiado, tempere e cozinhe 5 minutos.',
+  'Sirva o molho sobre a polenta.'],
+ dica:'Polenta de verdade pede 25 minutos de fogo baixo. Menos que isso e ela fica com gosto de fubá cru.'},
+
+{id:'r161',nome:'Almôndegas ao molho de tomate com arroz',ref:['almoco','jantar'],t:40,kcal:593,p:46,c:56,g:19,rende:'3 porções',
+ ing:[i('Carne moída',400,'carne moida'),i('Aveia em flocos',40,'aveia'),i('Ovo inteiro',50,'ovo'),i('Tomate',400,'tomate'),i('Arroz branco cozido',400,'arroz'),i('Cebola',120,'cebola'),i('Alho',12,'alho'),i('Azeite de oliva',18,'azeite'),i('Sal, pimenta e orégano',6,'tempero')],
+ modo:[
+  'Misture a carne com a aveia, o ovo, metade da cebola ralada, sal e pimenta.',
+  'Faça bolinhas do tamanho de uma noz e reserve.',
+  'Refogue o resto da cebola e o alho no azeite, junte o tomate batido e ferva.',
+  'Ponha as almôndegas cruas no molho, tampe e cozinhe 20 minutos em fogo baixo, sem mexer nos primeiros 10.',
+  'Sirva com o arroz.'],
+ dica:'Aveia no lugar do pão amanhecido dá a mesma liga e acrescenta fibra. E não endurece a almôndega.'},
+
+{id:'r162',nome:'Pão francês com ovo mexido e tomate',ref:['cafe'],t:10,kcal:507,p:21,c:61,g:19,rende:'1 porção',
+ ing:[i('Pão francês',100,'pao'),i('Ovo inteiro',100,'ovo'),i('Tomate',60,'tomate'),i('Azeite de oliva',6,'azeite'),i('Sal e cebolinha',2,'tempero')],
+ modo:[
+  'Corte o pão ao meio e toste na frigideira seca, com o miolo para baixo.',
+  'Bata os ovos com sal e mexa em fogo baixo com o azeite, até formar cremes grandes.',
+  'Junte o tomate picado e a cebolinha fora do fogo.',
+  'Sirva dentro do pão.'],
+ dica:'Pão francês com ovo é o café da manhã mais comum do Brasil e já resolve a proteína da manhã. O que falta nele é fruta.'},
+
+{id:'r163',nome:'Sopa de grão-de-bico com espinafre',ref:['jantar'],t:35,kcal:508,p:22,c:72,g:17,rende:'2 tigelas',
+ ing:[i('Grão-de-bico cozido',400,'grao-de-bico'),i('Espinafre refogado',150,'espinafre'),i('Cebola',100,'cebola'),i('Alho',12,'alho'),i('Cenoura',150,'cenoura'),i('Azeite de oliva',20,'azeite'),i('Cominho, sal, pimenta e limão',14,'limao')],
+ modo:[
+  'Refogue a cebola, o alho e o cominho no azeite.',
+  'Junte a cenoura em cubos e cozinhe 5 minutos.',
+  'Acrescente o grão-de-bico e 500 ml de água e cozinhe 15 minutos.',
+  'Bata metade no liquidificador e volte à panela.',
+  'Junte o espinafre, desligue e acerte com limão e sal.'],
+ dica:'Limão no fim de sopa de leguminosa levanta o prato inteiro. É o que falta quando a sopa fica com gosto de nada.'},
+
+{id:'r164',nome:'Jiló refogado com ovo e arroz',ref:['jantar'],t:25,kcal:449,p:16,c:57,g:17,rende:'2 porções',
+ ing:[i('Jiló',350,'jilo'),i('Ovo inteiro',150,'ovo'),i('Arroz branco cozido',300,'arroz'),i('Cebola',80,'cebola'),i('Alho',12,'alho'),i('Azeite de oliva',18,'azeite'),i('Sal e pimenta',5,'tempero')],
+ modo:[
+  'Corte o jiló em rodelas e deixe 15 minutos em água com sal: tira parte do amargo.',
+  'Seque bem e doure no azeite em fogo alto, sem mexer muito.',
+  'Junte a cebola e o alho e refogue 3 minutos.',
+  'Empurre para o lado, quebre os ovos e mexa junto.',
+  'Sirva sobre o arroz.'],
+ dica:'Quem acha jiló amargo demais quase sempre cozinhou em vez de dourar. Fogo alto e seco muda o gosto.'},
+
+{id:'r165',nome:'Suco de maracujá com água de coco e chia',ref:['lanche1','lanche2'],t:4,kcal:178,p:3,c:33,g:4,rende:'1 copo grande',
+ ing:[i('Polpa de maracujá',60,'maracuja'),i('Água de coco',250,'agua de coco'),i('Chia',12,'chia'),i('Mel',8,'mel')],
+ modo:[
+  'Bata a polpa com a água de coco e o mel.',
+  'Junte a chia e espere 10 minutos antes de beber.',
+  'Não coe: a semente do maracujá é fibra.'],
+ dica:'Maracujá não acalma ninguém — isso é a folha, em chá, e nem ela tem evidência forte. O suco é só suco bom.'}
+);
+
 /* Sugestões da despensa, agrupadas */
 const PANTRY_GROUPS=[
- ['Proteínas',['ovo','frango','carne','peixe','atum','sardinha','whey','presunto']],
- ['Carboidratos',['arroz','feijao','macarrao','pao','aveia','tapioca','batata','batata-doce','mandioquinha','quinoa','grao-de-bico','lentilha','granola','farinha','cuscuz']],
- ['Laticínios',['leite','iogurte','queijo','cottage','requeijao','manteiga']],
- ['Legumes e verduras',['tomate','cebola','alho','alface','brocolis','cenoura','abobrinha','pimentao','chuchu','couve','pepino','champignon','espinafre','beterraba']],
- ['Frutas',['banana','maca','mamao','laranja','abacaxi','morango','abacate','manga','limao']],
- ['Gorduras e extras',['azeite','amendoim','castanha','chia','mel','pipoca','shoyu','mostarda','canela','gengibre','sal']]
+ ['Proteínas',['ovo','frango','carne','peixe','atum','sardinha','whey','presunto','tilapia','figado','tofu','soja texturizada','clara']],
+ ['Carboidratos',['arroz','feijao','macarrao','pao','aveia','tapioca','batata','batata-doce','mandioquinha','quinoa','grao-de-bico','lentilha','granola','farinha','cuscuz','fuba','polvilho','inhame','ervilha','mandioca','milho']],
+ ['Laticínios',['leite','iogurte','queijo','cottage','requeijao','manteiga','ricota']],
+ ['Legumes e verduras',['tomate','cebola','alho','alface','brocolis','cenoura','abobrinha','pimentao','chuchu','couve','pepino','champignon','espinafre','beterraba','abobora','repolho','couve-flor','vagem','quiabo','jilo','berinjela']],
+ ['Frutas',['banana','maca','mamao','laranja','abacaxi','morango','abacate','manga','limao','goiaba','maracuja','tangerina','uva-passa']],
+ ['Gorduras e extras',['azeite','amendoim','castanha','chia','mel','pipoca','shoyu','mostarda','canela','gengibre','sal','linhaca','gergelim','cacau','coco ralado','azeitona','extrato de tomate',
+  'molho de tomate','pasta de amendoim','agua de coco']]
 ];
 
 
@@ -5678,8 +6574,9 @@ function cardReceita(r,s){
    casar com 'melancia', e 'carne moída' tem que casar com 'carne'.
    ===================================================================== */
 const ING_GRUPO={
- carne:['carne','frango','peixe','atum','sardinha','tilapia'],
- ovo:['ovo'],
+ carne:['carne','frango','peixe','atum','sardinha','tilapia','figado','presunto',
+        'camarao','porco','linguica','peru'],
+ ovo:['ovo','clara','gema'],
  leite:['leite','queijo','iogurte','requeijao','ricota','cottage','whey'],
  /* Trigo declarado. Aveia NÃO entra: ela é naturalmente sem glúten, mas
     quase sempre tem contaminação cruzada — e isso está dito na tela, em
@@ -5700,6 +6597,7 @@ const ING_GRUPO={
    isso em vez de fingir que filtrou alguma coisa. */
 const ALERGIAS=[
  {id:'al1',n:'Trigo, centeio, cevada e aveia',tok:['trigo','centeio','cevada','aveia','pao','macarrao','farinha','granola','shoyu'],
+  nao:['farinha de mandioca','farinha de milho','farinha de arroz'],
   d:'A norma junta os quatro num item só, e inclui a AVEIA. É a diferença para o filtro de preferência "sem trigo", que deixa a aveia de fora porque ela é naturalmente sem glúten — para alergia e para doença celíaca, a contaminação cruzada conta.'},
  {id:'al2',n:'Crustáceos',tok:['camarao','caranguejo','siri','lagosta','lagostim','crustaceo'],
   d:'Camarão, caranguejo, siri, lagosta.'},
@@ -5710,6 +6608,7 @@ const ALERGIAS=[
  {id:'al6',n:'Soja',tok:['soja','shoyu','tofu','edamame'],
   d:'Inclui shoyu, que é feito de soja, e o óleo de soja.'},
  {id:'al7',n:'Leite de qualquer mamífero',tok:['leite','queijo','iogurte','requeijao','ricota','cottage','whey','manteiga','mussarela','coalhada','creme de leite'],
+  nao:['leite de coco','leite de castanha','leite de amendoa'],
   d:'A norma diz "leites de todas as espécies de animais mamíferos": vaca, cabra, búfala, ovelha. Whey é proteína do leite.'},
  {id:'al8',n:'Amêndoa',tok:['amendoa','amendoas']},
  {id:'al9',n:'Avelã',tok:['avela','avelas']},
@@ -5741,9 +6640,21 @@ function tokenBate(chave,tok){
  const k=nrm(chave);
  return k===tok||k.indexOf(tok+' ')===0||k.indexOf(tok+'-')===0||k.indexOf(tok+' de ')===0;
 }
+/* O prefixo 'de' do tokenBate pega demais: 'farinha de mandioca' casava
+   com trigo e 'leite de coco' casaria com leite. Os dois sao falso
+   positivo que ESCONDE receita de quem precisa dela — farinha de mandioca
+   nao tem gluten, leite de coco nao e laticinio. Mesmo mecanismo que
+   separa noz-moscada de noz, agora tambem no grupo. */
+const ING_GRUPO_NAO={
+ trigo:['farinha de mandioca','farinha de milho','farinha de arroz'],
+ leite:['leite de coco','leite de castanha','leite de amendoa']
+};
 function recTemGrupo(r,g){
- const toks=ING_GRUPO[g]||[];
- return r.ing.some(function(x){return toks.some(function(t){return tokenBate(x.k,t)})});
+ const toks=ING_GRUPO[g]||[], nao=ING_GRUPO_NAO[g]||[];
+ return r.ing.some(function(x){
+  if(nao.indexOf(nrm(x.k))>=0)return false;
+  return toks.some(function(t){return tokenBate(x.k,t)});
+ });
 }
 /* Para alergia o casamento é mais largo e mais cuidadoso ao mesmo tempo:
    olha a chave E o nome do ingrediente, mas com limite de palavra, para
@@ -8654,7 +9565,6 @@ const FALTA=[
  ['Alimentação restritiva','Alimentação restritiva é muito mais comum em pessoas trans que na população geral — num serviço de transtorno alimentar, 16,7% das pessoas em tratamento para ARFID eram trans ou não binárias. O app não tem nada para isso, e não vai ter sem nutricionista: orientação alimentar errada piora ARFID em vez de ajudar. Por enquanto o que dá para fazer é esconder os números, que já existe no Perfil.','fila'],
  ['Lembrete que toca sozinho','Os horários que você configura só aparecem enquanto o app está aberto. Notificação de verdade depende de permissão do navegador e de o aparelho deixar — funciona bem no Android e mal no iPhone, e eu não quero prometer aplicação de hormônio na hora e falhar.','fila'],
  ['Treino com vídeo dentro do treino','Hoje o vídeo de cada movimento está na biblioteca. Durante a série, com o celular apoiado, você não vai procurar — ele tinha que estar ali.','fila'],
- ['Mais receita sem ingrediente animal','São dez. Dez dá para montar o dia, mas repete. O certo é o dobro disso.','fila'],
  ['Comunidade','Não é esquecimento, é decisão. O apoio de outras pessoas trans é o fator que mais aparece associado a saúde e bem-estar — mas a revisão que diz isso também diz que a versão ONLINE quase não foi estudada. E um espaço sem moderação de verdade, com 36% de menores de 18 anos, é perigoso de um jeito que eu não sei consertar sozinho. Prefiro não ter.','nao'],
  ['Conta, nuvem e sincronizar','Também é decisão. No minuto em que existe servidor, existe um banco com dado de saúde e identidade de gênero de pessoas trans — e existe alguém que pode ser obrigado a entregar isso. A troca entre aparelhos é por arquivo, que é pior de usar e melhor de dormir.','nao'],
  ['Qualquer tipo de nota ou pontuação de saúde mental','A tela de humor registra e desenha, e não soma nada. Transformar isso em escore seria diagnosticar sem ter direito.','nao'],
@@ -8667,7 +9577,8 @@ const FEITO_AGORA=[
  ['Medir a voz pelo microfone','O app mede sozinho agora, em vez de mandar baixar um afinador. O som não é gravado.'],
  ['Gráficos de caloria, proteína, água e constância','Semana a semana, com a sua meta atravessada.'],
  ['Alergia alimentar','Os 18 da lista oficial da Anvisa, mais o que você escrever.'],
- ['O app ficou rápido','Cada toque custava até 210 ms com um ano de registro. Agora custa menos de 35 ms.']
+ ['O app ficou rápido','Cada toque custava até 210 ms com um ano de registro. Agora custa menos de 35 ms.'],
+ ['Cem receitas novas','De 65 para 165, com gramagem e modo de preparo. As sem ingrediente animal eram dez e agora são 36.']
 ];
 function blocoFalta(){
  const fila=FALTA.filter(function(x){return x[2]==='fila'});
