@@ -12,7 +12,12 @@
      o estrago de qualquer falha: nenhum script de fora roda, nenhuma conexão
      sai para host que não esteja nesta lista, e não existe formulário para
      onde vazar dado. O 'unsafe-inline' existe porque o app inteiro é um
-     script e um estilo dentro do próprio arquivo. -->
+     script e um estilo dentro do próprio arquivo.
+
+     O app diz na tela de Privacidade que vai ter anúncio. Rede de anúncio é
+     script de fora, e esta política barra script de fora: no dia de ligar o
+     anúncio, o host dele precisa entrar em script-src, img-src e connect-src,
+     um por um e nomeado. Curinga aqui derruba a promessa inteira. -->
 <meta http-equiv="Content-Security-Policy" content="
  default-src 'none';
  script-src 'self' 'unsafe-inline';
@@ -764,12 +769,16 @@ button.cday:active{transform:scale(.94)}
    <div class="subtabs" id="progTabs">
     <button class="subtab on" data-st="peso">Peso</button>
     <button class="subtab" data-st="medidas">Medidas e fotos</button>
+    <button class="subtab" data-st="semana">Minha semana</button>
+    <button class="subtab" data-st="habitos">Hábitos</button>
     <button class="subtab" data-st="resumo">Resumo</button>
     <button class="subtab" data-st="exames">Exames</button>
     <button class="subtab" data-st="notas">Anotações</button>
    </div>
    <div id="st-peso" class="stack" style="gap:14px"></div>
    <div id="st-medidas" class="stack" style="gap:14px" hidden></div>
+   <div id="st-semana" class="stack" style="gap:14px" hidden></div>
+   <div id="st-habitos" class="stack" style="gap:14px" hidden></div>
    <div id="st-resumo" class="stack" style="gap:14px" hidden></div>
    <div id="st-notas" class="stack" style="gap:14px" hidden></div>
    <div id="st-exames" class="stack" style="gap:14px" hidden></div>
@@ -2512,6 +2521,114 @@ function progHig(d){
  const l=higDoDia(d);
  return{f:l.filter(t=>t.nivel>0).length,t:l.length};
 }
+/* =====================================================================
+   ROTINA: A SEMANA E OS HÁBITOS
+   Duas planilhas que conversam. A primeira diz o que já está ocupado —
+   trabalho, estudo, sono, deslocamento. A segunda diz o que a pessoa
+   quer passar a fazer. O app cruza as duas e devolve um horário.
+
+   O cálculo não inventa tempo: ele só oferece buraco que existe de
+   verdade entre a hora de acordar e a de dormir. Quando não cabe, diz
+   que não cabe, em vez de empilhar hábito em cima de trabalho.
+   ===================================================================== */
+const AG_TIPOS=[
+ ['trabalho','Trabalho','#5b8def'],['estudo','Estudo','#9b6bdf'],
+ ['sono','Sono','#4a5368'],['desloc','Deslocamento','#d98b3a'],
+ ['cuidar','Cuidar de alguém','#d9638b'],['outro','Outro','#6b7280']
+];
+/* O app já tinha um DIAS_SEM, em outro formato (pares id/nome), lá na
+   parte do calendário. Estes aqui são só para a rotina, e levam nome
+   próprio para não brigar com aquele. */
+const ROT_DIAS=['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'];
+const ROT_CURTO=['dom','seg','ter','qua','qui','sex','sáb'];
+const HAB_QUANDO=[['manha','De manhã'],['tarde','À tarde'],['noite','À noite'],['qualquer','Tanto faz']];
+/* As faixas que dão sentido a "de manhã" e "à noite" na hora de encaixar. */
+const HAB_FAIXA={manha:[300,720],tarde:[720,1080],noite:[1080,1440],qualquer:[0,1440]};
+
+function hhmmOk(t){return typeof t==='string'&&/^([01]\d|2[0-3]):[0-5]\d$/.test(t)}
+function emMin(t){const m=String(t||'').match(/^(\d{1,2}):(\d{2})$/);return m?(+m[1])*60+(+m[2]):0}
+function emHora(n){
+ n=Math.max(0,Math.min(1439,Math.round(n)));
+ return String(Math.floor(n/60)).padStart(2,'0')+':'+String(n%60).padStart(2,'0');
+}
+function blocosDoDia(w){
+ return (S.agenda[String(w)]||[]).slice().sort(function(a,b){return emMin(a.ini)-emMin(b.ini)});
+}
+/* Os buracos entre acordar e dormir que nenhum bloco ocupa. */
+function livresDoDia(w){
+ const p=S.perfil;
+ let ini=emMin(hhmmOk(p.acordar)?p.acordar:'07:00');
+ let fim=emMin(hhmmOk(p.dormir)?p.dormir:'23:00');
+ if(fim<=ini)fim=1440;                       /* quem dorme depois da meia-noite */
+ const ocupado=blocosDoDia(w).map(function(b){return[emMin(b.ini),emMin(b.fim)]})
+  .sort(function(a,b){return a[0]-b[0]});
+ const livres=[];
+ let cur=ini;
+ ocupado.forEach(function(o){
+  if(o[1]<=cur||o[0]>=fim)return;
+  if(o[0]>cur)livres.push([cur,Math.min(o[0],fim)]);
+  cur=Math.max(cur,o[1]);
+ });
+ if(cur<fim)livres.push([cur,fim]);
+ return livres.filter(function(l){return l[1]-l[0]>=5});
+}
+function minutosLivres(w){
+ return livresDoDia(w).reduce(function(a,l){return a+(l[1]-l[0])},0);
+}
+/* Encaixa os hábitos do dia nos buracos. Devolve, para cada hábito, a
+   hora achada — ou o motivo de não ter achado. Hábito com hora fixa pela
+   pessoa entra primeiro e reserva o lugar dele. */
+function rotinaSemana(w){
+ const hs=S.habitos.filter(function(h){return h.dias.indexOf(w)>=0});
+ const livres=livresDoDia(w).map(function(l){return[l[0],l[1]]});
+ const posto=[];
+ const reserva=function(ini,dur){
+  for(let i=0;i<livres.length;i++){
+   if(ini>=livres[i][0]&&ini+dur<=livres[i][1]){
+    const resto=[];
+    if(ini-livres[i][0]>=5)resto.push([livres[i][0],ini]);
+    if(livres[i][1]-(ini+dur)>=5)resto.push([ini+dur,livres[i][1]]);
+    livres.splice.apply(livres,[i,1].concat(resto));
+    return true;
+   }
+  }
+  return false;
+ };
+ /* 1. os de hora marcada pela pessoa */
+ hs.filter(function(h){return h.fixa}).forEach(function(h){
+  const ini=emMin(h.fixa);
+  const coube=reserva(ini,h.min);
+  posto.push({h,ini,fixa:true,conflito:!coube});
+ });
+ /* 2. o resto, dentro da faixa pedida, no primeiro buraco que serve */
+ hs.filter(function(h){return !h.fixa}).forEach(function(h){
+  const fx=HAB_FAIXA[h.quando]||HAB_FAIXA.qualquer;
+  let achou=null;
+  for(let i=0;i<livres.length&&achou===null;i++){
+   const ini=Math.max(livres[i][0],fx[0]);
+   if(ini+h.min<=Math.min(livres[i][1],fx[1]))achou=ini;
+  }
+  /* Não coube na faixa pedida: tenta em qualquer hora livre, e diz. */
+  let fora=false;
+  if(achou===null){
+   for(let i=0;i<livres.length&&achou===null;i++){
+    if(livres[i][0]+h.min<=livres[i][1]){achou=livres[i][0];fora=true}
+   }
+  }
+  if(achou===null){posto.push({h,ini:null,semLugar:true});return}
+  reserva(achou,h.min);
+  posto.push({h,ini:achou,foraDaFaixa:fora});
+ });
+ return posto.sort(function(a,b){
+  if(a.ini===null)return 1; if(b.ini===null)return -1; return a.ini-b.ini;
+ });
+}
+function habFeito(h,d){return !!(h.feito||{})[d]}
+function progHabitos(d){
+ const w=new Date(d+'T12:00:00').getDay();
+ const hs=S.habitos.filter(function(h){return h.dias.indexOf(w)>=0});
+ return{f:hs.filter(function(h){return habFeito(h,d)}).length,t:hs.length};
+}
 const DEF={
  perfil:{nome:'',sexo:'naosei',idade:28,altura:172,peso:70,meta:74,ativ:1.375,obj:'ganhar',
    inicio:'',local:'casa',thIni:'',onboard:false,manual:null,mig:0,trilha:'masc',higOff:[],
@@ -2523,6 +2640,13 @@ const DEF={
  dias:{},pesos:[],medidas:[],cargas:{},despensa:[],fotos:[],compras:[],recentes:[],favs:[],vozLog:[],
  salvos:[],trocas:{},ficha:{},externo:{ativo:false,fonte:'',treino:{},dieta:[]},th:{freq:14,hist:[]},
  ciclo:{regras:[],sintomas:{}},meds:[],notas:[],higMeus:[],exames:[],
+ /* A semana fixa: o que já está ocupado, por dia da semana (0 = domingo).
+    Cada bloco é {id, ini:'HH:MM', fim:'HH:MM', o:tipo}. É daqui que sai
+    o buraco livre onde os hábitos cabem. */
+ agenda:{},
+ /* Os hábitos que a pessoa quer ter. O app acha a hora; ela pode fixar
+    outra em `fixa` e aí o cálculo respeita. */
+ habitos:[],
  /* O que a pessoa escrever DENTRO do disfarce. É conteúdo de verdade:
     sem ele a tela fica vazia, e tela vazia entrega o disfarce. */
  disf:{notas:[],lista:[],calc:''},
@@ -2669,6 +2793,25 @@ function normalizaTudo(){
  S.ui.dobras=Array.isArray(S.ui.dobras)?S.ui.dobras:[];
  S.exames=Array.isArray(S.exames)?S.exames.filter(x=>x&&x.id&&x.n&&x.v):[];
  if(typeof p.senha!=='string')p.senha='';
+ /* Agenda e hábitos: formato conferido um a um, porque vêm de backup e
+    de versão antiga, onde simplesmente não existiam. */
+ S.agenda=(S.agenda&&typeof S.agenda==='object'&&!Array.isArray(S.agenda))?S.agenda:{};
+ Object.keys(S.agenda).forEach(function(k){
+  if(!/^[0-6]$/.test(k)||!Array.isArray(S.agenda[k])){delete S.agenda[k];return}
+  S.agenda[k]=S.agenda[k].filter(function(b){
+   return b&&b.id&&hhmmOk(b.ini)&&hhmmOk(b.fim)&&emMin(b.fim)>emMin(b.ini);
+  }).slice(0,12);
+ });
+ S.habitos=Array.isArray(S.habitos)?S.habitos.filter(function(h){
+  return h&&h.id&&typeof h.n==='string'&&h.n.trim();
+ }).slice(0,30).map(function(h){
+  return{id:h.id,n:String(h.n).slice(0,40),
+   min:Math.max(1,Math.min(240,Number(h.min)||10)),
+   quando:['manha','tarde','noite','qualquer'].indexOf(h.quando)>=0?h.quando:'qualquer',
+   dias:Array.isArray(h.dias)?h.dias.filter(function(x){return x>=0&&x<=6}):[0,1,2,3,4,5,6],
+   fixa:hhmmOk(h.fixa)?h.fixa:'',
+   feito:(h.feito&&typeof h.feito==='object'&&!Array.isArray(h.feito))?h.feito:{}};
+ }):[];
  S.trocas=(S.trocas&&typeof S.trocas==='object'&&!Array.isArray(S.trocas))?S.trocas:{};
  S.cargas=(S.cargas&&typeof S.cargas==='object'&&!Array.isArray(S.cargas))?S.cargas:{};
  S.dias=(S.dias&&typeof S.dias==='object'&&!Array.isArray(S.dias))?S.dias:{};
@@ -3603,6 +3746,10 @@ function sheet(titulo,html,sub){
 function closeSheet(){
  if(typeof pararCamera==='function')pararCamera();
  if(typeof pararMedidor==='function')pararMedidor();
+ /* A contagem da sessão de voz não pode continuar rodando depois que a
+    folha sai da tela: sem isto ela seguiria marcando exercício como
+    feito com a folha fechada. */
+ if(typeof pararSessaoVoz==='function')pararSessaoVoz();
  $('#modalRoot').innerHTML='';document.body.style.overflow='';
  const app=$('#main');
  if(app){app.removeAttribute('inert');app.removeAttribute('aria-hidden')}
@@ -3942,12 +4089,37 @@ function cardHabitos(){
    '<button class="li" data-a="hab" data-k="'+k+'"><span class="chk '+(x.hab[k]?'on':'')+'">'+ic('check')+'</span>'+
    ic(i2,'font-size:16px;color:var(--ink-3)')+
    '<span class="grow" style="font-size:13.8px;font-weight:600;'+(x.hab[k]?'text-decoration:line-through;color:var(--ink-3)':'')+'">'+t+'</span></button>').join('')+'</div>'+
+  /* Os hábitos que a própria pessoa criou entram aqui, no mesmo cartão
+     dos do app, com a hora que o cálculo da semana achou. Em cartão
+     separado seriam duas listas chamadas "hábitos" na mesma tela. */
+  blocoMeusHabitos()+
   '<hr class="sep"><div class="g3">'+
    '<label class="fld">Sono (h) '+selo('sono','7 h')+'<input type="number" step="0.5" inputmode="decimal" data-a="dia-num" data-f="sono" value="'+(x.sono||'')+'" placeholder="0"></label>'+
    '<label class="fld">Passos<input type="number" inputmode="numeric" data-a="dia-num" data-f="passos" value="'+(x.passos||'')+'" placeholder="0"></label>'+
    '<label class="fld">Energia<select data-a="dia-num" data-f="humor">'+
     ['—','Muito baixa','Baixa','Normal','Boa','Ótima'].map((t,i2)=>'<option value="'+i2+'"'+((x.humor||0)===i2?' selected':'')+'>'+t+'</option>').join('')+
    '</select></label></div></div>';
+}
+function blocoMeusHabitos(){
+ const d=hoje(), w=new Date(d+'T12:00:00').getDay();
+ const rot=rotinaSemana(w);
+ if(!rot.length)return '';
+ return '<hr class="sep">'+
+  '<div class="row" style="gap:8px;align-items:baseline;margin-bottom:8px">'+
+   '<span class="lbl grow">Os seus</span>'+
+   '<button class="btn gh xs" data-a="go-sub" data-tab="prog" data-st="habitos">organizar</button></div>'+
+  '<div class="stack" style="gap:7px">'+rot.map(function(r){
+   const feito=habFeito(r.h,d);
+   return '<div class="row" style="gap:9px;align-items:center">'+
+    '<button class="chk '+(feito?'on':'')+'" data-a="hab-feito" data-id="'+esc(r.h.id)+'" '+
+     'aria-pressed="'+(feito?'true':'false')+'" style="flex:none">'+ic('check')+'</button>'+
+    '<span class="num tiny" style="flex:none;min-width:44px;color:var(--ink-3)">'+
+     (r.ini===null?'—':emHora(r.ini))+'</span>'+
+    '<span class="grow" style="font-size:13.8px;font-weight:600;'+
+     (feito?'text-decoration:line-through;color:var(--ink-3)':'')+'">'+esc(r.h.n)+'</span>'+
+    (r.semLugar?'<span class="tag w" style="flex:none">não coube</span>':'')+
+    '</div>';
+  }).join('')+'</div>';
 }
 function cardSemana(){
  const dias=[];for(let i=6;i>=0;i--)dias.push(addDias(hoje(),-i));
@@ -4875,16 +5047,15 @@ const CREATINA=[
  ['A dose','3 a 5 g por dia, da versão monoidratada, todo dia, inclusive nos dias sem treino. Não precisa de fase de saturação, não precisa de horário e não precisa de ciclo de pausa. As versões caras com outros nomes não se mostraram melhores que a monoidratada.'],
  ['O preço','É o suplemento mais barato por efeito que existe. Um pote de 300 g, na dose de 3 g, dura cerca de cem dias, e custa bem menos que um pote de whey — que rende duas semanas e substitui comida que você poderia comprar.'],
  ['Creatinina no exame: atenção','A creatina vira creatinina no corpo, e creatinina é justamente o que o laboratório usa para estimar como está o rim. Quem toma creatina costuma ver esse valor subir um pouco sem ter nada no rim. Avise quem te acompanha que você usa, antes de coletar — senão o exame vira susto, ou vira investigação que não precisava acontecer.'],
- ['O que ela não é','Não é esteroide, não é hormônio e não tem nada a ver com bloqueador ou com testosterona. Isso está respondido com estudo no artigo de dúvidas comuns que está nas fontes.'],
+ ['O que ela não é','Não é esteroide e não tem nada a ver com bloqueador ou com testosterona.'],
  ['Quando não faz sentido','Se você ainda não treina com regularidade, não bate a proteína do dia ou dorme mal, creatina não vai aparecer em nada. Ela é a última coisa da fila, não a primeira. E quem tem doença de rim, ou está em gestação, pergunta antes.']
 ];
 function blocoCreatina(){
  return dobra('plano:creatina','Creatina','leaf',
   'o único suplemento com evidência forte, e o efeito dele é pequeno',function(){
   return '<div class="card">'+chTtl('leaf','Creatina')+
-   '<p class="tiny muted" style="line-height:1.7">Este é o único suplemento que o app cita por nome, e não é por entusiasmo: '+
-   'é porque a evidência dele é forte e o efeito dele é pequeno, e as duas coisas precisam ser ditas na mesma frase. '+
-   'O app não vende nada e não indica marca.</p>'+
+   '<p class="tiny muted" style="line-height:1.7">O único suplemento que o app cita por nome. '+
+   'O app não indica marca e não ganha nada se você comprar.</p>'+
    '<div class="stack" style="gap:0;margin-top:12px">'+CREATINA.map(function(x){
     return '<div class="li"><div class="grow"><div class="ttl">'+esc(x[0])+'</div>'+
      '<div class="sub" style="line-height:1.55">'+esc(x[1])+'</div></div></div>';
@@ -6271,9 +6442,12 @@ function buscarCodigo(cod){
    const p=j&&j.product;
    if(!j||j.status!==1||!p)throw new Error('sem produto');
    const n=p.nutriments||{};
-   let kcal=Number(n['energy-kcal_100g']);
-   if(!kcal&&n.energy_100g)kcal=Number(n.energy_100g)/4.184;
-   if(!kcal||!isFinite(kcal))throw new Error('sem valores');
+   /* Zero é valor, não ausência. Café preto e refrigerante zero têm
+      0 kcal de verdade, e o teste antigo (`!kcal`) jogava os dois fora
+      como se o produto não existisse na base. */
+   let kcal=n['energy-kcal_100g']!=null?Number(n['energy-kcal_100g']):NaN;
+   if(!isFinite(kcal)&&n.energy_100g!=null)kcal=Number(n.energy_100g)/4.184;
+   if(!isFinite(kcal))throw new Error('sem valores');
    const nome=[(p.product_name_pt||p.product_name||'').trim(),(p.brands||'').split(',')[0].trim()]
     .filter(Boolean).join(' — ').slice(0,70)||('Produto '+cod);
    /* a base aberta também traz fibra, sódio, ferro e cálcio quando o
@@ -6296,10 +6470,18 @@ function buscarCodigo(cod){
     '<p class="xtiny muted" style="margin-top:8px">Valores da base aberta Open Food Facts. '+
     'Confira no rótulo se parecer estranho.</p></div>';
   })
-  .catch(()=>{
+  /* Duas coisas diferentes, que antes davam a mesma frase: código que a
+     base não conhece, e produto que a base conhece sem a tabela
+     nutricional preenchida. Dizer "não achei" no segundo caso manda a
+     pessoa conferir o código de barras à toa. */
+  .catch(function(e){
    if(!$('#scanRes'))return;
-   $('#scanRes').innerHTML='<p class="tiny" style="color:var(--warn)">Não achei esse produto na base aberta. '+
-    'Use a aba Manual e copie os valores do rótulo da embalagem.</p>';
+   const semValor=e&&e.message==='sem valores';
+   $('#scanRes').innerHTML='<p class="tiny" style="color:var(--warn);line-height:1.6">'+
+    (semValor
+     ?'Achei o produto, mas a base não tem a tabela nutricional dele.'
+     :'Não achei esse código na base aberta.')+
+    ' Digite os valores do rótulo na aba Manual.</p>';
   });
 }
 
@@ -6495,8 +6677,8 @@ function stBebidas(){
     '<p class="tiny muted" style="line-height:1.7;margin-top:10px">Sobre risco: a OMS afirmou em 2023 que não se conhece '+
     'dose livre de efeito, e que para câncer não existe nível seguro. '+selo('alcool','o que isso quer dizer')+'</p>'+
     '<p class="tiny muted" style="line-height:1.7;margin-top:10px">O app não registra álcool nem conta dose, e não vai te cobrar. '+
-    'Se você faz terapia hormonal, fígado já é uma das coisas que o exame de rotina acompanha: '+
-    'quem prescreve é quem deve saber do seu consumo, e isso é conversa de consulta, não de aplicativo.</p></div>';
+    'Se você faz terapia hormonal, quem prescreve é quem deve saber do seu consumo: o fígado já entra '+
+    'no exame de rotina.</p></div>';
   })+
 
   dobra('beb:receitas','Bebida que alimenta','pot',
@@ -6712,7 +6894,14 @@ function stVoz(){
    '<button class="btn '+(x.voz.feito?'gh':'acc')+' bl" style="margin-top:12px" data-a="fim-voz">'+
     (x.voz.feito?'Treino de voz concluído — desfazer':'Concluir treino de voz')+'</button></div>'+
 
-  '<div class="card">'+chTtl('wave','Os exercícios de hoje')+
+  '<div class="card">'+chTtl('wave','Os exercícios de hoje',
+    '<span class="tag a">'+v.min+' min</span>')+
+   /* O guiado vem antes da lista: é o jeito de fazer o treino, e a lista
+      vira consulta. Quem quiser fazer solto continua tocando item a item. */
+   '<button class="btn acc bl" style="margin-bottom:12px" data-a="voz-sessao">'+ic('timer')+
+    ' Treinar agora, com o tempo contado</button>'+
+   '<p class="xtiny muted" style="margin:-6px 0 12px;line-height:1.6">O app conta o tempo de cada exercício '+
+   'e passa para o próximo sozinho, para você não precisar olhar o relógio no meio do som.</p>'+
    '<div class="stack" style="gap:9px">'+v.exs.map(e2=>{
     const ok=!!(x.voz.ex||{})[e2.id];
     return '<div class="ex '+(ok?'done':'')+'"><div class="row top" style="gap:10px">'+
@@ -7031,6 +7220,111 @@ function sheetVozEx(id){
   '<button class="btn '+(ok?'gh':'acc')+' bl" data-a="voz-ex" data-id="'+id+'" data-close="1">'+
    (ok?'Desmarcar':'Marcar como feito')+'</button>',
   e2.min+' minutos');
+}
+/* =====================================================================
+   SESSÃO GUIADA DE VOZ
+   Treino de voz é o único da rotina em que a pessoa precisa olhar o
+   relógio enquanto faz: sustentar um som por quatro minutos sem contar
+   o tempo não dá. Antes ela abria um exercício, lia, e virava a conta
+   de minuto na cabeça — ou abria o cronômetro do celular por fora.
+
+   Aqui o app conta. Cada exercício roda o tempo que ele mesmo declara
+   em `min`, e quando acaba já marca como feito e passa para o próximo
+   sozinho, porque parar para tocar na tela no meio de um exercício de
+   voz é justamente o que quebra o exercício.
+   ===================================================================== */
+let vozSesInt=null, vozSes=null;
+function pararSessaoVoz(){
+ if(vozSesInt)clearInterval(vozSesInt);
+ vozSesInt=null; vozSes=null;
+}
+function vozSessaoAbrir(){
+ const v=vozDoDia(hoje());
+ if(!v.exs.length)return toast('Hoje não tem exercício de voz');
+ vozSes={exs:v.exs,i:0,resta:v.exs[0].min*60,pausado:false,feitos:0};
+ sheet('Treino de voz guiado',
+  '<div id="vozSes"></div>',
+  v.bloco.t+' · '+v.min+' min no total');
+ vozSessaoPinta();
+ if(vozSesInt)clearInterval(vozSesInt);
+ vozSesInt=setInterval(vozSessaoTick,1000);
+}
+function vozSessaoTick(){
+ if(!vozSes||vozSes.pausado)return;
+ if(!$('#vozSes')){pararSessaoVoz();return}   /* folha fechada por fora */
+ vozSes.resta--;
+ if(vozSes.resta>0){vozSessaoPinta();return}
+ vozSessaoProximo(true);
+}
+/* marcado=true quando o tempo acabou de verdade: aí conta como feito.
+   Pular com o botão NÃO marca — pular é a pessoa dizendo que não fez. */
+function vozSessaoProximo(marcado){
+ if(!vozSes)return;
+ const atual=vozSes.exs[vozSes.i];
+ if(marcado&&atual){
+  /* hoje() e não `hj`: `hj` só existe dentro do despachante de ações, e
+     aqui quem chama é o relógio. Com `hj` isto lançava a cada segundo,
+     por dentro do setInterval, e o contador seguia para número negativo
+     sem nunca trocar de exercício. */
+  const D=hoje();
+  const y=dia(D);
+  y.voz.ex[atual.id]=true;
+  const v=vozDoDia(D);
+  if(v.exs.every(e2=>y.voz.ex[e2.id])){y.voz.feito=true;y.hab.voz=true}
+  save('dia',D);
+  vozSes.feitos++;
+  if(navigator.vibrate)try{navigator.vibrate([160,80,160])}catch(e){}
+ }
+ vozSes.i++;
+ if(vozSes.i>=vozSes.exs.length){vozSessaoFim();return}
+ vozSes.resta=vozSes.exs[vozSes.i].min*60;
+ vozSessaoPinta();
+}
+function vozSessaoFim(){
+ const feitos=vozSes?vozSes.feitos:0;
+ if(vozSesInt)clearInterval(vozSesInt);
+ vozSesInt=null;
+ const el=$('#vozSes');
+ if(el)el.innerHTML=
+  '<div style="text-align:center;padding:14px 0">'+
+  '<div style="font-size:30px;line-height:1">✓</div>'+
+  '<p class="tiny" style="line-height:1.7;margin-top:10px"><b>Treino de voz terminado.</b></p>'+
+  '<p class="xtiny muted" style="line-height:1.65;margin-top:6px">'+feitos+
+   (feitos===1?' exercício marcado':' exercícios marcados')+' como feitos no dia de hoje.</p>'+
+  '<p class="xtiny muted" style="line-height:1.65;margin-top:8px">Se a garganta apertou ou ardeu em algum momento, '+
+  'pare por hoje — isso não é parte do treino.</p>'+
+  '<button class="btn acc bl" style="margin-top:13px" data-a="close">Fechar</button></div>';
+ vozSes=null;
+ render();
+}
+function vozSessaoPinta(){
+ const el=$('#vozSes'); if(!el||!vozSes)return;
+ const e2=vozSes.exs[vozSes.i];
+ const mm=String(Math.floor(vozSes.resta/60)).padStart(2,'0');
+ const ss=String(vozSes.resta%60).padStart(2,'0');
+ const total=e2.min*60, andado=total-vozSes.resta;
+ const pct=Math.max(0,Math.min(100,Math.round(andado/total*100)));
+ el.innerHTML=
+  '<div class="row" style="gap:8px;align-items:baseline;margin-bottom:4px">'+
+   '<span class="xtiny muted">Exercício '+(vozSes.i+1)+' de '+vozSes.exs.length+'</span>'+
+   '<span class="grow"></span><span class="tag n">'+esc(e2.tipo||'')+'</span></div>'+
+  '<div class="ttl" style="font-size:16px;font-weight:700;line-height:1.3">'+esc(e2.n)+'</div>'+
+  '<div style="text-align:center;margin:14px 0 6px">'+
+   '<div class="num" style="font-size:44px;font-weight:600;line-height:1;'+
+    'font-variant-numeric:tabular-nums">'+mm+':'+ss+'</div>'+
+   '<div class="xtiny muted" style="margin-top:5px">'+(vozSes.pausado?'em pausa':'falando')+'</div>'+
+  '</div>'+
+  '<div style="height:6px;border-radius:99px;background:var(--line);overflow:hidden;margin-bottom:13px">'+
+   '<div style="height:100%;width:'+pct+'%;background:var(--accent);transition:width .4s linear"></div></div>'+
+  '<div class="stack" style="gap:9px;margin-bottom:14px">'+e2.como.map(function(p,i){
+    return '<div class="row top" style="gap:10px"><div class="idx">'+(i+1)+'</div>'+
+     '<div class="grow tiny" style="line-height:1.5">'+esc(p)+'</div></div>';
+   }).join('')+'</div>'+
+  '<div class="row wrap" style="gap:7px">'+
+   '<button class="btn acc sm grow" data-a="voz-ses-pausa">'+(vozSes.pausado?'Continuar':'Pausar')+'</button>'+
+   '<button class="btn gh sm grow" data-a="voz-ses-pular">Pular este</button>'+
+  '</div>'+
+  '<button class="btn gh bl sm" style="margin-top:8px" data-a="voz-ses-parar">Parar o treino</button>';
 }
 function stVozVideos(){
  const alvo=S.perfil.vozAlvo;
@@ -7947,13 +8241,27 @@ function tentarDestravar(){
 }
 function cardSenha(){
  const tem=temSenha();
- return '<div class="card">'+chTtl('check','Senha para abrir',
-   tem?'<span class="tag o">ligada</span>':'')+
-  '<p class="tiny muted" style="line-height:1.7">Uma tela na frente do app, '+
-  'para quem pegar seu celular não cair direto no seu histórico.</p>'+
-  '<p class="tiny muted" style="line-height:1.7;margin-top:9px"><b>O que ela não é:</b> criptografia. '+
-  'Quem souber abrir o armazenamento do navegador passa por cima dela. Contra olhar por cima do ombro, funciona; '+
-  'contra quem tem perícia, não. Se o risco for esse, o disfarce do nome do app e o apagar tudo protegem mais.</p>'+
+ /* O disfarce só funciona com senha. Quem escolheu um disfarce e não pôs
+    senha está achando que está escondido e não está — e o único lugar
+    onde isso se resolve é aqui. Então o aviso mora aqui, não só na tela
+    do disfarce. */
+ const disfarcePendurado=!!S.perfil.disfarce&&!tem;
+ return '<div class="card'+(disfarcePendurado?'" style="border-color:var(--warn)':'')+'">'+
+   chTtl('check','Senha para abrir',
+   tem?'<span class="tag o">ligada</span>':'<span class="tag n">desligada</span>')+
+  (disfarcePendurado
+   ?'<p class="tiny" style="line-height:1.7;color:var(--warn);font-weight:600">'+
+    'Você escolheu o disfarce de “'+esc(disfarceAtual().app)+'”, mas ele não está valendo: '+
+    'sem senha, qualquer toque abre o Norte por baixo. Ponha uma senha e o disfarce começa a funcionar.</p>'
+   :'')+
+  '<p class="tiny muted" style="line-height:1.7'+(disfarcePendurado?';margin-top:9px':'')+'">Uma tela na frente do app, '+
+  'para quem pegar seu celular não cair direto no seu histórico.'+
+  (tem?' Ela é pedida toda vez que o app abre.':'')+'</p>'+
+  '<p class="tiny muted" style="line-height:1.7;margin-top:9px">Ela segura olhar por cima do ombro, '+
+  'e não segura quem tem perícia: não é criptografia, e quem souber abrir o armazenamento do navegador passa por cima. '+
+  'Para esse risco, o disfarce e o apagar tudo protegem mais.</p>'+
+  '<p class="xtiny muted" style="line-height:1.65;margin-top:9px">Não existe recuperação: sem servidor, '+
+  'não há para onde mandar um link. Esquecer esta senha custa tudo que está guardado.</p>'+
   (tem
    ?'<div class="row wrap" style="gap:7px;margin-top:12px">'+
     '<button class="btn gh sm grow" data-a="senha-mudar">Trocar a senha</button>'+
@@ -7961,15 +8269,73 @@ function cardSenha(){
    :'<button class="btn acc bl sm" style="margin-top:12px" data-a="senha-por">'+ic('check')+' Pôr uma senha</button>')+
   '</div>';
 }
+/* Senha óbvia: avisa, não bloqueia. Bloquear empurra a pessoa para uma
+   senha que ela não lembra — e senha esquecida aqui custa TUDO, porque
+   não existe recuperação. Quem sabe do risco dela é ela. */
+function senhaObvia(s){
+ if(!s)return '';
+ if(/^(.)\1+$/.test(s))return 'Dígitos todos iguais é dos primeiros palpites de qualquer pessoa.';
+ if('01234567890123456789'.indexOf(s)>=0)return 'Sequência seguida é dos primeiros palpites.';
+ if('09876543210987654321'.indexOf(s)>=0)return 'Sequência de trás para a frente também é palpite comum.';
+ if(/^(19|20)\d\d$/.test(s))return 'Isto parece um ano. Ano de nascimento quem te conhece adivinha.';
+ return '';
+}
+/* Confere a cada tecla, em vez de só no "Guardar". Antes a pessoa
+   digitava duas senhas às cegas, apertava, e só então descobria por um
+   aviso que some que as duas não batiam — tendo que recomeçar sem saber
+   qual das duas errou. */
+function senhaAfere(){
+ const nova=(($('#snNova')||{}).value||''), conf=(($('#snConf')||{}).value||'');
+ const okTam=nova.length>=4, okIgual=nova.length>0&&nova===conf;
+ const item=function(ok,txt){
+  return '<div class="xtiny" style="display:flex;gap:7px;align-items:flex-start;line-height:1.7;'+
+   'color:'+(ok?'var(--ok)':'var(--muted, #8b8b9a)')+'">'+
+   '<span aria-hidden="true" style="flex:none;width:12px">'+(ok?'✓':'·')+'</span>'+
+   '<span>'+txt+'</span></div>';
+ };
+ const reg=$('#snRegras');
+ if(reg)reg.innerHTML=item(okTam,'pelo menos 4 dígitos')+
+   item(okIgual,'as duas iguais'+(conf.length&&!okIgual?' — ainda não batem':''));
+ const av=$('#snAviso');
+ if(av){
+  const m=okTam?senhaObvia(nova):'';
+  av.innerHTML=m?'<div class="xtiny" style="color:var(--warn);line-height:1.6;margin-top:7px">'+esc(m)+'</div>':'';
+ }
+ const b=$('#snOk');
+ if(b){b.disabled=!(okTam&&okIgual);b.style.opacity=b.disabled?'.45':'';}
+}
 function sheetSenha(trocar){
  sheet(trocar?'Trocar a senha':'Pôr uma senha',
-  '<p class="tiny muted" style="line-height:1.65;margin-bottom:13px">Quatro dígitos ou mais. '+
-  'Não dá para recuperar depois: não existe servidor para pedir de volta.</p>'+
-  (trocar?'<label class="fld">Senha de agora<input type="password" inputmode="numeric" id="snAtual" autocomplete="off"></label>':'')+
+  '<p class="tiny muted" style="line-height:1.65;margin-bottom:5px">Quatro dígitos ou mais.</p>'+
+  '<p class="xtiny" style="line-height:1.65;margin-bottom:13px;color:var(--warn)">'+
+  'Não dá para recuperar depois. Sem servidor, não existe "esqueci minha senha": '+
+  'perder esta senha é perder treino, comida, fotos e exames.</p>'+
+  (trocar?'<label class="fld">Senha de agora<input type="password" inputmode="numeric" id="snAtual" autocomplete="off"></label>'+
+   '<div id="snErroAtual" class="xtiny" style="color:var(--bad);line-height:1.6;min-height:2px"></div>':'')+
   '<label class="fld" style="margin-top:10px">Nova senha<input type="password" inputmode="numeric" id="snNova" autocomplete="off"></label>'+
   '<label class="fld" style="margin-top:10px">De novo, para conferir<input type="password" inputmode="numeric" id="snConf" autocomplete="off"></label>'+
-  '<button class="btn acc bl" style="margin-top:14px" data-a="senha-ok" data-v="'+(trocar?'1':'')+'">Guardar</button>',
+  /* Ver o que se digitou é o que mais evita o erro de não bater: num
+     teclado de celular, dois campos cegos erram muito. Fica desligado
+     por padrão, porque a tela pode estar sendo vista por outra pessoa. */
+  '<button class="btn gh xs" style="margin-top:9px" data-a="senha-ver" id="snVer">'+ic('face')+' Mostrar o que eu digitei</button>'+
+  '<div id="snRegras" style="margin-top:10px"></div>'+
+  '<div id="snAviso"></div>'+
+  '<button class="btn acc bl" style="margin-top:14px" id="snOk" data-a="senha-ok" data-v="'+(trocar?'1':'')+'">Guardar</button>',
   'Fica só neste aparelho');
+ /* Confere já na abertura, para o "Guardar" começar apagado e as regras
+    aparecerem antes de a pessoa digitar qualquer coisa. */
+ senhaAfere();
+ ['snAtual','snNova','snConf'].forEach(function(id){
+  const el=$('#'+id);
+  if(!el)return;
+  el.addEventListener('input',senhaAfere);
+  el.addEventListener('keydown',function(e){
+   if(e.key!=='Enter')return;
+   e.preventDefault();
+   const b=$('#snOk');
+   if(b&&!b.disabled)b.click();
+  });
+ });
 }
 
 /* =====================================================================
@@ -8046,9 +8412,8 @@ function stExames(){
     }).join('')
    :'<div class="card">'+vazio('chart','Nenhum resultado anotado ainda.')+'</div>')+
   blocoOsso()+
-  '<div class="card"><p class="xtiny muted" style="line-height:1.7">Fica só neste aparelho, como todo o resto, '+
-  'e some junto se você usar o apagar tudo. Exame é dado de saúde: pense duas vezes antes de deixar o app aberto '+
-  'num celular que outras pessoas pegam — a senha no Perfil ajuda nisso.</p></div>';
+  '<div class="card"><p class="xtiny muted" style="line-height:1.7">Exame é dado de saúde: pense duas vezes antes '+
+  'de deixar o app aberto num celular que outras pessoas pegam — a senha no Perfil ajuda nisso.</p></div>';
 }
 function sheetExameNovo(){
  sheet('Anotar um resultado',
@@ -8314,8 +8679,7 @@ function blocoFalta(){
  return dobra('guias:falta','O que este app não tem','info',
   fila.length+' coisas na fila e '+nao.length+' que eu decidi não fazer',function(){
   return '<div class="card">'+chTtl('info','O que este app não tem')+
-   '<p class="tiny muted" style="line-height:1.7">Um app que diz o tamanho da própria evidência devia dizer o tamanho do próprio buraco. '+
-   'Isto é para você saber o que <b>não</b> esperar daqui antes de contar com isso.</p>'+
+   '<p class="tiny muted" style="line-height:1.7">O que <b>não</b> esperar daqui, antes de contar com isso.</p>'+
    '<div class="lbl" style="margin:14px 0 7px">Na fila</div>'+
    '<div class="stack" style="gap:0">'+fila.map(li).join('')+'</div>'+
    '<hr class="sep"><div class="lbl" style="margin-bottom:7px">Decidi não fazer, e por quê</div>'+
@@ -8389,8 +8753,8 @@ function stNotas(){
    '<label class="fld" style="margin-top:12px">Escrever'+
     '<textarea id="notaTxt" rows="4" placeholder="o que você quiser guardar" style="resize:vertical"></textarea></label>'+
    '<button class="btn acc bl sm" style="margin-top:10px;width:100%" data-a="nota-nova">'+ic('plus')+' Guardar</button>'+
-   '<p class="xtiny muted" style="margin-top:10px;line-height:1.6">Fica só neste aparelho, como todo o resto. '+
-   'Some junto se você usar o apagar tudo, e não vai para lugar nenhum.</p></div>'+
+   '<p class="xtiny muted" style="margin-top:10px;line-height:1.6">Fica só neste aparelho, '+
+   'e some junto se você usar o apagar tudo.</p></div>'+
   (ns.length?ns.map(function(n){
     return '<div class="card">'+
      '<div class="row spread" style="gap:9px;margin-bottom:7px">'+
@@ -9369,7 +9733,7 @@ function blocoAvisos(onde){
  return lista.map(cardAviso).join('');
 }
 
-const EMAIL_CONTATO='sendmenoflowers@duck.com';
+const EMAIL_CONTATO='manofnortheast@duck.com';
 
 /* =====================================================================
    PROFISSIONAIS
@@ -9402,7 +9766,8 @@ function stProfissionais(){
   'Atende online? (sim/não):\n'+
   'Experiência com pessoas trans:\n'+
   'Contato que pode ser publicado:\n'+
-  'Valor ou se atende por convênio ou gratuito:\n');
+  'Valor ou se atende por convênio ou gratuito:\n'+
+  'Você é uma pessoa trans? (sim/não — se sim, o aluguel tem desconto):\n');
  const temLista=PROFISSIONAIS.length>0;
  $('#st-profissionais').innerHTML=
   blocoAvisos('profissionais')+
@@ -9426,8 +9791,7 @@ function stProfissionais(){
    :'<div class="card hero">'+chTtl('user','Achar profissional que te atenda bem')+
      '<p class="tiny" style="line-height:1.7">O app ainda <b>não tem uma lista de profissionais</b>. '+
      'Nenhum pedido foi conferido até agora, e lista inventada seria pior que lista nenhuma.</p>'+
-     '<p class="tiny muted" style="line-height:1.7;margin-top:10px">O que dá para fazer hoje está logo abaixo: '+
-     'onde procurar, e como conferir quem você encontrar.</p></div>'+
+     '</div>'+
     '<div class="card">'+chTtl('search','Onde procurar')+
      '<div class="stack" style="gap:0">'+[
       ['Ambulatório trans do SUS','Atendimento público e especializado. A lista de serviços está no guia de hormonização, aqui em Direitos e serviços.'],
@@ -9447,22 +9811,32 @@ function stProfissionais(){
        '<div class="sub" style="line-height:1.55">'+esc(x[1])+'</div></div></div>';
      }).join('')+'</div></div>')+
 
-  '<div class="card">'+chTtl('bell','Você é profissional e quer ser listado?')+
-   '<p class="tiny muted" style="line-height:1.7">Mande um e-mail com os dados abaixo. É de graça e não tem patrocínio: '+
-   'o app não cobra por posição nem por destaque, e não aceitaria. '+
-   'Cada pedido é conferido antes de entrar, então pode demorar.</p>'+
+  '<div class="card">'+chTtl('bell','Você é profissional e quer um espaço aqui?')+
+   '<p class="tiny muted" style="line-height:1.7">O espaço é <b>alugado por mês</b>. '+
+   '<b>Profissional trans paga menos</b> — o valor e o desconto vão na resposta do e-mail.</p>'+
+   /* O dinheiro não pode comprar o selo, e isto precisa estar escrito na
+      mesma tela em que se cobra. Num app de saúde, deixar a dúvida no ar
+      sobre o que o pagamento compra é o começo de alguém se consultar
+      com quem não devia. */
+   '<p class="tiny" style="line-height:1.7;margin-top:10px">Pagar compra o espaço, e só. '+
+   'O registro no conselho continua sendo conferido um por um, quem não passa não entra e não é cobrado, '+
+   'e o app <b>não recomenda ninguém</b>: estar aqui não é selo de qualidade. '+
+   'Não existe posição melhor para quem paga mais.</p>'+
+
    '<div class="stack" style="gap:0;margin-top:11px">'+
    ['Nome e profissão','Número de registro no conselho da categoria','Cidade e estado, e se atende online',
     'Sua experiência atendendo pessoas trans','Contato que pode ser publicado',
-    'Valor, ou se atende por convênio ou de graça'].map(function(t,i){
+    'Valor, ou se atende por convênio ou de graça',
+    'Se você é uma pessoa trans, para o desconto'].map(function(t,i){
     return '<div class="li"><span class="idx" style="background:var(--surface-2);color:var(--ink-3)">'+(i+1)+'</span>'+
      '<div class="grow"><div class="ttl">'+esc(t)+'</div></div></div>';
    }).join('')+'</div>'+
    '<a class="btn acc bl" style="margin-top:12px" href="mailto:'+EMAIL_CONTATO+'?subject='+assunto+'&body='+corpo+'">'+
-   ic('bell')+' Pedir um espaço por e-mail</a>'+
-   '<p class="xtiny muted" style="margin-top:10px;line-height:1.6">O e-mail abre já preenchido com os campos. '+
-   'Se o botão não funcionar no seu aparelho, escreva para <b>'+EMAIL_CONTATO+'</b>.</p>'+
-   '<p class="xtiny muted" style="margin-top:9px;line-height:1.6">Pedir não garante publicação, e sair da lista é só pedir.</p></div>'+
+   ic('bell')+' Pedir o espaço e o valor por e-mail</a>'+
+   '<p class="xtiny muted" style="margin-top:10px;line-height:1.6">Se o botão não funcionar no seu aparelho, '+
+   'escreva para <b>'+EMAIL_CONTATO+'</b>.</p>'+
+   '<p class="xtiny muted" style="margin-top:9px;line-height:1.6">Pedir não garante publicação, pode demorar, '+
+   'e sair da lista é só pedir.</p></div>'+
 
   (!temLista?'':'<div class="card" style="border-color:var(--warn)">'+chTtl('bell','Teve problema com alguém da lista?')+
    '<p class="tiny" style="line-height:1.7">Desrespeito, despreparo, cobrança indevida, qualquer coisa. '+
@@ -9541,31 +9915,27 @@ function stPrivacidade(){
   '<button class="btn gh sm" data-a="go" data-tab="perfil" style="align-self:flex-start">'+ic('left')+' Perfil</button>'+
 
   '<div class="card hero">'+chTtl('info','Privacidade e termos')+
-   '<p class="tiny" style="line-height:1.7">Resumo honesto: <b>tudo que você registra fica neste aparelho</b> e não vai para servidor nenhum, '+
-   'porque não existe servidor nem conta. Mas o app não é uma ilha — algumas coisas saem, e estão listadas abaixo.</p></div>'+
+   '<p class="tiny" style="line-height:1.7">Resumo honesto: <b>tudo que você registra fica neste aparelho</b>. '+
+   'Mas o app não é uma ilha — algumas coisas saem, e estão listadas abaixo.</p></div>'+
 
   '<div class="card" style="border-color:var(--ok)">'+chTtl('heart','A promessa')+
-   '<p class="tiny" style="line-height:1.75">Em primeira pessoa e sem rodeio:</p>'+
-   '<div class="stack" style="gap:0;margin-top:11px">'+
-   [['Eu não recebo nada do que você escreve','Não existe conta, não existe login, não existe servidor deste app. Nada do que você registra chega a mim, nem por engano, nem se eu quisesse.'],
-    ['Não vendo e não compartilho','Não existe anúncio, não existe rastreador, não existe parceiro, não existe analytics. Não há o que vender porque não há o que coletar.'],
-    ['Não existe perfil seu em lugar nenhum','Nem com outro nome, nem anonimizado, nem agregado. Esse tipo de promessa costuma vir com asterisco. Esta não tem.'],
-    ['Se isso mudar, muda com aviso na cara','Se um dia este app precisar de conta ou de servidor, vai estar escrito nesta tela antes de valer, e você poderá apagar tudo antes.'],
-    ['Dá para conferir','O código é aberto. Qualquer pessoa que saiba ler JavaScript pode checar se o que está escrito aqui é verdade — e essa é a única garantia que vale alguma coisa.']
+   '<div class="stack" style="gap:0">'+
+   [['Eu não recebo nada do que você escreve','Não existe conta, login nem servidor deste app. Nada do que você registra chega a mim.'],
+    ['O anúncio não enxerga o que você registra','O app vai ter anúncio, para se pagar. Ele não lê treino, comida, peso, foto nem exame: isso nunca sai do aparelho e não chega a quem anuncia.'],
+    ['Se isso mudar, muda com aviso na cara','Se um dia este app precisar de conta ou de servidor, vai estar escrito nesta tela antes de valer, e você poderá apagar tudo antes.']
    ].map(function(x){
     return '<div class="li"><span class="chk on" style="flex:none">'+ic('check')+'</span>'+
      '<div class="grow"><div class="ttl">'+esc(x[0])+'</div>'+
      '<div class="sub" style="line-height:1.55">'+esc(x[1])+'</div></div></div>';
    }).join('')+'</div>'+
-   '<a class="btn gh bl sm" style="margin-top:12px;width:100%" href="https://github.com/lucasleticiosoaresalves-oss/app-exercicio-trans" target="_blank" rel="noopener">'+
-   ic('book')+' Conferir o código</a></div>'+
+   '</div>'+
 
   '<div class="card">'+chTtl('check','O que nunca sai daqui','<span class="tag o">'+NAO_SAI.length+'</span>')+
    '<div class="stack" style="gap:0">'+NAO_SAI.map(function(t){
     return '<div class="li"><span class="chk on">'+ic('check')+'</span><span class="grow tiny">'+esc(t)+'</span></div>';
    }).join('')+'</div>'+
-   '<p class="xtiny muted" style="margin-top:10px;line-height:1.6">Fica no armazenamento do navegador, neste aparelho. '+
-   'Ninguém, nem eu, consegue ler isso de fora.</p></div>'+
+   '<p class="xtiny muted" style="margin-top:10px;line-height:1.6">Fica no armazenamento do navegador, '+
+   'neste aparelho.</p></div>'+
 
   '<div class="card" style="border-color:var(--warn)">'+chTtl('info','O que sai, e quando')+
    '<div class="stack" style="gap:0">'+SAI_DO_APARELHO.map(function(x){
@@ -9577,24 +9947,27 @@ function stPrivacidade(){
 
   '<div class="card">'+chTtl('user','Seus direitos sobre esses dados')+
    '<p class="tiny muted" style="line-height:1.7">Pela LGPD, dado de saúde e de identidade de gênero é '+
-   '<b>dado pessoal sensível</b>. Este app não coleta, não armazena fora do seu aparelho, não compartilha e não vende nada: '+
-   'não existe banco de usuários, então não existe vazamento possível.</p>'+
+   '<b>dado pessoal sensível</b>. Não existe banco de usuários deste app para vazar. '+
+   'O que está no seu aparelho depende de quem tem o aparelho — é para isso que serve a senha no Perfil.</p>'+
    '<p class="tiny muted" style="line-height:1.7;margin-top:10px">Acesso, correção e eliminação você exerce '+g('sozinh')+':</p>'+
    '<div class="row wrap" style="gap:7px;margin-top:11px">'+
     '<button class="btn gh sm" data-a="exportar">Baixar tudo que é seu</button>'+
     '<button class="btn gh sm" data-a="baixar-csv">Baixar como planilha</button>'+
     '<button class="btn gh sm rm" data-a="apagar-tudo">Apagar tudo deste aparelho</button></div>'+
-   '<p class="xtiny muted" style="margin-top:10px;line-height:1.6">"Baixar tudo que é seu" é um arquivo com tudo mesmo: '+
+   '<p class="xtiny muted" style="margin-top:10px;line-height:1.6">"Baixar tudo que é seu" leva tudo mesmo: '+
    'peso, medidas, cargas, diário, água, treino, voz, ciclo, medicação, exames, fotos, anotações e configuração. '+
    'Apagar é definitivo e não tem backup em lugar nenhum — baixe antes se quiser guardar.</p></div>'+
 
   '<div class="card" style="border-color:var(--warn)">'+chTtl('info','O que este app não é')+
    '<div class="stack" style="gap:9px">'+[
-    ['Não é dispositivo médico','Não diagnostica, não trata e não monitora doença. É organização de rotina, e só.'],
+    /* Eram cinco. Ficaram os três que mudam o que a pessoa faz:
+       procurar profissional, não mexer em hormônio por conta e onde
+       ligar numa emergência. "Não é dispositivo médico" e "os cálculos
+       são estimativa" saíram — a margem de erro já está escrita na tela
+       de cada cálculo, onde ela serve para alguma coisa. */
     ['Não substitui profissional','Nutricionista, educador físico, fonoaudiólogo, dermatologista, psicólogo e médico fazem coisas que um app não faz.'],
     ['Não orienta hormonização','Nada aqui fala de dose, via, marca ou ajuste. Isso é prescrição, e prescrição tem responsável com registro.'],
-    ['Não é emergência','Se você está em risco agora, o CVV atende 24 horas no 188, de graça. Em emergência médica, SAMU 192.'],
-    ['Os cálculos são estimativa','Gasto calórico, percentual de gordura e 1RM são fórmulas com margem de erro, e cada tela diz qual é a dela.']
+    ['Não é emergência','Se você está em risco agora, o CVV atende 24 horas no 188, de graça. Em emergência médica, SAMU 192.']
    ].map(function(x){
     return '<div class="row top" style="gap:9px">'+ic('x','color:var(--warn);font-size:15px;margin-top:2px')+
      '<div class="grow"><div style="font-weight:700;font-size:13.5px">'+esc(x[0])+'</div>'+
@@ -9606,16 +9979,38 @@ function stPrivacidade(){
    'déficit calórico e número de corpo na adolescência têm risco real de transtorno alimentar. '+
    'Nessa idade, o ideal é fazer isso acompanhada ou acompanhado.</p></div>'+
 
-  '<div class="card">'+chTtl('heart','Quem fez e com que responsabilidade')+
-   '<p class="tiny muted" style="line-height:1.7">Feito por uma pessoa só, de graça, sem anúncio e sem venda de dado, '+
-   'com o código aberto. Cada recomendação mostra o estudo de onde veio e o quanto ele é firme, inclusive quando é fraco.</p>'+
-   '<p class="tiny muted" style="line-height:1.7;margin-top:10px">Se alguma coisa aqui conflitar com o que um profissional te disse, '+
-   '<b>vale o que o profissional disse</b>.</p>'+
-   '<div class="row wrap" style="gap:7px;margin-top:11px">'+
-    '<a class="btn gh sm" href="https://github.com/lucasleticiosoaresalves-oss/app-exercicio-trans" target="_blank" rel="noopener">'+
-    ic('book')+' Ver o código</a>'+
-    '<button class="btn gh sm" data-a="go" data-tab="ciencia" data-v="base">'+ic('book')+' Em que o app se baseia</button>'+
-    '<a class="btn gh sm" href="mailto:'+EMAIL_CONTATO+'">'+ic('bell')+' Falar comigo</a></div></div>';
+  cardQuemFez();
+}
+/* =====================================================================
+   QUEM FEZ
+   Uma pessoa só, com nome e endereço. Num app sobre transição, saber de
+   quem é importa: é a diferença entre conselho de alguém e conselho de
+   lugar nenhum.
+   ===================================================================== */
+const AUTOR={
+ nome:'Lucas Soares',
+ site:'https://quartodolucas.neocities.org',
+ siteN:'quartodolucas.neocities.org',
+ twitter:'https://twitter.com/lucasinsidemind',
+ twitterN:'@lucasinsidemind',
+ github:'https://github.com/lucasleticiosoaresalves-oss',
+ githubN:'github.com/lucasleticiosoaresalves-oss'
+};
+function cardQuemFez(){
+ const lk=function(href,icone,txt){
+  return '<a class="btn gh sm" href="'+esc(href)+'" target="_blank" rel="noopener">'+ic(icone)+' '+esc(txt)+'</a>';
+ };
+ return '<div class="card">'+chTtl('heart','Quem fez')+
+  '<p class="tiny" style="line-height:1.7"><b>'+esc(AUTOR.nome)+'</b>, sozinho.</p>'+
+  '<p class="tiny muted" style="line-height:1.7;margin-top:8px">Cada recomendação mostra o estudo de onde veio '+
+  'e o quanto ele é firme, inclusive quando é fraco. Se alguma coisa aqui conflitar com o que um profissional '+
+  'te disse, <b>vale o que o profissional disse</b>.</p>'+
+  '<div class="row wrap" style="gap:7px;margin-top:12px">'+
+   lk(AUTOR.site,'home',AUTOR.siteN)+
+   lk(AUTOR.twitter,'face',AUTOR.twitterN)+
+   lk(AUTOR.github,'star','GitHub')+
+   '<a class="btn gh sm" href="mailto:'+EMAIL_CONTATO+'">'+ic('bell')+' Falar comigo</a>'+
+  '</div></div>';
 }
 
 /* =====================================================================
@@ -9682,8 +10077,7 @@ function blocoHormonios(){
   '<p class="tiny" style="line-height:1.7;margin:0">Não existe aqui dose, marca, via nem ajuste, e nunca vai existir. '+
   'Isso é prescrição, e prescrição tem responsável com registro no conselho. '+
   'O que tem aqui é o que costuma acontecer e em que ordem, para você saber o que perguntar na consulta.</p>'+
-  '<p class="tiny" style="line-height:1.7;margin-top:9px"><b>Nunca mude dose por conta própria.</b> '+
-  'Nem por causa de humor, nem por achar que está lento.</p></div></div></div>';
+  '<p class="tiny" style="line-height:1.7;margin-top:9px"><b>Nunca mude dose por conta própria.</b></p></div></div></div>';
  h+=linhas(t==='masc'?'Testosterona: o que acontece e quando':'Estrogênio: o que acontece e quando',
    'clock', t==='masc'?HORM_MASC:HORM_FEM, '<span class="tag n">linha do tempo típica</span>');
  if(t==='masc'){
@@ -9919,9 +10313,7 @@ function stHumor(){
    '<p class="tiny" style="line-height:1.7">Três coisas por dia, e o que estava acontecendo. '+
    'Não é para julgar o dia: é para, daqui a dois meses, você poder olhar e ver padrão — '+
    'e levar isso para a consulta em vez de tentar lembrar.</p>'+
-   '<p class="tiny muted" style="line-height:1.7;margin-top:10px"><b>Isto não é teste e não dá nota.</b> '+
-   'O app não soma pontuação e não diz nome de transtorno. Existe instrumento certo para isso, '+
-   'e ele vale aplicado e lido por quem foi treinado — não por um app.</p></div>'+
+   '</div>'+
 
   '<div class="card">'+chTtl('sun','Hoje')+
    ESCALAS_MENTAL.map(escala).join('')+
@@ -9954,9 +10346,9 @@ function stHumor(){
 
   '<div class="card">'+chTtl('book','O que isto é, e o que não é')+
    '<div class="stack" style="gap:0">'+[
+    /* Três, não cinco. "É memória" e "o contexto importa" eram boas
+       frases que não mudavam nada do que a pessoa faz depois de ler. */
     ['Não é diagnóstico','O app não soma pontos, não calcula escore e não diz "depressão" nem "ansiedade generalizada". Isso é consulta, não app.'],
-    ['É memória','O que ele faz bem é lembrar por você. Chegar na consulta com dois meses de registro muda a conversa — é a diferença entre "acho que tenho estado mal" e mostrar quando começou e o que estava junto.'],
-    ['O contexto importa tanto quanto a nota','A literatura que este app cita aponta estigma — violência, discriminação e rejeição — como o que mais pesa na saúde mental de pessoas trans. Por isso as etiquetas existem: nem tudo que dói vem de dentro.'],
     ['Hormônio não é antidepressivo','Se o humor piorou depois de começar, isso não é preço a pagar: é motivo de consulta. E se não melhorou como você esperava, isso não quer dizer que a transição não é sua.'],
     ['Você pode parar de registrar','Acompanhar humor ajuda muita gente e atrapalha algumas. Se marcar nota todo dia estiver te deixando pior, pare — e isso não é desistir de nada.']
    ].map(function(x2){
@@ -9966,9 +10358,8 @@ function stHumor(){
    '<div class="row wrap" style="gap:5px;margin-top:11px">'+selo('fat_mental','Hormonização e humor')+
    selo('passar','O peso do estigma')+'</div></div>'+
 
-  '<div class="card"><p class="xtiny muted" style="line-height:1.7">Tudo isto fica neste aparelho, '+
-  'como o resto do app, e entra no arquivo quando você baixa os seus dados. '+
-  'Se você usa o app num celular que outras pessoas pegam, a senha no Perfil vale ainda mais para esta tela.</p></div>';
+  '<div class="card"><p class="xtiny muted" style="line-height:1.7">Se outras pessoas pegam este celular, '+
+  'a senha no Perfil vale ainda mais para esta tela.</p></div>';
 
  const ta=$('#mentalObs');
  if(ta)ta.addEventListener('input',function(){mental(hoje()).obs=ta.value.slice(0,600);save()});
@@ -10417,11 +10808,175 @@ function stConquistas(){
    '<div class="num xtiny" style="margin-top:4px;font-weight:600">'+prog+'</div></div>').join('')+
   '</div></div>';
 }
+/* =====================================================================
+   TELA: MINHA SEMANA
+   A planilha do que já está ocupado. Uma linha por dia, os blocos
+   dentro, e quanto sobra. O número que importa é o que sobra: é ele
+   que diz se um hábito novo cabe ou se é promessa vazia.
+   ===================================================================== */
+function corBloco(t){const x=AG_TIPOS.find(function(a){return a[0]===t});return x?x[2]:'#6b7280'}
+function nomeBloco(t){const x=AG_TIPOS.find(function(a){return a[0]===t});return x?x[1]:'Outro'}
+function stSemana(){
+ const hojeW=new Date(hoje()+'T12:00:00').getDay();
+ const totalBlocos=[0,1,2,3,4,5,6].reduce(function(a,w){return a+blocosDoDia(w).length},0);
+ let h=
+  '<div class="card hero">'+chTtl('cal','Minha semana',
+    totalBlocos?'<span class="tag o">'+totalBlocos+'</span>':'')+
+   '<p class="tiny muted" style="line-height:1.7">Marque o que já está ocupado: trabalho, estudo, sono, '+
+   'deslocamento. O app usa isto para achar onde cabem os seus hábitos, o treino e a comida — '+
+   'e para parar de sugerir horário que você não tem.</p>'+
+   (totalBlocos?'':'<p class="tiny" style="line-height:1.7;margin-top:9px;color:var(--warn)">'+
+    'Ainda não tem nada marcado. Sem isso, o app considera o seu dia inteiro livre entre acordar e dormir.</p>')+
+   '<p class="xtiny muted" style="line-height:1.6;margin-top:9px">O dia começa às <b>'+
+   esc(S.perfil.acordar||'07:00')+'</b> e termina às <b>'+esc(S.perfil.dormir||'23:00')+'</b>, '+
+   'como está no Perfil.</p></div>';
+
+ for(let w=0;w<7;w++){
+  const bs=blocosDoDia(w), livre=minutosLivres(w);
+  h+='<div class="card'+(w===hojeW?' hero':'')+'">'+
+   '<div class="row" style="gap:8px;align-items:baseline">'+
+    '<div class="grow" style="font-weight:700;font-size:15px">'+ROT_DIAS[w]+
+     (w===hojeW?' <span class="tag a" style="margin-left:5px">hoje</span>':'')+'</div>'+
+    '<span class="tag '+(livre>=60?'o':livre>=30?'w':'n')+'">'+
+     (livre>=60?Math.floor(livre/60)+'h'+(livre%60?' '+(livre%60)+'min':''):livre+' min')+' livre</span>'+
+   '</div>'+
+   (bs.length
+    ?'<div class="stack" style="gap:6px;margin-top:10px">'+bs.map(function(b){
+      return '<div class="row" style="gap:9px;align-items:center">'+
+       '<span style="flex:none;width:4px;height:26px;border-radius:99px;background:'+corBloco(b.o)+'"></span>'+
+       '<span class="num tiny" style="flex:none;min-width:84px">'+esc(b.ini)+' – '+esc(b.fim)+'</span>'+
+       '<span class="grow tiny">'+esc(nomeBloco(b.o))+'</span>'+
+       '<button class="chip rm" data-a="ag-rm" data-w="'+w+'" data-id="'+esc(b.id)+'" '+
+        'aria-label="Tirar este bloco">'+ic('x')+'</button></div>';
+     }).join('')+'</div>'
+    :'<p class="xtiny muted" style="margin-top:8px">Dia todo livre.</p>')+
+   '<button class="btn gh sm" style="margin-top:10px" data-a="ag-novo" data-w="'+w+'">'+
+    ic('plus')+' Marcar um horário</button>'+
+   '</div>';
+ }
+ h+='<div class="card">'+chTtl('wand','Copiar de um dia para os outros')+
+  '<p class="tiny muted" style="line-height:1.65">Se a sua semana se repete, marque um dia e copie.</p>'+
+  '<div class="row wrap" style="gap:6px;margin-top:10px">'+ROT_CURTO.map(function(n,w){
+   return '<button class="chip" data-a="ag-copiar" data-w="'+w+'"'+
+    (blocosDoDia(w).length?'':' disabled style="opacity:.4"')+'>'+esc(n)+'</button>';
+  }).join('')+'</div>'+
+  '<p class="xtiny muted" style="margin-top:9px;line-height:1.6">Copia para segunda a sexta. '+
+  'O que já estiver lá é substituído.</p></div>';
+ $('#st-semana').innerHTML=h;
+}
+/* =====================================================================
+   TELA: HÁBITOS
+   A planilha do que a pessoa quer passar a fazer, e onde isso cai na
+   semana dela. A grade é hábito por dia, para a semana inteira caber
+   numa olhada — e a lista de baixo mostra a hora que o app achou.
+   ===================================================================== */
+function stHabitos(){
+ const d=hoje(), w=new Date(d+'T12:00:00').getDay(), pr=progHabitos(d);
+ let h=
+  '<div class="card hero">'+chTtl('check','Hábitos',
+    S.habitos.length?'<span class="tag o">'+pr.f+'/'+pr.t+' hoje</span>':'')+
+   '<p class="tiny muted" style="line-height:1.7">O que você quer passar a fazer. '+
+   'O app acha a hora dentro do que sobra da sua semana, e você muda se não gostar.</p>'+
+   '<button class="btn acc bl sm" style="margin-top:11px" data-a="hab-novo">'+ic('plus')+' Novo hábito</button>'+
+   '</div>';
+
+ if(!S.habitos.length){
+  h+='<div class="card"><p class="tiny muted" style="line-height:1.7">Nenhum hábito ainda. '+
+   'Comece por um só: hábito demais de uma vez é a forma mais comum de não manter nenhum.</p></div>';
+  $('#st-habitos').innerHTML=h; return;
+ }
+ /* a grade: uma linha por hábito, sete colunas */
+ h+='<div class="card">'+chTtl('cal','A semana inteira')+
+  '<div style="overflow-x:auto;margin:0 -4px">'+
+  '<table style="width:100%;border-collapse:collapse;font-size:12px">'+
+  '<thead><tr><th style="text-align:left;padding:5px 6px;font-weight:600;color:var(--ink-3)">Hábito</th>'+
+   ROT_CURTO.map(function(n,i){
+    return '<th style="padding:5px 3px;font-weight:600;color:var(--ink-3)'+
+     (i===w?';color:var(--accent)':'')+'">'+esc(n)+'</th>';
+   }).join('')+'</tr></thead><tbody>'+
+  S.habitos.map(function(x){
+   return '<tr style="border-top:1px solid var(--line)">'+
+    '<td style="padding:7px 6px"><button data-a="hab-abrir" data-id="'+esc(x.id)+'" '+
+     'style="text-align:left;max-width:132px">'+esc(x.n)+
+     '<div class="xtiny muted">'+x.min+' min</div></button></td>'+
+    [0,1,2,3,4,5,6].map(function(i){
+     const quer=x.dias.indexOf(i)>=0;
+     return '<td style="padding:4px 2px;text-align:center">'+
+      '<button data-a="hab-dia" data-id="'+esc(x.id)+'" data-w="'+i+'" '+
+      'aria-label="'+(quer?'Tirar de ':'Pôr em ')+ROT_DIAS[i]+'" '+
+      'style="width:22px;height:22px;border-radius:7px;border:1px solid var(--line);'+
+      'background:'+(quer?'var(--accent)':'transparent')+';color:#fff;font-size:11px;line-height:1">'+
+      (quer?'✓':'')+'</button></td>';
+    }).join('')+'</tr>';
+  }).join('')+'</tbody></table></div>'+
+  '<p class="xtiny muted" style="margin-top:9px;line-height:1.6">Toque num quadrado para pôr ou tirar o hábito daquele dia. '+
+  'Toque no nome para mudar ou apagar.</p></div>';
+
+ /* a rotina calculada de hoje */
+ const rot=rotinaSemana(w), livre=minutosLivres(w);
+ h+='<div class="card">'+chTtl('clock','Onde isso cai hoje',
+   '<span class="tag '+(livre>=60?'o':'w')+'">'+(livre>=60?Math.floor(livre/60)+'h'+(livre%60?' '+(livre%60):''):livre+' min')+' livre</span>')+
+  (rot.length
+   ?'<div class="stack" style="gap:7px">'+rot.map(function(r){
+     const feito=habFeito(r.h,d);
+     return '<div class="row" style="gap:9px;align-items:center">'+
+      '<button class="chk '+(feito?'on':'')+'" data-a="hab-feito" data-id="'+esc(r.h.id)+'" '+
+       'aria-pressed="'+(feito?'true':'false')+'" style="flex:none">'+ic('check')+'</button>'+
+      '<span class="num tiny" style="flex:none;min-width:46px">'+
+       (r.ini===null?'—':emHora(r.ini))+'</span>'+
+      '<span class="grow tiny"'+(feito?' style="opacity:.55;text-decoration:line-through"':'')+'>'+
+       esc(r.h.n)+'</span>'+
+      (r.fixa?'<span class="tag n" style="flex:none">fixo</span>':'')+
+      (r.semLugar?'<span class="tag w" style="flex:none">não coube</span>':'')+
+      (r.conflito?'<span class="tag w" style="flex:none">em cima de outra coisa</span>':'')+
+      (r.foraDaFaixa?'<span class="tag n" style="flex:none">fora do horário pedido</span>':'')+
+      '</div>';
+    }).join('')+'</div>'
+   :'<p class="tiny muted">Nenhum hábito marcado para hoje.</p>')+
+  (rot.some(function(r){return r.semLugar})
+   ?'<p class="xtiny" style="margin-top:10px;line-height:1.6;color:var(--warn)">'+
+    'O que ficou como <b>não coube</b> não tem buraco livre na sua semana. '+
+    'Ou tira um bloco em Minha semana, ou tira o hábito desse dia — o app não vai fingir que o tempo existe.</p>'
+   :'')+
+  '<button class="btn gh bl sm" style="margin-top:11px" data-a="go-sub" data-tab="prog" data-st="semana">'+
+  ic('cal')+' Ver e mudar a minha semana</button></div>';
+ $('#st-habitos').innerHTML=h;
+}
+function sheetHabito(id){
+ const x=id?S.habitos.find(function(z){return z.id===id}):null;
+ S.ui.hbQuando=x?x.quando:'qualquer';
+ S.ui.hbDias=x?x.dias.slice():[1,2,3,4,5];
+ sheet(x?'Mudar hábito':'Novo hábito',
+  '<label class="fld">O que é<input type="text" id="hbN" maxlength="40" placeholder="Ler 10 páginas" value="'+
+   esc(x?x.n:'')+'"></label>'+
+  '<div class="row" style="gap:9px;margin-top:10px">'+
+   '<label class="fld grow">Quanto tempo<input type="number" inputmode="numeric" id="hbMin" min="1" max="240" value="'+
+    (x?x.min:10)+'"></label>'+
+   '<label class="fld grow">Hora fixa <span class="muted">(se quiser)</span>'+
+    '<input type="time" id="hbFixa" value="'+esc(x&&x.fixa?x.fixa:'')+'"></label></div>'+
+  '<p class="xtiny muted" style="line-height:1.6;margin-top:7px">Sem hora fixa, o app acha um buraco livre sozinho.</p>'+
+  '<div class="lbl" style="margin:13px 0 7px">Prefere que parte do dia?</div>'+
+  '<div class="row wrap" style="gap:6px" id="hbQuando">'+HAB_QUANDO.map(function(q){
+   return '<button class="chip'+((S.ui.hbQuando===q[0])?' on':'')+'" data-a="hab-quando" data-v="'+q[0]+'">'+
+    esc(q[1])+'</button>';
+  }).join('')+'</div>'+
+  '<div class="lbl" style="margin:13px 0 7px">Em que dias</div>'+
+  '<div class="row wrap" style="gap:6px" id="hbDias">'+ROT_CURTO.map(function(n,w){
+   return '<button class="chip'+((S.ui.hbDias.indexOf(w)>=0)?' on':'')+'" data-a="hab-diatoggle" data-w="'+w+'">'+
+    esc(n)+'</button>';
+  }).join('')+'</div>'+
+  '<div id="hbErro" class="xtiny" style="color:var(--bad);min-height:4px;margin-top:10px"></div>'+
+  '<button class="btn acc bl" style="margin-top:6px" data-a="hab-ok"'+(id?' data-id="'+esc(id)+'"':'')+'>'+
+   (x?'Guardar':'Criar')+'</button>'+
+  (x?'<button class="btn gh bl sm" style="margin-top:8px" data-a="hab-rm" data-id="'+esc(id)+'">Apagar este hábito</button>':''),
+  x?'':'Um de cada vez funciona melhor');
+}
 function renderProg(){
  const s=S.ui.sub.prog;
  $$('#progTabs .subtab').forEach(b=>b.classList.toggle('on',b.dataset.st===s));
- ['peso','medidas','resumo','exames','notas'].forEach(k=>{const el=$('#st-'+k);if(el)el.hidden=(k!==s)});
- ({peso:stPeso,medidas:stMedidas,resumo:stResumo,exames:stExames,notas:stNotas}[s]||stPeso)();
+ ['peso','medidas','semana','habitos','resumo','exames','notas'].forEach(k=>{const el=$('#st-'+k);if(el)el.hidden=(k!==s)});
+ ({peso:stPeso,medidas:stMedidas,semana:stSemana,habitos:stHabitos,
+   resumo:stResumo,exames:stExames,notas:stNotas}[s]||stPeso)();
 }
 
 /* =====================================================================
@@ -10649,14 +11204,12 @@ function pf_tema(){
 function pf_guardar(){
  const p=S.perfil,m=metas();
  return   '<div class="card">'+chTtl('info','Onde os seus dados ficam')+
-   '<p class="tiny muted">Seus registros ficam neste navegador, neste aparelho. Não existe servidor nem conta, '+
-    'e nada do que você registra é enviado para lugar nenhum. '+
+   '<p class="tiny muted">Seus registros ficam neste navegador, neste aparelho. Não existe servidor nem conta. '+
     'Eles não somem ao fechar a aba, mas também não viajam sozinhos para outro celular: para isso use '+
     '<b>Baixar meus dados</b> aqui e <b>Importar dados</b> do outro lado. Limpar os dados do site no navegador apaga tudo, '+
     'então vale baixar de vez em quando.</p>'+
-   '<p class="xtiny muted" style="line-height:1.65;margin-top:9px">O arquivo leva tudo: peso, medidas, cargas, diário de comida, '+
-   'água, treino, voz, ciclo, medicação, exames, fotos, anotações e o que você configurou. '+
-   'Ele fica no seu aparelho como qualquer download — e, como é tudo isso junto, trate o arquivo com o mesmo cuidado que você trata o app.</p>'+
+   '<p class="xtiny muted" style="line-height:1.65;margin-top:9px">O arquivo leva tudo que está no app, '+
+   'junto, e fica no aparelho como qualquer download. Trate ele com o mesmo cuidado que trata o app.</p>'+
    '<div class="row wrap" style="gap:7px;margin-top:11px">'+
     '<button class="btn gh sm" data-a="exportar">Baixar meus dados</button>'+
     '<button class="btn gh sm" data-a="importar">Importar dados</button>'+
@@ -10668,9 +11221,8 @@ function pf_ciencia(){
  const p=S.perfil,m=metas();
  return   '<div class="card">'+chTtl('book','Em que o app se baseia',
     '<span class="tag n">'+EVID.length+' pontos</span>')+
-   '<p class="tiny muted">Séries, calorias, proteína, água, sono, pele, voz: cada número do app veio de algum estudo, '+
-   'e esta tela mostra qual, com o quanto aquele estudo é firme. Inclui os pontos em que a evidência é fraca '+
-   'e o ponto em que não existe estudo nenhum.</p>'+
+   '<p class="tiny muted">Cada número do app veio de algum estudo. A tela mostra qual, '+
+   'e o quanto ele é firme.</p>'+
    '<button class="btn gh bl sm" style="margin-top:11px;width:100%" data-a="go" data-tab="ciencia" data-v="base">'+
    ic('book')+' Abrir as fontes</button></div>';
 }
@@ -10764,9 +11316,7 @@ function pf_comida(){
   'Para parte das pessoas isso ajuda, e para parte isso é o próprio problema. '+
   'As respostas aqui decidem <b>o que o app mostra para você</b> — e nada mais.</p>'+
   '<p class="tiny muted" style="line-height:1.7;margin-top:10px"><b>Não é teste e não dá nota.</b> '+
-  'O app não soma pontuação, não calcula escore e não diz se você tem alguma coisa. '+
-  'Ele pergunta e acredita na sua resposta. Para decidir o que mostrar, isso basta — '+
-  'diagnóstico é consulta, não app.</p>'+
+  'O app pergunta e acredita na sua resposta. Diagnóstico é consulta, não app.</p>'+
   '<div class="stack" style="gap:0;margin-top:13px">'+PERG_TA.map(function(q){
    return '<div style="padding:11px 0;border-top:1px solid var(--line)">'+
     '<div class="ttl" style="margin-bottom:7px">'+esc(q.p)+'</div>'+
@@ -10795,7 +11345,7 @@ function pf_comida(){
     'E o CAPS da sua região atende saúde mental pelo SUS sem precisar de encaminhamento.</p>'
    :'')+
   '<p class="xtiny muted" style="margin-top:11px;line-height:1.65">"Prefiro não dizer" não tranca nada e o app não insiste. '+
-  'Estas respostas ficam neste aparelho, como todo o resto, e você pode mudar ou apagar quando quiser.</p>'+
+  'Você pode mudar ou apagar estas respostas quando quiser.</p>'+
   (respondeu?'<button class="btn gh bl sm" style="margin-top:11px" data-a="ta-limpar">Apagar estas respostas</button>':'')+
   '</div>';
 }
@@ -10808,12 +11358,8 @@ function pf_ocultar(){
     'Depois o app não pergunta de novo — e você muda quando quiser, aqui mesmo.</p>')+
    '<p class="tiny muted" style="line-height:1.65">Peso, percentual de gordura, medidas, caloria e gráficos '+
    '<b>aparecem normalmente</b>. O app não parte do princípio de que você tem transtorno alimentar.</p>'+
-   '<p class="tiny muted" style="line-height:1.65;margin-top:8px">Eles só travam se você responder, nas perguntas '+
-   'logo acima, que tem ou já teve — ou que ver esse tipo de número te faz mal. '+
-   'Depois que travam, não destravam sozinhos: para ver de novo, precisa da senha. '+
-   'Você também pode desligar qualquer um deles na mão, aqui, sem responder nada.</p>'+
-   '<p class="tiny muted" style="line-height:1.65;margin-top:8px">Esconder não apaga: '+
-   'o app continua registrando e calculando igual — só não devolve o número para a tela.</p>'+
+   '<p class="tiny muted" style="line-height:1.65;margin-top:8px">Desligue aqui o que não quer ver, '+
+   'sem responder nada. Esconder não apaga: o app continua calculando igual.</p>'+
    '<div class="row wrap" style="gap:5px;margin-top:11px">'+OCULTAVEIS.map(([k,n])=>
     '<button class="chip '+(oculto(k)?'':'on')+'" data-a="ocultar" data-k="'+k+'">'+
     ic(travado(k)?'check':(oculto(k)?'x':'check'))+' '+esc(n)+
@@ -10965,17 +11511,16 @@ function pf_diaCheio(){
 function pf_oQueE(){
  const p=S.perfil,m=metas();
  return   '<div class="card">'+chTtl('heart','O que este app é')+
-   '<p class="tiny muted" style="line-height:1.7">É <b>gratuito</b>, não tem anúncio e não vende dado nenhum. '+
-   'Tudo que você registra fica <b>neste aparelho</b>: não existe servidor, não existe conta, '+
-   'e nada do que você escreve sai daqui. '+
-   'Não há inteligência artificial lendo o que você registra. '+
-   'O código é aberto e pode ser conferido por qualquer pessoa.</p>'+
-   '<p class="xtiny muted" style="margin-top:9px;line-height:1.6">Três coisas saem, e vale saber quais: a fonte das letras, '+
-   'a miniatura dos vídeos e a consulta de código de barras. Nenhuma leva o que você registrou.</p>'+
+   '<p class="tiny muted" style="line-height:1.7">É <b>gratuito</b>. Tudo que você registra fica '+
+   '<b>neste aparelho</b>, e nenhuma inteligência artificial lê o que você escreve.</p>'+
+   '<p class="tiny muted" style="line-height:1.7;margin-top:9px">O app vai passar a ter <b>anúncio</b>, '+
+   'para se pagar. Ele fica em lugar que não atravessa o uso: nunca no meio do treino, do diário de comida '+
+   'ou do medidor de voz.</p>'+
+   '<p class="xtiny muted" style="margin-top:9px;line-height:1.6">Três coisas saem: a fonte das letras, '+
+   'a miniatura dos vídeos e a consulta de código de barras.</p>'+
    '<div class="row wrap" style="gap:7px;margin-top:11px">'+
    '<button class="btn gh sm" data-a="go" data-tab="privacidade">'+ic('info')+' Privacidade e termos</button>'+
-   '<a class="btn gh sm" href="https://github.com/lucasleticiosoaresalves-oss/app-exercicio-trans" '+
-   'target="_blank" rel="noopener">'+ic('book')+' Ver o código</a></div></div>';
+   '<button class="btn gh sm" data-a="go" data-tab="privacidade">'+ic('heart')+' Quem fez</button></div></div>';
 }
 /* Os ícones dos disfarces não são desenho meu: são o conjunto Crystal
    Clear, de 2005. Eles vêm sob LGPL, e LGPL pede que quem redistribui diga
@@ -10996,8 +11541,7 @@ function pf_creditos(){
 function pf_avisoFinal(){
  const p=S.perfil,m=metas();
  return   '<div class="card">'+chTtl('info','Avisos')+
-   '<p class="xtiny muted" style="line-height:1.65">Este app não substitui profissional, e não orienta nada sobre dose ou uso de hormônio. '+
-   'Pare e procure ajuda se aparecer dor articular, tontura ou falta de ar no treino, '+
+   '<p class="xtiny muted" style="line-height:1.65">Pare e procure ajuda se aparecer dor articular, tontura ou falta de ar no treino, '+
    'dor ou rouquidão que não passa, ou irritação forte na pele.</p></div>';
 }
 /* =====================================================================
@@ -11632,13 +12176,12 @@ function viewBase(){
  const areas=[...new Set(EVID.map(v=>v.area))];
  return '<div class="card hero">'+chTtl('book','Em que o app se baseia')+
    '<p class="tiny" style="line-height:1.7">Cada número daqui — séries, calorias, proteína, água, sono — veio de algum lugar. '+
-   'Esta tela diz de onde, e diz também o quanto aquele lugar é firme. Onde a evidência é fraca, está escrito que é fraca. '+
-   'Onde não achei estudo que sustentasse o número, está escrito que não achei.</p>'+
+   'Esta tela diz de onde e o quanto aquele lugar é firme. Onde a evidência é fraca, ou não existe, '+
+   'está escrito.</p>'+
    '<div class="row wrap" style="gap:5px;margin-top:12px">'+
     Object.keys(FORCA).map(k=>'<span class="tag '+FORCA[k][1]+'">'+esc(FORCA[k][0])+'</span>').join('')+'</div>'+
    '<p class="xtiny muted" style="margin-top:10px;line-height:1.6">Forte: várias revisões ou consenso de sociedade médica. '+
-   'Moderada: uma meta-análise, ou ensaios consistentes com ressalvas. Limitada: poucos estudos, amostras pequenas ou certeza baixa. '+
-   'Nada aqui substitui avaliação de profissional, e nenhum desses estudos foi feito pensando especificamente em você.</p></div>'+
+   'Moderada: uma meta-análise, ou ensaios consistentes com ressalvas. Limitada: poucos estudos, amostras pequenas ou certeza baixa.</p></div>'+
   /* vinte e cinco fichas abertas davam dez telas de rolagem. Agora cada
      área é uma dobra, e o título diz quantas fichas tem dentro. */
   areas.map(function(a){
@@ -12060,12 +12603,51 @@ document.addEventListener('click',ev=>{
    'dá para importar de volta depois.</p>','Sem servidor, sem recuperação');break;
   case 'senha-por':sheetSenha(false);break;
   case 'senha-mudar':sheetSenha(true);break;
-  case 'senha-tirar':{S.perfil.senha='';destravado=true;save('base');render();
-   toast('Senha tirada');break}
+  case 'senha-ver':{
+   const mostrar=$('#snNova')&&$('#snNova').type==='password';
+   ['snAtual','snNova','snConf'].forEach(function(id){
+    const el=$('#'+id); if(el)el.type=mostrar?'text':'password';
+   });
+   const b=$('#snVer');
+   if(b)b.innerHTML=ic('face')+' '+(mostrar?'Esconder de novo':'Mostrar o que eu digitei');
+   break}
+  /* Tirar a senha não acontece mais num toque só. É destrutivo de um
+     jeito que não parece: sem senha o disfarce para de valer, porque
+     um disfarce que abre sozinho no primeiro toque não esconde nada —
+     e isso acontecia em silêncio, sem ninguém avisar. */
+  case 'senha-tirar':{
+   const comDisfarce=!!S.perfil.disfarce;
+   sheet('Tirar a senha',
+    '<p class="tiny muted" style="line-height:1.7">O app volta a abrir direto, sem pedir nada.</p>'+
+    (comDisfarce
+     ?'<p class="tiny" style="line-height:1.7;margin-top:10px;color:var(--warn)"><b>O disfarce para junto.</b> '+
+      'Hoje o app aparece como “'+esc(disfarceAtual().app)+'”. Sem senha ele volta a se chamar Norte, '+
+      'com o ícone do Norte, porque disfarce que abre no primeiro toque não esconde nada.</p>'
+     :'')+
+    '<p class="xtiny muted" style="line-height:1.65;margin-top:10px">Nada do que você registrou é apagado. '+
+    'Dá para pôr uma senha de novo quando quiser.</p>'+
+    '<button class="btn bl rm" style="margin-top:14px;background:var(--bad);color:#fff" data-a="senha-tirar-confirma">'+
+    (comDisfarce?'Tirar a senha e o disfarce':'Tirar a senha')+'</button>'+
+    '<button class="btn gh bl sm" style="margin-top:8px" data-a="close">Deixar como está</button>',
+    comDisfarce?'Isto também desliga o disfarce':'Dá para pôr de novo depois');
+   break}
+  case 'senha-tirar-confirma':{
+   const tinha=!!S.perfil.disfarce;
+   S.perfil.senha='';destravado=true;save('base');closeSheet();render();
+   toast(tinha?'Senha e disfarce desligados':'Senha tirada');break}
   case 'senha-ok':{
    const atual=(($('#snAtual')||{}).value||''),nova=(($('#snNova')||{}).value||''),
          conf=(($('#snConf')||{}).value||'');
-   if(d.v&&hashSenha(atual)!==S.perfil.senha)return toast('A senha de agora não confere');
+   /* O erro da senha de agora fica COLADO no campo dela, e não num aviso
+      que some: num formulário de três campos, "não confere" solto não
+      diz qual dos três está errado. */
+   const alvoErro=$('#snErroAtual');
+   if(d.v&&hashSenha(atual)!==S.perfil.senha){
+    if(alvoErro)alvoErro.textContent='Esta não é a senha de agora.';
+    const el=$('#snAtual'); if(el){el.value='';el.focus();}
+    return;
+   }
+   if(alvoErro)alvoErro.textContent='';
    if(nova.length<4)return toast('Use pelo menos 4 dígitos');
    if(nova!==conf)return toast('As duas não são iguais');
    S.perfil.senha=hashSenha(nova);destravado=true;save('base');closeSheet();render();
@@ -12181,7 +12763,118 @@ document.addEventListener('click',ev=>{
    const v=vozDoDia(hj);
    if(v.exs.every(e2=>y.voz.ex[e2.id])){y.voz.feito=true;y.hab.voz=true}
    save('dia',hj);if(d.close)closeSheet();render();break}
+  /* ---------------- MINHA SEMANA ---------------- */
+  case 'ag-novo':{
+   const w=+d.w;
+   sheet('Marcar horário — '+ROT_DIAS[w],
+    '<p class="tiny muted" style="line-height:1.65;margin-bottom:12px">O que já ocupa este horário.</p>'+
+    '<div class="row" style="gap:9px">'+
+     '<label class="fld grow">Começa<input type="time" id="agIni" value="08:00"></label>'+
+     '<label class="fld grow">Termina<input type="time" id="agFim" value="12:00"></label></div>'+
+    '<div class="lbl" style="margin:13px 0 7px">O que é</div>'+
+    '<div class="row wrap" style="gap:6px" id="agTipos">'+AG_TIPOS.map(function(t,i){
+     return '<button class="chip'+(i===0?' on':'')+'" data-a="ag-tipo" data-v="'+t[0]+'">'+esc(t[1])+'</button>';
+    }).join('')+'</div>'+
+    '<div id="agErro" class="xtiny" style="color:var(--bad);min-height:4px;margin-top:9px"></div>'+
+    '<button class="btn acc bl" style="margin-top:8px" data-a="ag-ok" data-w="'+w+'">Guardar</button>',
+    ROT_DIAS[w]);
+   S.ui.agTipo='trabalho';
+   break}
+  case 'ag-tipo':{
+   S.ui.agTipo=d.v;
+   $$('#agTipos .chip').forEach(function(b){b.classList.toggle('on',b.dataset.v===d.v)});
+   break}
+  case 'ag-ok':{
+   const w=String(+d.w), ini=(($('#agIni')||{}).value||''), fim=(($('#agFim')||{}).value||'');
+   const err=$('#agErro');
+   if(!hhmmOk(ini)||!hhmmOk(fim)){if(err)err.textContent='Preencha as duas horas.';return}
+   if(emMin(fim)<=emMin(ini)){if(err)err.textContent='A hora de terminar tem que ser depois da de começar.';return}
+   S.agenda[w]=(S.agenda[w]||[]).concat([{id:'a'+Date.now(),ini,fim,o:S.ui.agTipo||'trabalho'}]).slice(0,12);
+   save('base');closeSheet();render();toast('Marcado');break}
+  case 'ag-rm':{
+   const w=String(+d.w);
+   S.agenda[w]=(S.agenda[w]||[]).filter(function(b){return b.id!==d.id});
+   save('base');render();toast('Tirado');break}
+  case 'ag-copiar':{
+   const w=+d.w, bs=blocosDoDia(w);
+   if(!bs.length)return toast('Esse dia não tem nada marcado');
+   sheet('Copiar '+ROT_DIAS[w],
+    '<p class="tiny muted" style="line-height:1.7">Copiar os '+bs.length+
+    (bs.length===1?' bloco':' blocos')+' de '+ROT_DIAS[w]+' para <b>segunda a sexta</b>.</p>'+
+    '<p class="xtiny muted" style="line-height:1.65;margin-top:9px">O que já estiver marcado nesses dias é substituído. '+
+    'Sábado e domingo não são tocados.</p>'+
+    '<button class="btn acc bl" style="margin-top:13px" data-a="ag-copiar-ok" data-w="'+w+'">Copiar</button>'+
+    '<button class="btn gh bl sm" style="margin-top:8px" data-a="close">Deixar como está</button>');
+   break}
+  case 'ag-copiar-ok':{
+   const bs=blocosDoDia(+d.w);
+   [1,2,3,4,5].forEach(function(k){
+    S.agenda[String(k)]=bs.map(function(b,i){
+     return{id:'a'+Date.now()+'_'+k+'_'+i,ini:b.ini,fim:b.fim,o:b.o};
+    });
+   });
+   save('base');closeSheet();render();toast('Copiado para segunda a sexta');break}
+
+  /* ---------------- HÁBITOS ---------------- */
+  case 'hab-novo':sheetHabito(null);break;
+  case 'hab-abrir':sheetHabito(d.id);break;
+  case 'hab-dia':{
+   const x=S.habitos.find(function(z){return z.id===d.id}); if(!x)break;
+   const w=+d.w, i=x.dias.indexOf(w);
+   if(i>=0)x.dias.splice(i,1); else x.dias.push(w);
+   save('base');render();break}
+  case 'hab-feito':{
+   const x=S.habitos.find(function(z){return z.id===d.id}); if(!x)break;
+   const D=hoje();
+   x.feito=x.feito||{};
+   if(x.feito[D])delete x.feito[D]; else x.feito[D]=true;
+   save('base');render();break}
+  case 'hab-ok':{
+   const n=(($('#hbN')||{}).value||'').trim();
+   const err=$('#hbErro');
+   if(!n){if(err)err.textContent='Dê um nome ao hábito.';return}
+   const min=Math.max(1,Math.min(240,Number((($('#hbMin')||{}).value||'10'))||10));
+   const fixa=(($('#hbFixa')||{}).value||'');
+   const base={n:n.slice(0,40),min,quando:S.ui.hbQuando||'qualquer',
+     fixa:hhmmOk(fixa)?fixa:'',dias:(S.ui.hbDias||[0,1,2,3,4,5,6]).slice()};
+   if(d.id){
+    const x=S.habitos.find(function(z){return z.id===d.id});
+    if(x)Object.assign(x,base);
+   }else{
+    if(S.habitos.length>=30)return toast('São 30 hábitos no máximo');
+    S.habitos.push(Object.assign({id:'h'+Date.now(),feito:{}},base));
+   }
+   save('base');closeSheet();render();toast(d.id?'Mudado':'Hábito criado');break}
+  case 'hab-quando':{
+   S.ui.hbQuando=d.v;
+   $$('#hbQuando .chip').forEach(function(b){b.classList.toggle('on',b.dataset.v===d.v)});
+   break}
+  case 'hab-diatoggle':{
+   const w=+d.w; S.ui.hbDias=S.ui.hbDias||[];
+   const i=S.ui.hbDias.indexOf(w);
+   if(i>=0)S.ui.hbDias.splice(i,1); else S.ui.hbDias.push(w);
+   $$('#hbDias .chip').forEach(function(b){
+    b.classList.toggle('on',S.ui.hbDias.indexOf(+b.dataset.w)>=0);
+   });
+   break}
+  case 'hab-rm':{
+   const x=S.habitos.find(function(z){return z.id===d.id}); if(!x)break;
+   sheet('Apagar “'+x.n+'”',
+    '<p class="tiny muted" style="line-height:1.7">O hábito sai da sua semana, e o histórico de dias marcados '+
+    'vai junto.</p>'+
+    '<button class="btn bl rm" style="margin-top:13px;background:var(--bad);color:#fff" '+
+     'data-a="hab-rm-ok" data-id="'+esc(d.id)+'">Apagar</button>'+
+    '<button class="btn gh bl sm" style="margin-top:8px" data-a="close">Deixar como está</button>');
+   break}
+  case 'hab-rm-ok':{
+   S.habitos=S.habitos.filter(function(z){return z.id!==d.id});
+   save('base');closeSheet();render();toast('Apagado');break}
+
   case 'voz-info':sheetVozEx(d.id);break;
+  case 'voz-sessao':vozSessaoAbrir();break;
+  case 'voz-ses-pausa':if(vozSes){vozSes.pausado=!vozSes.pausado;vozSessaoPinta()}break;
+  case 'voz-ses-pular':vozSessaoProximo(false);break;
+  case 'voz-ses-parar':pararSessaoVoz();closeSheet();render();break;
   case 'fim-voz':{const y=dia(hj);y.voz.feito=!y.voz.feito;y.hab.voz=y.voz.feito;
    save('dia',hj);render();if(y.voz.feito)toast('Treino de voz concluído');break}
   case 'add-voz':{const hz=Number(($('#hzIn')||{}).value),min=Number(($('#minIn')||{}).value)||0;
