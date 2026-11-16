@@ -986,7 +986,7 @@ F2UP:{nome:'Superior Completo',foco:'Superior inteiro · ombro e dorsal',dur:50,
   e('Bi-set: rosca + tríceps banco','3','12 + 12','60s','')]},
 
 F2HIIT:{nome:'Cardio HIIT e Core',foco:'Condicionamento e abdômen',dur:35,tipo:'treino',cor:'b',
- nota:'Gasto calórico alto em pouco tempo e core mais forte. Se estiver muito cansado, troque por 35 min de caminhada — o benefício para a saúde é parecido.',
+ nota:'Gasto calórico alto em pouco tempo e core mais forte. Se o cansaço estiver demais, troque por 35 min de caminhada — o benefício para a saúde é parecido.',
  aquec:AQ_FULL,alonga:ALONGA,
  gym:[e('HIIT na esteira ou bike','10 blocos','30 seg forte / 60 seg leve','—','20 minutos no total. Forte = você não consegue conversar'),
   e('Prancha','3','40 seg','40s',''),
@@ -2259,7 +2259,7 @@ const VOZ_EX=[
    'Suba devagar, como uma sirene, até o ponto mais alto que sai sem apertar a garganta. Desça do mesmo jeito.',
    'Faça 8 subidas e descidas completas, sem pressa.',
    'Depois pare na altura alvo e sustente o "mmm" por 10 segundos, 5 vezes.'],
-  dica:'Se apertou, doeu ou ficou rouco: você passou do limite. A voz treinada nunca dói.'},
+  dica:'Se apertou, doeu ou a voz ficou rouca: você passou do limite. A voz treinada nunca dói.'},
  {id:'sustenta',n:'Sustentar a nota alvo',min:3,tipo:'altura',
   como:['Use um afinador no celular (qualquer app de tuner mostra a frequência em Hz).',
    'Fale a vogal "a" e observe a frequência que aparece.',
@@ -2471,7 +2471,7 @@ const HIG=[
   porque:'Pia cheia aumenta a sensação de descontrole e atrapalha comer direito no dia seguinte.'},
  {id:'unhas',n:'Cortar as unhas',ic:'check',freq:10,per:'qualquer',
   niveis:['Cortar as que estão incomodando','Cortar todas as mãos','Mãos e pés'],
-  porque:'A cada 10 dias basta. Entra aqui para você não precisar lembrar sozinho.'},
+  porque:'A cada 10 dias basta. Entra aqui para você não precisar lembrar disso.'},
  {id:'lencol',n:'Trocar a roupa de cama',ic:'moon',freq:10,per:'qualquer',
   niveis:['Trocar só a fronha','Trocar lençol e fronha','Trocar tudo e lavar'],
   porque:'A fronha sozinha já ajuda a pele do rosto e o cheiro da cama. É a versão mínima que vale.'},
@@ -2486,7 +2486,7 @@ const HIG=[
  {id:'postura',n:'Checar a postura',ic:'ruler',freq:1,per:'qualquer',
   niveis:['Encostar as costas na parede e respirar 3 vezes','Abrir o peito e girar os ombros 10 vezes','Fazer a série curta de postura'],
   porque:'Postura curvada para esconder o peito vira dor e encurtamento. '+
-   'Trinta segundos encostado na parede já lembram o corpo de onde é o lugar do ombro.'},
+   'Trinta segundos com as costas na parede já lembram o corpo de onde é o lugar do ombro.'},
  {id:'remedio',n:'Medicação',ic:'bell',freq:1,per:'qualquer',ess:true,
   niveis:['Tomei'],
   porque:'Se você usa alguma medicação contínua, este é o item que não tem versão reduzida. '+
@@ -3124,14 +3124,28 @@ function metaSegura(){
 /* Números que a pessoa escolheu não ver. Ela continua registrando tudo — as metas
    seguem sendo calculadas —, o app é que para de devolver o número na tela.
    Existe porque ver peso e percentual de gordura todo dia faz mal a muita gente. */
-/* Números de corpo e de caloria. Nascem desligados e não voltam sozinhos:
-   para quem tem histórico de transtorno alimentar, ver estes números todo
-   dia é o próprio gatilho. Religar exige a senha de NUM_SENHA. */
-const NUM_TRAVADOS=['peso','gordura','medidas','kcal'];
+/* Números de corpo, de caloria e os gráficos. Vêm LIBERADOS: o app não
+   parte do princípio de que quem abriu ele tem transtorno alimentar.
+   A trava cai quando a pessoa responde, nas perguntas de PERG_TA, que
+   tem ou já teve — ou que ver estes números faz mal. Depois disso não
+   volta sozinho: religar exige a senha de SENHA_NUMEROS. */
+const NUM_TRAVADOS=['peso','gordura','medidas','kcal','graficos'];
 /* Não é segurança: está no fonte, que é público, e quem souber abrir acha.
    É um degrau, para o religar não acontecer no impulso de um dia ruim. */
 const SENHA_NUMEROS='norte-7412';
-function numLiberado(){return S.perfil.numLiberado===true}
+function numLiberado(){
+ /* Escolha explícita manda, nos dois sentidos: destravou com a senha, ou
+    mandou trancar de novo. */
+ if(S.perfil.numLiberado===true)return true;
+ if(S.perfil.numLiberado===false)return false;
+ /* Nunca mexeu. Liberado — a não ser que as respostas digam o contrário.
+    Esta última linha é o que segura quem respondeu "tenho" numa versão
+    em que tudo nascia trancado: lá a marca nunca chegou a ser gravada,
+    e sem isto a atualização destravaria os números dessas pessoas
+    sozinha, que é exatamente o acidente que esta tela existe para
+    evitar. */
+ return !travaPorTA();
+}
 function travado(k){return NUM_TRAVADOS.indexOf(k)>=0&&!numLiberado()}
 function oculto(k){
  if(travado(k))return true;
@@ -4007,7 +4021,7 @@ const POR_QUE={
  puxada:{g:'Dorsal, bíceps e a parte alta das costas. É o músculo que define a largura das costas vista de frente e de trás.',
   masc:'Junto com a elevação lateral, é o que mais muda a silhueta vista de frente — o formato em V que a roupa marca vem daqui. É o exercício mais importante da sua trilha.',
   fem:'Entra pela postura e pelas costas, sem buscar largura: por isso aparece com pegada e volume diferentes da trilha masculinizar.',
-  bem:'Puxar é o padrão que mais falta em quem passa o dia sentado, e é o que mais alivia ombro curvado.',
+  bem:'Puxar é o padrão que mais falta em quem passa o dia na cadeira, e é o que mais alivia ombro curvado.',
   semEle:'Sem puxar, o peito fica mais forte que as costas e o ombro gira para a frente. É a receita da postura curvada.'},
  remada:{g:'Costas na horizontal, com foco na parte do meio: a que puxa a escápula para trás.',
   masc:'Dá espessura às costas, que é o que a puxada sozinha não dá.',
@@ -4047,12 +4061,12 @@ const POR_QUE={
  ponte:{g:'Glúteo isolado, sem carregar a coluna. É o jeito de treinar glúteo pesado com a lombar descansada.',
   masc:'Entra como acessório de quadril e proteção de lombar.',
   fem:'É o exercício com melhor relação entre esforço e retorno para glúteo, e dá para fazer em casa sem nada.',
-  bem:'Um dos poucos exercícios de perna que funciona deitado, para quem tem joelho sensível.',
+  bem:'Um dos poucos exercícios de perna que funciona na posição deitada, para quem tem joelho sensível.',
   semEle:'O glúteo continua sendo treinado no agachamento e no stiff, mas com menos isolamento.'},
  panturrilha:{g:'Panturrilha. Responde devagar e é muito genética, mas sustenta tornozelo e caminhada.',
   masc:'Acessório.',
   fem:'Acessório, com efeito na linha da perna vista de lado.',
-  bem:'Ajuda circulação e equilíbrio, principalmente para quem fica muito tempo em pé ou sentado.',
+  bem:'Ajuda circulação e equilíbrio, principalmente para quem fica muito tempo em pé ou na cadeira.',
   semEle:'Nada quebra. É acessório puro.'},
  prancha:{g:'Core em isometria: ele segura, em vez de encurtar. Isso treina a cintura sem engrossar os oblíquos.',
   masc:'Core firme sustenta carga nos outros exercícios e protege a lombar.',
@@ -4069,7 +4083,7 @@ const POR_QUE={
   fem:'Mantém o condicionamento sem comer o treino de perna.',
   bem:'É o centro desta trilha. Caminhada conta, e conta muito.',
   semEle:'Perde-se condicionamento e o efeito sobre humor, que é o mais bem documentado de todos.'},
- along:{g:'Mobilidade e postura. É a parte que compensa o encurtamento de quem passa o dia sentado ou curvado.',
+ along:{g:'Mobilidade e postura. É a parte que compensa o encurtamento de quem passa o dia na cadeira ou de ombros curvados.',
   masc:'Compensa diretamente o encurtamento de peito de quem usa binder e de quem anda com o ombro para a frente para esconder o peito. Essa postura é queixa comum, e ela responde a alongamento de peito somado a remada.',
   fem:'Mantém a amplitude de ombro e quadril, que é o que deixa o movimento solto em vez de duro.',
   bem:'Dois minutos já contam. É a versão mínima que mantém a sequência viva.',
@@ -4394,7 +4408,7 @@ const MOV={
    'Suba empurrando o quadril para a frente e aperte o glúteo.'],
   erros:['Dobrar o joelho e virar agachamento','Arredondar a lombar','Afastar o peso do corpo']},
  ponte:{n:'Elevação pélvica e ponte',m:'Glúteo e posterior de coxa',
-  passos:['Deitado, pés perto do bumbum e apoiados no chão.',
+  passos:['Deite com os pés perto do bumbum, apoiados no chão.',
    'Empurre o chão com os calcanhares e suba o quadril.',
    'Aperte o glúteo por 2 segundos no topo, sem forçar a lombar.',
    'Desça devagar até quase encostar.'],
@@ -4425,7 +4439,7 @@ const MOV={
   erros:['Começar no ritmo forte sem aquecer','Encurtar o descanso entre os blocos','Tontura: pare e sente']},
  along:{n:'Alongamento e mobilidade',m:'Recuperação e amplitude',
   passos:['Entre na posição devagar, até sentir tensão — nunca dor.',
-   'Segure parado por 30 segundos, sem balançar.',
+   'Segure a posição por 30 segundos, sem balançar.',
    'Respire fundo: a cada expiração você ganha um pouco mais de amplitude.',
    'Saia da posição com a mesma calma com que entrou.'],
   erros:['Balançar para forçar amplitude','Prender a respiração','Alongar músculo frio e sem aquecer']}
@@ -4862,7 +4876,7 @@ const CREATINA=[
  ['O preço','É o suplemento mais barato por efeito que existe. Um pote de 300 g, na dose de 3 g, dura cerca de cem dias, e custa bem menos que um pote de whey — que rende duas semanas e substitui comida que você poderia comprar.'],
  ['Creatinina no exame: atenção','A creatina vira creatinina no corpo, e creatinina é justamente o que o laboratório usa para estimar como está o rim. Quem toma creatina costuma ver esse valor subir um pouco sem ter nada no rim. Avise quem te acompanha que você usa, antes de coletar — senão o exame vira susto, ou vira investigação que não precisava acontecer.'],
  ['O que ela não é','Não é esteroide, não é hormônio e não tem nada a ver com bloqueador ou com testosterona. Isso está respondido com estudo no artigo de dúvidas comuns que está nas fontes.'],
- ['Quando não faz sentido','Se você ainda não treina com regularidade, não bate a proteína do dia ou dorme mal, creatina não vai aparecer em nada. Ela é a última coisa da fila, não a primeira. E quem tem doença de rim, ou está grávida, pergunta antes.']
+ ['Quando não faz sentido','Se você ainda não treina com regularidade, não bate a proteína do dia ou dorme mal, creatina não vai aparecer em nada. Ela é a última coisa da fila, não a primeira. E quem tem doença de rim, ou está em gestação, pergunta antes.']
 ];
 function blocoCreatina(){
  return dobra('plano:creatina','Creatina','leaf',
@@ -4917,11 +4931,23 @@ function stPlano(){
 /* Cargas, volume e histórico respondem a mesma pergunta: estou evoluindo? */
 function stEvolucao(){
  if(oculto('graficos')){
+  /* Dois motivos diferentes para a tela estar vazia, e eles não podem
+     usar a mesma frase: "você escolheu" é verdade para quem desligou na
+     mão, e é falso — e meio acusatório — para quem só respondeu que tem
+     transtorno alimentar e teve os gráficos trancados pelo app. */
+  const porTrava=travado('graficos');
   $('#st-evolucao').innerHTML=
    '<div class="card hero">'+chTtl('chart','Evolução do treino')+
-   '<p class="tiny muted" style="line-height:1.65">Você escolheu não ver gráficos nem números de treino. '+
-   'Suas cargas continuam sendo guardadas: quando quiser olhar, é só ligar de volta.</p>'+
-   avisoOculto('Comparar número de treino com o de ontem faz mal a muita gente — e treinar não depende disso.')+'</div>'+
+   (porTrava
+    ?'<p class="tiny muted" style="line-height:1.65">Os gráficos e os números de treino estão '+
+     '<b>trancados</b>, pelo que você respondeu nas perguntas sobre comida. '+
+     'Suas cargas continuam sendo guardadas inteiras — o app só não devolve o número para a tela.</p>'+
+     '<p class="xtiny muted" style="margin-top:9px;line-height:1.6">Para ver de novo é preciso a senha. '+
+     '<button class="btn gh xs" data-a="go-sub" data-tab="perfil" data-st="ver">Onde se pede</button></p>'
+    :'<p class="tiny muted" style="line-height:1.65">Você escolheu não ver gráficos nem números de treino. '+
+     'Suas cargas continuam sendo guardadas: quando quiser olhar, é só ligar de volta.</p>'+
+     avisoOculto('Comparar número de treino com o de ontem faz mal a muita gente — e treinar não depende disso.'))+
+   '</div>'+
    blocoHistorico();
   return;
  }
@@ -5224,7 +5250,7 @@ function avisoComida(){
   'de como está o seu intestino, de condição de saúde nem do seu histórico com comida. '+
   'Quem prescreve dieta é nutricionista ou médico — é profissão regulamentada, e por um motivo.</p>'+
   '<p class="tiny muted" style="line-height:1.7;margin-top:10px"><b>Procure profissional</b> se você tem alguma condição de saúde, '+
-  'está grávida, usa medicação de uso contínuo, tem alergia alimentar diagnosticada, tem ou já teve transtorno alimentar, '+
+  'está em gestação, usa medicação de uso contínuo, tem alergia alimentar diagnosticada, tem ou já teve transtorno alimentar, '+
   'ou se algum exame veio alterado. Nesses casos o que está aqui não serve como plano.</p>'+
   '<p class="tiny" style="line-height:1.7;margin-top:10px">E vale dizer o óbvio: <b>você pode ignorar qualquer sugestão daqui.</b> '+
   'Nada nesta tela cobra nada de ninguém, e um dia fora da conta não desfaz nada.</p>'+
@@ -6381,7 +6407,7 @@ function stAgua(){
      '<div class="grow"><div class="ttl num">'+h+'</div>'+
      '<div class="sub">'+(passou?'já passou — ':'')+'acumulado esperado: '+alvo+' ml</div></div>'+
      '<button class="btn gh xs" data-a="agua" data-v="300">+300</button></div>';}).join('')+'</div>'+
-   '<p class="xtiny muted" style="margin-top:9px">Teste prático: urina clara ao longo do dia significa hidratação em dia; urina escura indica que você está atrasado na meta.</p></div>';
+   '<p class="xtiny muted" style="margin-top:9px">Teste prático: urina clara ao longo do dia significa hidratação em dia; urina escura indica que você está '+g('atrasad')+' na meta.</p></div>';
 }
 
 /* =====================================================================
@@ -6609,7 +6635,7 @@ const ATIVOS=[
  {n:'Adapaleno',pra:'Acne, cravo, textura',ev:'retinoide',forca:'forte',
   o:'O retinoide que se compra sem receita no Brasil. É o mais eficaz desta lista para acne.',
   c:'À noite, pele seca, duas ou três vezes por semana no começo. Nunca junto com o filtro da manhã.',
-  cuid:'Irrita, descama e deixa a pele mais sensível ao sol nas primeiras semanas. Não use se estiver grávida.'},
+  cuid:'Irrita, descama e deixa a pele mais sensível ao sol nas primeiras semanas. Não use em gestação.'},
  {n:'Ácido azelaico',pra:'Acne com mancha, rosácea, pele sensível',ev:'azelaico',forca:'forte',
   o:'Age em três frentes: bactéria, inflamação e produção de melanina. Em dezesseis ensaios, reduziu cravos perto de 70% contra 14% do veículo.',
   c:'Pode ser usado de manhã e à noite, e junto com quase tudo. Concentração de 10% em dermocosmético, 15 a 20% com receita.',
@@ -7116,7 +7142,7 @@ const BINDER=[
  ['Máximo de 8 horas por dia','Passar disso aumenta muito a chance de dor nas costelas, alteração de postura e irritação da pele. Tire assim que chegar em casa.'],
  ['Nunca durma com ele','Dormir com binder é uma das causas mais comuns de dor torácica persistente e de deformidade de costela a longo prazo.'],
  ['Nunca use faixa, atadura, esparadrapo ou bandagem','Esses materiais não cedem quando você respira fundo. É assim que acontecem fraturas de costela e lesão de pele. Binder de verdade, do tamanho certo, é mais seguro e mais confortável.'],
- ['Tamanho certo não é o menor','Se marca fundo na pele, dói, dá falta de ar ou você não consegue respirar fundo, está pequeno. Siga a tabela do fabricante e meça relaxado.'],
+ ['Tamanho certo não é o menor','Se marca fundo na pele, dói, dá falta de ar ou você não consegue respirar fundo, está pequeno. Siga a tabela do fabricante e meça com o corpo relaxado.'],
  ['Dias de folga','Reserve um ou dois dias por semana sem binder, e os dias de treino pesado também. A pele e a musculatura precisam disso.'],
  ['Sinais para parar e procurar ajuda','Dor nas costelas que não passa, falta de ar, formigamento nos braços, tosse persistente, dor nas costas que piora. Nenhum deles é normal.'],
  ['Compense todo dia','Cinco minutos de respiração diafragmática e alongamento de peitoral na porta reduzem bastante o encurtamento causado pelo uso diário.']
@@ -7859,9 +7885,14 @@ function aplicaIdentidade(){
   if(mf){
    const j={name:nome,short_name:nome,lang:'pt-BR',start_url:'./index.html',scope:'./',
     display:'standalone',orientation:'portrait',background_color:d.fundo,theme_color:d.barra,
+    /* Sem 'maskable': o ícone é um objeto recortado sobre
+       transparência, e maskable promete ao sistema que dá para cortar
+       em qualquer formato sem estragar. Daria: os raios do sol sairiam
+       cortados e o fundo transparente mostraria o que o lançador
+       pusesse atrás. Sem a promessa, o Android põe o ícone inteiro
+       sobre o fundo dele, que é como ícone recortado deve ser usado. */
     icons:[{src:d.ic,sizes:'192x192',type:'image/png',purpose:'any'},
-     {src:d.ic2,sizes:d.gr,type:'image/png',purpose:'any'},
-     {src:d.ic2,sizes:d.gr,type:'image/png',purpose:'maskable'}]};
+     {src:d.ic2,sizes:d.gr,type:'image/png',purpose:'any'}]};
    if(aplicaIdentidade._url)URL.revokeObjectURL(aplicaIdentidade._url);
    aplicaIdentidade._url=URL.createObjectURL(new Blob([JSON.stringify(j)],{type:'application/manifest+json'}));
    mf.href=aplicaIdentidade._url;
@@ -8049,7 +8080,11 @@ function cardIdentidade(){
    return '<button class="chip'+(on?' on':'')+'" data-a="pronome" data-v="'+esc(x.id)+'">'+esc(x.n)+'</button>';
   }).join('')+'</div>'+
   '<p class="xtiny muted" style="margin-top:8px;line-height:1.6">O app usa pouca palavra marcada por gênero, de propósito. '+
-  'Onde usa, passa a usar a sua: '+esc(g('lid'))+', '+esc(g('cansad'))+', '+esc(g('sozinh'))+'.'+
+  /* Estas três são as palavras que o app REALMENTE adapta, nas telas de
+     água, privacidade, postura e medidas. Antes o exemplo era outro e
+     nenhuma das três aparecia em lugar nenhum: o cartão prometia uma
+     coisa que não acontecia. */
+  'Onde usa, passa a usar a sua: '+esc(g('atrasad'))+', '+esc(g('sozinh'))+', '+esc(g('curvad'))+'.'+
   (p.pronome?'':' Sem escolha, ele continua escrevendo as duas formas — nunca escolhe por você.')+'</p>'+
 
   '<hr class="sep"><div class="lbl" style="margin-bottom:7px">Sua identidade <span class="muted">(se quiser dizer)</span></div>'+
@@ -8113,7 +8148,7 @@ const POSTURA=[
  ['Alongar o peito na porta','De pé num vão de porta, antebraços apoiados nas laterais, um pé à frente. Deixe o peito abrir sem forçar. 30 segundos, duas vezes. É o que solta o que o binder e a postura fecharam.'],
  ['Encostar na parede','Costas, nuca e glúteo na parede, braços em L. Deslize os braços para cima e para baixo 10 vezes. Isso ensina o corpo onde é o lugar neutro do ombro.'],
  ['Remada é o exercício da postura','Mais que qualquer alongamento. Alongar abre, mas é a remada que dá força para a parte do meio das costas segurar o ombro no lugar. Alongamento sem remada desfaz em horas.'],
- ['Gato e camelo','De quatro, arredonde e depois estenda a coluna devagar, 10 vezes. Serve para a coluna lembrar que ela se move, principalmente depois de um dia inteiro sentado.'],
+ ['Gato e camelo','De quatro, arredonde e depois estenda a coluna devagar, 10 vezes. Serve para a coluna lembrar que ela se move, principalmente depois de um dia inteiro na cadeira.'],
  ['O lembrete que funciona','Não é "fique reto". É escolher um gatilho do dia — cada vez que o celular tocar, cada vez que você se levantar — e nesse momento girar os ombros para trás uma vez. Repetição curta e frequente vence esforço longo.'],
  ['Não treine de binder','Isto não é sobre postura, é sobre respirar. Compressão limita a caixa torácica e sobrecarrega pescoço e lombar justamente nos exercícios que deveriam corrigir a postura.',['masc','andro','bem']]
 ];
@@ -8122,13 +8157,13 @@ function blocoPostura(){
     feminilizar ela é conteúdo endereçado a outra pessoa */
  const itens=POSTURA.filter(x=>!x[2]||x[2].indexOf(S.perfil.trilha)>=0);
  return '<div class="card">'+chTtl('ruler','Postura')+
-  '<p class="tiny muted" style="line-height:1.7;margin-bottom:11px">Ficar curvado para esconder o peito não é vaidade: '+
+  '<p class="tiny muted" style="line-height:1.7;margin-bottom:11px">Ficar '+g('curvad')+' para esconder o peito não é vaidade: '+
   'vira dor de pescoço, de lombar e falta de ar.</p>'+
   '<div class="stack" style="gap:0">'+itens.map(x=>
    '<div class="li"><div class="grow"><div class="ttl">'+esc(x[0])+'</div>'+
    '<div class="sub" style="line-height:1.55">'+esc(x[1])+'</div></div></div>').join('')+'</div>'+
   blocoVideos('Ver como se faz',[
- ['6Be-s3RwVp4','Alongamento de peitoral (parede)','Grupo Longevitá - Brasília','Para o encurtamento de quem anda curvado'],
+ ['6Be-s3RwVp4','Alongamento de peitoral (parede)','Grupo Longevitá - Brasília','Para o encurtamento de quem anda de ombros curvados'],
  ['ZyzddYCVVMM','COMO CORRIGIR OS "OMBROS CAÍDOS" COM O ALONGAMENTO DE PEITORAL? APRENDA AGORA.','Personal Gustavo Teixeira','Série curta, sem equipamento'],
  ['bNUNSu9LcQo','Como CORRIGIR POSTURA CURVADA em Casa com 1 CABO DE VASSOURA! VEJA AGORA','Rosi Bogorni | Pilates, saúde e bem-estar!','Como compensar o uso diário']
   ],'A postura responde a força nas costas somada a alongamento de peito. Só um dos dois não segura.')+'</div>';
@@ -9259,7 +9294,7 @@ const AVISOS=[
     'Para treinar: top esportivo de compressão leve, duas regatas justas, ou binder próprio de treino. Nunca faixa, atadura, plástico ou fita.'},
  {id:'voz_forcar',onde:'voz',fixo:true,ev:'voz',trilhas:['masc','fem','bem','andro'],
   t:'Voz treinada não dói',
-  d:'Se apertou a garganta, ardeu ou ficou rouco, você passou do limite — pare naquele dia. '+
+  d:'Se apertou a garganta, ardeu ou a voz ficou rouca, você passou do limite — pare naquele dia. '+
     'Forçar altura machuca as pregas vocais, e lesão vocal demora muito mais para reverter do que leva para acontecer.'},
  {id:'meta_baixa',onde:'prog',fixo:true,ev:'tmb',trilhas:['masc','fem','bem','andro'],
   t:'Sua meta de peso está abaixo do que o app planeja',
@@ -9544,7 +9579,7 @@ function stPrivacidade(){
    '<p class="tiny muted" style="line-height:1.7">Pela LGPD, dado de saúde e de identidade de gênero é '+
    '<b>dado pessoal sensível</b>. Este app não coleta, não armazena fora do seu aparelho, não compartilha e não vende nada: '+
    'não existe banco de usuários, então não existe vazamento possível.</p>'+
-   '<p class="tiny muted" style="line-height:1.7;margin-top:10px">Acesso, correção e eliminação você exerce sozinho:</p>'+
+   '<p class="tiny muted" style="line-height:1.7;margin-top:10px">Acesso, correção e eliminação você exerce '+g('sozinh')+':</p>'+
    '<div class="row wrap" style="gap:7px;margin-top:11px">'+
     '<button class="btn gh sm" data-a="exportar">Baixar tudo que é seu</button>'+
     '<button class="btn gh sm" data-a="baixar-csv">Baixar como planilha</button>'+
@@ -10039,7 +10074,7 @@ function stMedidas(){
     return tile(n,n1(v),d0?((d0>0?'+':'')+d0+' cm'):'sem mudança',d0?(bom?'var(--ok)':'var(--warn)'):'var(--ink)');
    }).join('')+'</div>'+
    proporcaoDaTrilha(ult)
-   :vazio('ruler','Nenhuma medida registrada. Meça relaxado, sempre no mesmo ponto e no mesmo dia da semana.'))+
+   :vazio('ruler','Nenhuma medida registrada. Meça '+g('relaxad')+', sempre no mesmo ponto e no mesmo dia da semana.'))+
   '</div>'+
   blocoGordura()+
   '<div class="card">'+chTtl('plus','Nova medição')+
@@ -10677,9 +10712,11 @@ function pf_lembretes(){
 }
 /* ---------------------------------------------------------------------
    PERGUNTAS SOBRE COMIDA
-   O app já nascia com peso, gordura, medidas e caloria travados, e já
-   dizia por quê. O que faltava era perguntar — e deixar a resposta
-   valer.
+   Peso, gordura, medidas, caloria e gráficos aparecem normais para
+   quem chega. O app não assume que quem abriu ele tem transtorno
+   alimentar — assumir isso é dizer a todo mundo, sem perguntar, que o
+   corpo dela é um problema a ser administrado. Então ele pergunta, e
+   deixa a resposta valer.
 
    Quem responde que tem, que já teve, que ver número faz mal ou que
    contar comida já virou obsessão tem os números trancados na hora,
@@ -10741,7 +10778,7 @@ function pf_comida(){
   }).join('')+'</div>'+
   (trava
    ?'<p class="tiny" style="line-height:1.7;margin-top:12px;color:var(--warn);font-weight:600">'+
-    'Pelo que você respondeu, peso, percentual de gordura, medidas e caloria estão <b>trancados</b>. '+
+    'Pelo que você respondeu, peso, percentual de gordura, medidas, caloria e gráficos estão <b>trancados</b>. '+
     'O app continua registrando e calculando tudo por baixo — porção, receita e plano seguem certos. '+
     'Ele só não devolve o número para a tela.</p>'+
     '<p class="xtiny muted" style="margin-top:8px;line-height:1.6">Para destravar é preciso a senha, '+
@@ -10769,9 +10806,14 @@ function pf_ocultar(){
    (p.viuOcultar?'':'<p class="tiny" style="background:var(--pink-soft);border-radius:11px;padding:11px;'+
     'line-height:1.6;font-weight:600;margin-bottom:11px">Antes de começar, escolha isto. '+
     'Depois o app não pergunta de novo — e você muda quando quiser, aqui mesmo.</p>')+
-   '<p class="tiny muted" style="line-height:1.65">Peso, percentual de gordura, medidas e caloria vêm '+
-   '<b>desligados e travados</b>: ver estes números todo dia é gatilho para quem tem histórico de transtorno alimentar. '+
-   'O app continua registrando e calculando igual — só não devolve o número para a tela.</p>'+
+   '<p class="tiny muted" style="line-height:1.65">Peso, percentual de gordura, medidas, caloria e gráficos '+
+   '<b>aparecem normalmente</b>. O app não parte do princípio de que você tem transtorno alimentar.</p>'+
+   '<p class="tiny muted" style="line-height:1.65;margin-top:8px">Eles só travam se você responder, nas perguntas '+
+   'logo acima, que tem ou já teve — ou que ver esse tipo de número te faz mal. '+
+   'Depois que travam, não destravam sozinhos: para ver de novo, precisa da senha. '+
+   'Você também pode desligar qualquer um deles na mão, aqui, sem responder nada.</p>'+
+   '<p class="tiny muted" style="line-height:1.65;margin-top:8px">Esconder não apaga: '+
+   'o app continua registrando e calculando igual — só não devolve o número para a tela.</p>'+
    '<div class="row wrap" style="gap:5px;margin-top:11px">'+OCULTAVEIS.map(([k,n])=>
     '<button class="chip '+(oculto(k)?'':'on')+'" data-a="ocultar" data-k="'+k+'">'+
     ic(travado(k)?'check':(oculto(k)?'x':'check'))+' '+esc(n)+
@@ -10935,6 +10977,22 @@ function pf_oQueE(){
    '<a class="btn gh sm" href="https://github.com/lucasleticiosoaresalves-oss/app-exercicio-trans" '+
    'target="_blank" rel="noopener">'+ic('book')+' Ver o código</a></div></div>';
 }
+/* Os ícones dos disfarces não são desenho meu: são o conjunto Crystal
+   Clear, de 2005. Eles vêm sob LGPL, e LGPL pede que quem redistribui diga
+   de quem é e sob que licença. O app é publicado na internet, então isso
+   aqui não é cortesia: é a condição de poder usá-los. */
+function pf_creditos(){
+ return   '<div class="card">'+chTtl('check','Créditos')+
+   '<p class="xtiny muted" style="line-height:1.65">Os ícones dos disfarces — o bloco de notas, '+
+   'a calculadora e a lista — são do conjunto <b>Crystal Clear</b>, feito por '+
+   'Everaldo Coelho e YellowIcon em 2005. São usados sob a licença '+
+   '<b>LGPL 2.1 ou posterior</b>, que é o que o autor escolheu ao publicá-los.</p>'+
+   '<div class="row wrap" style="gap:7px;margin-top:10px">'+
+   '<a class="btn gh sm" href="https://commons.wikimedia.org/wiki/Category:Crystal_Clear" '+
+   'target="_blank" rel="noopener">'+ic('book')+' De onde vieram</a>'+
+   '<a class="btn gh sm" href="https://www.gnu.org/licenses/old-licenses/lgpl-2.1.html" '+
+   'target="_blank" rel="noopener">'+ic('info')+' A licença</a></div></div>';
+}
 function pf_avisoFinal(){
  const p=S.perfil,m=metas();
  return   '<div class="card">'+chTtl('info','Avisos')+
@@ -10976,7 +11034,7 @@ const PF_BLOCOS={
  ver:[pf_comida,pf_ocultar,pf_contador,pf_tema],
  lembrete:[pf_lembAgua,pf_lembretes],
  privado:[pf_disfarce,pf_senha,pf_guardar,pf_avisosAqui,pf_avisosDano],
- sobre:[pf_ciencia,pf_oQueE,pf_desligar,pf_avisoFinal]
+ sobre:[pf_ciencia,pf_oQueE,pf_creditos,pf_desligar,pf_avisoFinal]
 };
 function pfGrupo(id){return PF_GRUPOS.find(function(g){return g[0]===id})||null}
 function renderPerfil(){
@@ -11469,7 +11527,7 @@ const FATOS=[
  {id:'fat_via',area:'Hormonização',forca:'media',
   t:'A via do estrogênio muda o risco de trombose, e isso é pergunta de consulta',
   d:'Em mulheres cis na menopausa, uma meta-análise achou risco de trombose venosa 1,9 vez maior com estrogênio oral e sem aumento com adesivo. Em mulheres trans, uma coorte grande achou risco 2,7 vezes maior com estrogênio oral e nenhum aumento com a via transdérmica, com incidência absoluta baixa nos dois casos. Boa parte do sinal da via oral vem do etinilestradiol, que é outra molécula, e não do estradiol: num grupo de 41 casos de trombose, 40 usavam etinilestradiol oral. As revisões chamam a via transdérmica de opção de menor risco, mas dizem com clareza que não existe comparação direta entre as apresentações, e que as doses comparadas não eram equivalentes.',
-  pra:'Isto está aqui para você ter a pergunta pronta, não para mudar nada sozinha: nunca mude via, dose nem marca por conta própria, muito menos por causa de um texto de app. O que fazer é levar a pergunta à consulta — ainda mais se você fuma, tem histórico de trombose na família, vai operar ou vai ficar muito tempo imobilizada. Dor, inchaço ou calor numa perna só, ou falta de ar que apareceu de repente, é emergência no mesmo dia.',
+  pra:'Isto está aqui para você ter a pergunta pronta, não para mudar nada por conta própria: nunca mude via, dose nem marca sem acompanhamento, muito menos por causa de um texto de app. O que fazer é levar a pergunta à consulta — ainda mais se você fuma, tem histórico de trombose na família, vai operar ou vai ficar muito tempo sem se mexer. Dor, inchaço ou calor numa perna só, ou falta de ar que apareceu de repente, é emergência no mesmo dia.',
   fontes:['vte_rev','ash24']},
 
  {id:'fat_pelo',area:'Pelo e pele',forca:'fraca',
@@ -11493,7 +11551,7 @@ const FATOS=[
  {id:'fat_academia',area:'Treino',forca:'media',
   t:'Pessoas trans treinam menos, e academia e vestiário são os lugares mais citados como barreira',
   d:'Uma revisão sistemática publicada na PLOS ONE encontrou nível de atividade física mais baixo em pessoas trans do que em pessoas cis, e listou as barreiras que mais aparecem: estigma, imagem corporal, espaços que não acolhem e a estrutura binária do esporte. Vestiário, academia e piscina são descritos como os ambientes mais difíceis, por medo de encarada e de assédio. Num levantamento de 2026 com quem está em hormonização, mulheres trans relataram queda específica de conforto em academia e em liga esportiva, enquanto o conforto em casa subiu. Um estudo transversal espanhol achou mulheres trans e pessoas não binárias com menos atividade física que pessoas transmasculinas, e ligou isso a discriminação social e legal.',
-  pra:'Se treinar em academia te custa caro, o problema não é falta de disciplina: é barreira documentada. Por isso todo treino daqui tem versão de casa, com elástico ou com o peso do corpo, e por isso caminhada é sempre aceita como troca. Treinar em horário vazio, ir acompanhada, trocar de roupa em casa e escolher academia pequena são saídas que aparecem nos relatos dos próprios estudos.',
+  pra:'Se treinar em academia te custa caro, o problema não é falta de disciplina: é barreira documentada. Por isso todo treino daqui tem versão de casa, com elástico ou com o peso do corpo, e por isso caminhada é sempre aceita como troca. Treinar em horário vazio, ir com alguém, trocar de roupa em casa e escolher academia pequena são saídas que aparecem nos relatos dos próprios estudos.',
   fontes:['pa_rev','pa_horm','pa_es']},
 
  {id:'fat_saudebr',area:'Acesso à saúde',forca:'fraca',
@@ -12219,8 +12277,16 @@ document.addEventListener('click',ev=>{
    /* Responder que tem tranca na hora, inclusive para quem já tinha
       destravado. E tranca na frente da pessoa, com aviso, não em
       silêncio. */
-   if(agora&&numLiberado()){S.perfil.numLiberado=false;save('base');render();
-    return toast('Números trancados. Para ver de novo, a senha.')}
+   /* A marca é gravada SEMPRE que a resposta tranca, e não só quando os
+      números estavam à vista. É isso que faz a trava continuar de pé se
+      a pessoa apagar as respostas depois: sem gravar, apagar as
+      respostas destravaria tudo de volta, e o aviso de "a trava
+      continua como estava" viraria mentira. */
+   if(agora){
+    const estava=numLiberado();
+    S.perfil.numLiberado=false;save('base');render();
+    if(estava)return toast('Números trancados. Para ver de novo, a senha.');
+   }
    save('base');render();
    if(agora&&!antes)toast('Números trancados pelo que você respondeu.');
    break}

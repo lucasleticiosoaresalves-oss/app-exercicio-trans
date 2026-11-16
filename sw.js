@@ -25,9 +25,15 @@
      passam direto para a rede: são coisas que a pessoa escolheu abrir
      naquele instante, e guardar isso seria guardar o que ela leu.
    ===================================================================== */
-const VERSAO = 'norte-v1';
+/* Subiu para v2 porque os ícones mudaram. Sem subir, quem já abriu o app
+   uma vez continuaria vendo os antigos para sempre: arquivo do app é
+   servido do cache primeiro, e cache velho só sai quando o nome muda. */
+const VERSAO = 'norte-v2';
 const CASCA = VERSAO + '-casca';
-const MIDIA = VERSAO + '-midia';
+/* As miniaturas NÃO levam a versão no nome, de propósito. Elas não têm
+   nada a ver com a versão do app, e amarrar as duas jogaria fora até 220
+   imagens já baixadas toda vez que eu trocasse um ícone. */
+const MIDIA = 'norte-midia';
 
 /* O mínimo para o app abrir sozinho. */
 const ESSENCIAIS = [
