@@ -602,7 +602,10 @@ button.cday:active{transform:scale(.94)}
 .x{width:32px;height:32px;border-radius:50%;background:var(--surface-2);display:grid;place-items:center;
   color:var(--ink-2);flex:none;transition:background .16s,color .16s}
 .x:hover{background:var(--surface-3);color:var(--ink)}
-.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(100px + env(safe-area-inset-bottom,0px));z-index:70;
+/* 92 e escolhido: acima da trava (90), para o aviso nao ser desenhado
+   atras dela, e abaixo do disfarce (95), porque um toast com a cara do
+   Norte em cima do disfarce entrega que ha outro app embaixo. */
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(100px + env(safe-area-inset-bottom,0px));z-index:92;
   background:var(--ink);color:var(--bg);padding:11px 18px;border-radius:12px;font-size:13px;font-weight:600;
   box-shadow:var(--sh-2);max-width:92vw;text-align:center;animation:up .22s}
 
@@ -7172,7 +7175,7 @@ function sheetDestravar(){
   '<hr class="sep">'+
   '<label class="fld">Já tem a senha?<input type="text" id="senhaNum" autocomplete="off" '+
    'placeholder="digite aqui" inputmode="text"></label>'+
-  '<button class="btn gh bl sm" style="margin-top:9px" data-a="destravar">Liberar os números</button>',
+  '<button class="btn gh bl sm" style="margin-top:9px" data-a="numeros-liberar">Liberar os números</button>',
   'o registro continua acontecendo');
 }
 function sheetReceita(id){
@@ -8865,11 +8868,18 @@ function telaDisfarce(){
  const box=$('#disfarce');
  if(!box)return;
  if(!emDisfarce()){
-  box.hidden=true;box.innerHTML='';document.body.style.overflow='';
-  ['#main','#tabbar','.hdr'].forEach(function(sel){
-   const el=document.querySelector(sel);
-   if(el){el.removeAttribute('inert');el.removeAttribute('aria-hidden')}
-  });
+  box.hidden=true;box.innerHTML='';
+  /* A trava usa a mesma camada de "nada atras e alcancavel". Limpar sem
+     olhar para ela liberava o fundo com a trava ainda na frente — e na
+     abertura isto roda DEPOIS de telaSenha(), entao era sempre a trava
+     que perdia. */
+  if(!precisaDestravar()){
+   document.body.style.overflow='';
+   ['#main','#tabbar','.hdr'].forEach(function(sel){
+    const el=document.querySelector(sel);
+    if(el){el.removeAttribute('inert');el.removeAttribute('aria-hidden')}
+   });
+  }
   return;
  }
  const d=disfarceAtual();
@@ -9123,6 +9133,16 @@ function telaSenha(){
     senha deixava a tela do outro app pendurada na frente de tudo. */
  telaDisfarce();
  box.hidden=!precisaDestravar();
+ /* O app continua desenhado por baixo. A camada cobre o olho e nao cobre
+    o foco: sem isto o Tab e o leitor de tela passeavam pelas 34 coisas
+    focaveis que a trava existe para esconder. O disfarce ja fazia isto
+    logo acima, pelo mesmo motivo. */
+ ['#main','#tabbar','.hdr'].forEach(function(sel){
+  const el2=document.querySelector(sel);
+  if(!el2)return;
+  if(precisaDestravar()){el2.setAttribute('inert','');el2.setAttribute('aria-hidden','true')}
+  else{el2.removeAttribute('inert');el2.removeAttribute('aria-hidden')}
+ });
  if(!precisaDestravar()){document.body.style.overflow='';return}
  document.body.style.overflow='hidden';
  box.innerHTML=
@@ -9143,7 +9163,11 @@ function telaSenha(){
 }
 function tentarDestravar(){
  const i=$('#senhaIn');if(!i)return;
- if(hashSenha(i.value)===S.perfil.senha){
+ /* Confere do jeito do disfarce (senhaBate, que tira espaco das pontas) e
+    tambem cru. Os dois caminhos divergiam: senha guardada com espaco
+    abria no disfarce e nao abria aqui. Aceitar as duas formas conserta
+    sem trancar ninguem que ja tenha senha. */
+ if(senhaBate(i.value)||hashSenha(i.value)===S.perfil.senha){
   destravado=true;i.value='';telaSenha();render();
  }else{
   const e=$('#senhaErro');if(e)e.textContent='Senha errada.';
@@ -13349,7 +13373,12 @@ document.addEventListener('click',ev=>{
    S.perfil.ocultar=o;save('base');render();
    toast(i<0?'Escondido. O registro continua.':'Vai aparecer de novo.');break}
   case 'destravar-abrir':sheetDestravar();break;
-  case 'destravar':{
+  /* Isto libera os NUMEROS, nao o app. Chamava-se 'destravar' e colidia
+     com o 'destravar' da tela de senha no mesmo switch: o JS pegava este
+     primeiro, este lia #senhaNum (campo que nao existe na tela de
+     senha), nao batia, e voltava. O botao "Abrir" da trava ficava morto
+     e quem pos senha nao abria mais o proprio app. */
+  case 'numeros-liberar':{
    const v=(($('#senhaNum')||{}).value||'').trim().toLowerCase();
    if(v!==SENHA_NUMEROS){toast('Senha não confere.');return}
    S.perfil.numLiberado=true;save('base');closeSheet();render();
@@ -13544,7 +13573,15 @@ document.addEventListener('click',ev=>{
    break}
   case 'senha-tirar-confirma':{
    const tinha=!!S.perfil.disfarce;
-   S.perfil.senha='';destravado=true;save('base');closeSheet();render();
+   S.perfil.senha='';destravado=true;
+   /* O disfarce sai junto, de verdade. So a senha saia: o disfarce ficava
+      guardado, a aba continuava se chamando "Calculadora" e a tela de
+      Privacidade passava a reclamar que o disfarce nao esta valendo —
+      logo depois do aviso dizendo que ele foi desligado. O botao promete
+      "Tirar a senha e o disfarce", e a folha promete o nome e o icone do
+      Norte de volta; agora os dois acontecem. */
+   if(tinha){S.perfil.disfarce='';aplicaIdentidade()}
+   save('base');closeSheet();render();
    toast(tinha?'Senha e disfarce desligados':'Senha tirada');break}
   case 'senha-ok':{
    const atual=(($('#snAtual')||{}).value||''),nova=(($('#snNova')||{}).value||''),
