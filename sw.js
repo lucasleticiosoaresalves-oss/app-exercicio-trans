@@ -166,3 +166,21 @@ self.addEventListener('fetch', function (ev) {
 self.addEventListener('message', function (ev) {
   if (ev.data === 'assumir') self.skipWaiting();
 });
+
+/* Tocar no aviso abre o app, e abre a aba que já estava aberta em vez de
+   uma nova — duas abas do mesmo app brigam pelo mesmo armazenamento, e
+   a segunda abriria na tela de trava por cima do que a pessoa estava
+   fazendo. */
+self.addEventListener('notificationclick', function (ev) {
+  ev.notification.close();
+  ev.waitUntil(
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(function (lista) {
+      for (var i = 0; i < lista.length; i++) {
+        if (lista[i].url.indexOf(self.registration.scope) === 0 && 'focus' in lista[i]) {
+          return lista[i].focus();
+        }
+      }
+      if (self.clients.openWindow) return self.clients.openWindow('./index.html');
+    })
+  );
+});

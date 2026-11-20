@@ -3965,7 +3965,7 @@ const DEF={
  perfil:{nome:'',sexo:'naosei',idade:28,altura:172,peso:70,meta:74,ativ:1.375,obj:'ganhar',
    inicio:'',local:'casa',thIni:'',onboard:false,manual:null,mig:0,trilha:'masc',higOff:[],
    vozAlvo:'masc',pele:'oleosa',horaTreino:'18:00',acordar:'07:00',dormir:'23:00',
-   lembretes:['09:00','11:00','14:00','16:30','19:00','21:00'],ocultar:[],alarmes:[],
+   lembretes:['09:00','11:00','14:00','16:30','19:00','21:00'],ocultar:[],alarmes:[],notifica:false,
    viuOcultar:false,disfarce:'',diaCheio:false,avisosOff:[],nivel:'zero',limites:[],higMin:[],
    corpoMeta:'',rampa:false,contador:'mes',hormAndro:'',pronome:'',identidade:'',senha:'',
    pergunta:'',resposta:'',
@@ -4109,6 +4109,7 @@ function normalizaTudo(){
  p.avisosOff=Array.isArray(p.avisosOff)?p.avisosOff:[];
  p.higMin=Array.isArray(p.higMin)?p.higMin:[];
  p.lembretes=Array.isArray(p.lembretes)?p.lembretes.filter(x=>/^\d{1,2}:\d{2}$/.test(x)):[];
+ p.notifica=!!p.notifica;
  if(['zero','algum','avancado'].indexOf(p.nivel)<0)p.nivel='zero';
  p.limites=Array.isArray(p.limites)?p.limites.filter(x=>LIMITES.some(l=>l.id===x)):[];
  if(!METAS_CORPO.some(m=>m.id===p.corpoMeta))p.corpoMeta='';
@@ -5417,6 +5418,108 @@ function cardAgua(){
    '<div class="tiny" style="'+(atraso>250?'color:var(--pink);font-weight:600':'color:var(--ink-2)')+'">'+
    (atraso>250?'Você está '+atraso+' ml atrás do ritmo da hora. Beba um copo agora.':
     'No ritmo certo'+(proxLembrete()?' · próximo gole às '+proxLembrete().h:'')+'.')+'</div></div></div></div>';
+}
+/* =====================================================================
+   NOTIFICAÇÃO
+   O app desenhava os lembretes na linha do tempo e esperava que a
+   pessoa abrisse o app para vê-los — o que é o contrário de lembrete.
+   Agora ele avisa de verdade, no horário, pelo sistema.
+
+   O QUE ELE NÃO CONSEGUE FAZER, e está escrito na tela: avisar com o
+   app fechado. Notificação agendada com o app fechado precisa de
+   servidor empurrando, e este app não tem servidor — é a mesma promessa
+   que faz nada seu sair do aparelho. Com o app aberto numa aba, mesmo
+   em segundo plano, o aviso sai.
+
+   O CUIDADO QUE IMPORTA MAIS: o texto do lembrete aparece na tela de
+   bloqueio, onde qualquer pessoa que pegar o celular lê. Por isso, com
+   disfarce ligado, a notificação sai com o nome do outro app e SÓ com
+   o que a pessoa escreveu — sem frase do Norte junto, sem nada que
+   entregue de onde veio.
+   ===================================================================== */
+/* Frases curtas, no tom do resto do app: sem palmadinha nas costas e
+   sem fingir que o dia foi bom. A escolha é pelo dia e pela hora, para
+   não repetir a mesma frase duas vezes no mesmo dia. */
+const MOTIVOS=[
+ 'Hoje conta mesmo quando não parece.',
+ 'Feito mal feito ainda é feito.',
+ 'Não precisa estar bem para beber água.',
+ 'Um copo não resolve o dia, mas o dia é feito deles.',
+ 'Dia ruim também conta no calendário.',
+ 'Metade do plano já é o plano.',
+ 'Ninguém está medindo. Só você.',
+ 'Recomeçar é a coisa mais comum do mundo.',
+ 'O corpo não precisa da sua aprovação para merecer cuidado.',
+ 'Cinco minutos contam. Zero também é um número.',
+ 'O que você faz hoje não precisa ser bonito.',
+ 'Pressa não é parte do plano.',
+ /* A única com desinência de gênero. Fica como função para o pronome
+    valer na hora de montar, e não no momento em que a lista é lida. */
+ function(){return 'Você não está '+g('atrasad')+' em nada.'},
+ 'A semana não acabou por causa de um dia.',
+ 'Lembrar é metade. A outra metade é agora.',
+ 'Seguir devagar ainda é seguir.'
+];
+function motivoDoDia(chave){
+ const d=hoje();
+ let n=0;
+ const t=d+'|'+chave;
+ for(let i=0;i<t.length;i++)n=(n*31+t.charCodeAt(i))>>>0;
+ const m=MOTIVOS[n%MOTIVOS.length];
+ return typeof m==='function'?m():m;
+}
+function podeNotificar(){
+ return typeof Notification!=='undefined'&&Notification.permission==='granted';
+}
+function notificaLigada(){return !!S.perfil.notifica&&podeNotificar()}
+/* O aviso sai pelo service worker quando ele existe, porque é o único
+   caminho que o Android aceita em app instalado. Sem ele, cai no
+   Notification direto, que basta no navegador aberto. */
+function avisa(titulo,corpo,chave){
+ if(!podeNotificar())return false;
+ const d=disfarceAtual();
+ const op={body:corpo,tag:'norte-'+chave,icon:d.ic,badge:d.ic,lang:'pt-BR',
+  renotify:false,requireInteraction:false};
+ try{
+  if(navigator.serviceWorker&&navigator.serviceWorker.ready){
+   navigator.serviceWorker.ready.then(function(r){
+    if(r&&r.showNotification)r.showNotification(titulo,op);
+    else new Notification(titulo,op);
+   }).catch(function(){try{new Notification(titulo,op)}catch(e){}});
+   return true;
+  }
+  new Notification(titulo,op);
+  return true;
+ }catch(e){return false}
+}
+/* Tudo que tem hora marcada no dia, numa lista só. */
+function lembretesDoDia(){
+ const L=[];
+ (S.perfil.lembretes||[]).forEach(function(h){L.push({h:h,t:'Beber água',k:'agua:'+h,agua:true})});
+ (S.perfil.alarmes||[]).forEach(function(a,i){L.push({h:a.h,t:a.t,k:'seu:'+i+':'+a.h})});
+ return L.sort(function(a,b){return hm2min(a.h)-hm2min(b.h)});
+}
+/* Memória do que já saiu hoje. Vive só nesta aba, de propósito: o que
+   interessa é não avisar duas vezes na mesma sessão, e um recarregar
+   não pode fazer o aviso das 9h sair às 14h — disso cuida a janela de
+   dois minutos logo abaixo. */
+let notifFeitos={d:'',k:{}};
+function tiqueNotifica(){
+ if(!notificaLigada())return;
+ const d=hoje();
+ if(notifFeitos.d!==d)notifFeitos={d:d,k:{}};
+ const ag=agoraMin();
+ lembretesDoDia().forEach(function(x){
+  const atraso=ag-hm2min(x.h);
+  /* Só no minuto do lembrete e nos dois seguintes. Aviso que chega
+     meia hora atrasado não é lembrete, é susto. */
+  if(atraso<0||atraso>2)return;
+  if(notifFeitos.k[x.k])return;
+  notifFeitos.k[x.k]=true;
+  /* Com disfarce, só o que ela escreveu, com o nome do outro app. */
+  if(disfarceLigado())avisa(nomeDoApp(),x.t,x.k);
+  else avisa(x.t,motivoDoDia(x.k),x.k);
+ });
 }
 function proxLembrete(){
  const ag=agoraMin();
@@ -13372,6 +13475,50 @@ function pf_avisosDano(){
       ic('redo')+' Mostrar os '+p.avisosOff.length+' avisos escondidos</button>'
     :'<p class="xtiny muted" style="margin-top:10px">Nenhum escondido agora.</p>')+'</div>';
 }
+function pf_notifica(){
+ const p=S.perfil;
+ const existe=typeof Notification!=='undefined';
+ const perm=existe?Notification.permission:'indisponivel';
+ const ligada=notificaLigada();
+ const bloqueada=perm==='denied';
+ const n=lembretesDoDia().length;
+ return '<div class="card">'+chTtl('bell','Avisar na hora',
+   ligada?'<span class="tag o">ligado</span>'
+   :bloqueada?'<span class="tag w">bloqueado</span>'
+   :'<span class="tag n">desligado</span>')+
+  '<p class="tiny" style="line-height:1.7">Com isto ligado, o aviso sai no celular na hora marcada, '+
+  'com o que você escreveu — “beber água”, “tomar o remédio”, o que for. '+
+  (n?'Hoje são <b>'+n+'</b> horários marcados.':'Você ainda não marcou nenhum horário.')+'</p>'+
+  /* A limitação não é detalhe: é o primeiro motivo de alguém achar que
+     o app está quebrado. Vem antes do botão, não depois. */
+  '<p class="tiny muted" style="line-height:1.7;margin-top:10px">O aviso sai com o app aberto, mesmo '+
+  'que em outra aba ou com a tela apagada por pouco tempo. <b>Com o app fechado, não sai</b> — isso '+
+  'precisaria de um servidor empurrando o aviso, e este app não tem servidor. É a mesma promessa de '+
+  'que nada seu sai do aparelho.</p>'+
+  '<p class="xtiny" style="line-height:1.7;margin-top:10px;color:var(--warn)">O que você escreve no '+
+  'lembrete <b>aparece na tela de bloqueio</b>, onde quem pegar o celular lê sem desbloquear. '+
+  'Escreva pensando nisso.</p>'+
+  (p.disfarce
+   ?'<p class="xtiny muted" style="line-height:1.7;margin-top:9px">Com o disfarce ligado, o aviso sai '+
+    'com o nome de <b>'+esc(disfarceAtual().app)+'</b> e só com o seu texto — sem frase do Norte '+
+    'junto e sem nada que diga de onde veio.</p>'
+   :'<p class="xtiny muted" style="line-height:1.7;margin-top:9px">Junto do lembrete vai uma frase '+
+    'curta, diferente a cada horário.</p>')+
+  (bloqueada
+   ?'<p class="tiny" style="line-height:1.7;margin-top:11px;color:var(--bad)">O navegador está '+
+    'bloqueando a notificação deste site. Para liberar, é nas configurações do navegador, em '+
+    'permissões do site — o app não consegue pedir de novo depois de um “não”.</p>'
+   :!existe
+    ?'<p class="tiny muted" style="line-height:1.7;margin-top:11px">Este navegador não tem '+
+     'notificação. O lembrete continua aparecendo na linha do tempo do dia.</p>'
+    :ligada
+     ?'<div class="row wrap" style="gap:7px;margin-top:12px">'+
+      '<button class="btn gh sm grow" data-a="notif-teste">Mandar um agora, para ver</button>'+
+      '<button class="btn gh sm grow" data-a="notif-off">Desligar</button></div>'
+     :'<button class="btn acc bl sm" style="margin-top:12px" data-a="notif-on">'+ic('bell')+
+      ' Ligar os avisos</button>')+
+  '</div>';
+}
 function pf_lembretes(){
  const p=S.perfil,m=metas();
  return   '<div class="card">'+chTtl('bell','Seus lembretes')+
@@ -13703,7 +13850,7 @@ const PF_BLOCOS={
  voce:[pf_dados,pf_identidade,pf_refCalc],
  metas:[pf_metas,pf_metaCorpo,pf_transicao,pf_nivel,pf_ritmo,pf_limites,pf_externo,pf_diaCheio],
  ver:[pf_comida,pf_ocultar,pf_contador,pf_tema],
- lembrete:[pf_lembAgua,pf_lembretes],
+ lembrete:[pf_notifica,pf_lembAgua,pf_lembretes],
  privado:[pf_disfarce,pf_senha,pf_guardar,pf_avisosAqui,pf_avisosDano],
  sobre:[pf_ciencia,pf_oQueE,pf_creditos,pf_desligar,pf_avisoFinal]
 };
@@ -14466,6 +14613,31 @@ document.addEventListener('click',ev=>{
   case 'destrocar-sessao':{const x2=dia(d.d||hj);delete x2.sess;
    save();render();toast('De volta ao treino do plano');break}
   case 'tema':S.ui.tema=d.v;aplicaTema();save('base');render();break;
+  /* Pedir permissão só dentro de um toque: navegador ignora pedido que
+     não veio de gesto, e alguns contam o pedido recusado como um "não"
+     definitivo, que não dá para desfazer dentro do app. */
+  case 'notif-on':{
+   if(typeof Notification==='undefined'){toast('Este navegador não tem notificação');break}
+   const liga=function(perm){
+    if(perm==='granted'){
+     S.perfil.notifica=true;save('base');render();
+     avisa('Avisos ligados','Você vai ser '+g('avisad')+' na hora de cada lembrete.','teste');
+    }else{
+     S.perfil.notifica=false;save('base');render();
+     toast(perm==='denied'?'O navegador bloqueou':'Sem permissão, sem aviso');
+    }
+   };
+   try{
+    const r=Notification.requestPermission(liga);
+    if(r&&r.then)r.then(liga);
+   }catch(e){toast('Não consegui pedir a permissão')}
+   break}
+  case 'notif-off':S.perfil.notifica=false;save('base');render();toast('Avisos desligados');break;
+  case 'notif-teste':{
+   const ok2=disfarceLigado()
+    ?avisa(nomeDoApp(),'Beber água','teste')
+    :avisa('Beber água',motivoDoDia('teste:'+Date.now()),'teste');
+   toast(ok2?'Mandei um agora':'Não consegui mandar');break}
   case 'alarm-add':{const h=($('#al_h')||{}).value,t=(($('#al_t')||{}).value||'').trim();
    if(!h||!t){toast('Falta a hora ou o texto');break}
    const A=S.perfil.alarmes||[];
@@ -15380,6 +15552,10 @@ if(foraDaFaixa.length)setTimeout(function(){
  toast('Ajustei '+foraDaFaixa.join(', ')+' para um valor possível.');
 },900);
 setInterval(()=>{if(S.ui.tab==='inicio'&&!$('#sheetBox'))renderInicio()},60000);
+/* A cada meio minuto, e não a cada minuto: com um minuto cheio um tique
+   que atrase um segundo pula o minuto do lembrete inteiro. */
+setInterval(tiqueNotifica,30000);
+tiqueNotifica();
 
 /* =====================================================================
    SERVICE WORKER
