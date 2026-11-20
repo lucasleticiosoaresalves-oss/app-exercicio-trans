@@ -15586,18 +15586,11 @@ if('serviceWorker' in navigator){
    if(reg.waiting&&navigator.serviceWorker.controller)mostraAtualizacao(reg);
    avisaNova(reg.installing);
    reg.addEventListener('updatefound',function(){avisaNova(reg.installing)});
-   /* O navegador só procura versão nova quando há navegação. Um app
-      instalado fica dias aberto no celular sem nenhuma — e nesse tempo
-      continua rodando a versão com que abriu. Quem mexe numa opção e
-      não vê a tela mudar muitas vezes está olhando a versão de antes,
-      não um defeito. Então: toda vez que o app volta para a frente,
-      pergunta se existe versão nova. No máximo uma vez a cada cinco
-      minutos, para não bater no servidor a cada troca de aba. */
-   let olhouEm=0;
+   /* Quando o app volta para a frente, pergunta ao navegador se existe
+      service worker novo. Sozinho isto não basta, e o bloco de fora
+      explica por quê. */
    document.addEventListener('visibilitychange',function(){
     if(document.hidden)return;
-    if(Date.now()-olhouEm<300000)return;
-    olhouEm=Date.now();
     try{reg.update()}catch(e){}
    });
   }).catch(function(){/* sem service worker o app funciona igual, só precisa de rede */});
@@ -15606,6 +15599,49 @@ if('serviceWorker' in navigator){
   navigator.serviceWorker.addEventListener('controllerchange',function(){
    if(recarregando)return;recarregando=true;location.reload();
   });
+  /* =====================================================================
+     VERSÃO NOVA DA PÁGINA
+     O navegador só procura versão nova quando há navegação. Um app
+     instalado na tela inicial fica dias aberto no celular sem nenhuma —
+     e nesse tempo continua rodando a versão com que abriu. Quem mexe
+     numa opção e não vê a tela mudar muitas vezes está olhando a versão
+     de antes, e não um defeito.
+
+     reg.update() sozinho NÃO resolve: ele só descobre service worker
+     novo. Na semana em que só o index.html muda — que é a maioria
+     delas, porque o app inteiro é esse arquivo — o sw.js fica igual, o
+     update() não acha nada e o aviso nunca aparece.
+
+     Então pergunta-se pela PÁGINA, com um HEAD: vêm só os cabeçalhos e
+     nenhum byte do arquivo de um mega. A etiqueta que o servidor manda
+     muda quando o arquivo muda, e é ela que é comparada.
+
+     Isto fica FORA do registro do service worker de propósito: lá
+     dentro, ele deixava de existir em todo navegador onde o registro
+     falha — e aí o app nunca mais descobre que envelheceu. */
+  let versaoMarca=null;
+  /* Guardados à vista de propósito. Sem isto, quando o aviso não
+     aparece não há como saber se o que falhou foi a etiqueta, a
+     comparação, o gatilho ou a tela — e foi exatamente o que me custou
+     meia hora na primeira versão disto. */
+  window.__versao={olhadas:0,marca:null,baseline:null};
+  function olhaVersaoPagina(){
+   window.__versao.olhadas++;
+   fetch('./index.html',{method:'HEAD',cache:'no-store'}).then(function(r){
+    const marca=r.headers.get('etag')||r.headers.get('last-modified');
+    if(!marca)return;
+    window.__versao.marca=marca;
+    if(versaoMarca===null){versaoMarca=marca;window.__versao.baseline=marca;return}
+    if(marca!==versaoMarca)mostraAtualizacao(null);
+   }).catch(function(){});
+  }
+  olhaVersaoPagina();
+  /* Relógio em vez de gatilho de visibilidade. O gatilho parecia mais
+     econômico e é mais frágil: depende de o sistema mandar o evento, e
+     num app instalado que fica horas na frente ele simplesmente não
+     acontece. O relógio tiquetaqueia do mesmo jeito, e o navegador já
+     segura o intervalo sozinho quando a aba está escondida. */
+  setInterval(olhaVersaoPagina,300000);
   window.mostraAtualizacao=function(reg){
    if(document.querySelector('#avisoVersao'))return;
    const el=document.createElement('div');
@@ -15616,7 +15652,9 @@ if('serviceWorker' in navigator){
    document.body.appendChild(el);
    el.querySelector('#btVersao').onclick=function(){
     lsFlush();
-    if(reg.waiting)reg.waiting.postMessage('assumir');else location.reload();
+    /* Sem service worker esperando — caso em que só a página mudou — é
+       recarregar mesmo. O reg vem nulo nessa chamada. */
+    if(reg&&reg.waiting)reg.waiting.postMessage('assumir');else location.reload();
    };
    el.querySelector('#btVersaoNao').onclick=function(){el.remove()};
   };
