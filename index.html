@@ -48,17 +48,131 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <style>
-/* Reset mínimo. O resto do estilo está no bloco principal, dentro do corpo. */
-:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-body{margin:0;font:14px system-ui,-apple-system,"Segoe UI",sans-serif}
+/* Reset mínimo e a PRIMEIRA PINTURA. O resto do estilo está no bloco
+   principal, lá dentro do corpo — que o navegador só lê depois, e até lá
+   pintava branco. Aqui dizia color-scheme:light fixo, então abrir o app
+   à noite era um clarão branco na cara antes do tema escuro entrar. A cor
+   de fundo agora já vale no primeiro quadro, nos dois temas. */
+:root{
+  --boot-bg:#f6f3f8;--boot-ink:#2a2338;
+  color-scheme:light dark;
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--boot-bg:#0e0b16;--boot-ink:#f0ecf8}}
+/* O color-scheme precisa ser dito nos tres casos, e nao so no
+   automatico: quem escolheu "Claro" num celular que esta no escuro
+   ficaria com a tela do app clara e a moldura do navegador escura,
+   que e o que o light dark sozinho faz. */
+:root[data-theme="dark"]{--boot-bg:#0e0b16;--boot-ink:#f0ecf8;color-scheme:dark}
+:root[data-theme="light"]{--boot-bg:#f6f3f8;--boot-ink:#2a2338;color-scheme:light}
+html{background:var(--boot-bg)}
+body{margin:0;font:14px system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--boot-bg)}
 img{max-width:100%}
 [hidden]{display:none!important}
+
+/* A tela de abertura. Cobre tudo até o app desenhar e sai em 220 ms.
+   Ela existe por dois motivos: a abertura deixa de ser um branco vazio
+   com a letra trocando no meio, e — com disfarce ligado — o primeiro
+   quadro já é o do outro app, em vez do sol e da palavra Norte. */
+#abre{position:fixed;inset:0;z-index:97;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:13px;background:var(--boot-bg);
+  transition:opacity .22s ease}
+#abre.sai{opacity:0;pointer-events:none}
+#abre img{width:74px;height:74px;animation:abreEnt .5s cubic-bezier(.2,.8,.25,1) both}
+#abre b{font:600 17px/1.2 system-ui,-apple-system,"Segoe UI",sans-serif;
+  color:var(--boot-ink);opacity:.88;animation:abreEnt .5s .07s cubic-bezier(.2,.8,.25,1) both}
+@keyframes abreEnt{from{opacity:0;transform:translateY(7px) scale(.96)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){#abre,#abre img,#abre b{animation:none;transition:none}}
 </style>
+<script>
+/* =====================================================================
+   IDENTIDADE, ANTES DE QUALQUER COISA APARECER
+
+   Este bloco existe por causa de um buraco no disfarce: o título, o
+   ícone e a descrição que estão escritos no topo deste arquivo dizem
+   "Norte" e só eram trocados lá no fim, quando o script grande rodava.
+   Num celular devagar isso é uma janela de segundos em que a aba diz
+   Norte, o ícone é o sol e a descrição conta o que o app é — com o
+   disfarce ligado.
+
+   A tabela mora aqui, e não lá embaixo, porque precisa valer antes. O
+   script grande lê ESTA tabela para montar DISFARCES, então as duas
+   pontas não têm como divergir.
+   ===================================================================== */
+window.NORTE_ID={
+ '':     {app:'Norte',ic:'./icone-192.png',ic2:'./icone-512.png',gr:'512x512',
+          barra:'#123c53',fundo:'#0e0b16',cat:['health','fitness','lifestyle'],
+          desc:'Treino, alimentação, voz e pele organizados dia a dia, o ano inteiro.'},
+ notas:  {app:'Notas',ic:'./icone-notas-192.png',ic2:'./icone-notas-384.png',gr:'384x384',
+          barra:'#f2b42a',fundo:'#faf7ef',cat:['productivity','utilities'],
+          desc:'Bloco de recados. Escreva, guarde e apague nota rápida.'},
+ calc:   {app:'Calculadora',ic:'./icone-calc-192.png',ic2:'./icone-calc-384.png',gr:'384x384',
+          barra:'#2e3440',fundo:'#20242e',cat:['utilities'],
+          desc:'Calculadora simples, para as contas do dia.'},
+ lista:  {app:'Lista',ic:'./icone-lista-192.png',ic2:'./icone-lista-384.png',gr:'384x384',
+          barra:'#20965c',fundo:'#f2faf6',cat:['shopping','productivity'],
+          desc:'Lista de compras. Marque o que já pegou.'}
+};
+(function(){
+ var d=NORTE_ID[''],tema='auto';
+ try{
+  var r=localStorage.getItem('rotatrans.v3');
+  if(r){
+   var o=JSON.parse(r);
+   if(o&&o.perfil&&NORTE_ID[o.perfil.disfarce||''])d=NORTE_ID[o.perfil.disfarce||''];
+   if(o&&o.ui&&(o.ui.tema==='light'||o.ui.tema==='dark'))tema=o.ui.tema;
+  }
+ }catch(e){}
+ /* O tema escolhido também entra agora, pelo mesmo motivo: aplicaTema()
+    só roda no fim, e quem pôs "Claro" num celular no escuro via a tela
+    escura primeiro. */
+ if(tema!=='auto')document.documentElement.setAttribute('data-theme',tema);
+ var disf=d!==NORTE_ID[''];
+ document.title=d.app;
+ var p=function(s){return document.querySelector(s)};
+ var el;
+ if((el=p('link[rel="icon"]')))el.href=d.ic;
+ if((el=p('link[rel="apple-touch-icon"]')))el.href=d.ic;
+ if((el=p('meta[name="apple-mobile-web-app-title"]')))el.content=d.app;
+ if((el=p('meta[name="description"]')))el.content=d.desc;
+ document.querySelectorAll('meta[name="theme-color"]').forEach(function(m){m.content=d.barra});
+ if(disf)document.documentElement.style.background=d.fundo;
+ window.NORTE_IDENT={app:d.app,ic:d.ic,fundo:d.fundo,disf:disf};
+ /* Rede de segurança: se o script grande quebrar, a abertura some
+    sozinha. Tela de carregamento presa para sempre é pior que app
+    quebrado à vista. */
+ setTimeout(function(){
+  var a=document.getElementById('abre');
+  if(a){a.classList.add('sai');setTimeout(function(){if(a.parentNode)a.remove()},400)}
+ },6000);
+})();
+</script>
 </head>
 <body>
+<div id="abre" role="status" aria-label="Abrindo"><img alt="" width="74" height="74"><b></b></div>
+<!-- Quem abrir sem JavaScript nao tem app nenhum, mas tambem nao pode
+     ficar olhando uma tela de carregamento que nunca sai. -->
+<noscript><style>#abre{display:none}</style></noscript>
+<script>
+/* Preenche a abertura com a identidade que o bloco do topo resolveu.
+   Fica aqui, colado no elemento, para o primeiro quadro já sair com o
+   nome e o ícone certos — com disfarce, os do outro app. */
+(function(){
+ var d=window.NORTE_IDENT,a=document.getElementById('abre');
+ if(!d||!a)return;
+ a.querySelector('img').src=d.ic;
+ a.querySelector('b').textContent=d.app;
+ if(d.disf)a.style.background=d.fundo;
+ a.setAttribute('aria-label','Abrindo '+d.app);
+})();
+</script>
 <a class="pular" href="#main">Pular para o conteúdo</a>
+<!-- A caixa rola e o cartão se centraliza com margin:auto, e não com
+     align-items. É o que segura o caso do teclado aberto num celular
+     baixo: centralizado pelo flex, um cartão mais alto que o espaço
+     fica cortado em cima e não há como alcançar o que ficou de fora. -->
 <div id="trava" hidden style="position:fixed;inset:0;z-index:90;background:var(--bg);
- display:flex;align-items:center;justify-content:center;padding:var(--gl)"></div>
+ display:flex;overflow:auto;-webkit-overflow-scrolling:touch;
+ padding:calc(var(--gl) + 8px) var(--gl)"></div>
 <style>
 /* Layout: app shell mobile-first — painel do dia no topo com a faixa da bandeira,
    conteúdo rolável, barra de abas fixa. Azul e rosa da bandeira como as duas cores
@@ -212,7 +326,12 @@ html{scroll-behavior:smooth}
 .anim>*:nth-child(4){animation-delay:.12s}.anim>*:nth-child(n+5){animation-delay:.16s}
 
 /* faixa da bandeira — azul, rosa, branco, rosa, azul */
+ /* O contorno não é enfeite: a faixa do meio da bandeira é branca, e em
+    cima de cartão branco ela sumia — a bandeira aparecia como duas
+    barras soltas com um buraco no meio. Com o contorno, a faixa branca
+    existe nos dois temas. */
 .flagbar{height:5px;width:100%;border-radius:999px;
+  box-shadow:inset 0 0 0 1px rgba(90,70,120,.16);
   background:linear-gradient(90deg,var(--flag-blue) 0 20%,var(--flag-pink) 20% 40%,
    var(--flag-white) 40% 60%,var(--flag-pink) 60% 80%,var(--flag-blue) 80% 100%)}
 
@@ -300,6 +419,32 @@ html{scroll-behavior:smooth}
 .g3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--s2)}
 .gauto{display:grid;grid-template-columns:repeat(auto-fit,minmax(102px,1fr));gap:var(--s2)}
 hr.sep{border:0;border-top:1px solid var(--line);margin:var(--s3) 0}
+/* O campo da trava. O espaçamento largo faz os pontos lerem como dígitos
+   separados, que é o que se quer enquanto se digita — mas no texto de
+   dica ele virava "s e n h a", e isso parecia defeito. Então o
+   espaçamento vale no que foi digitado e não na dica. */
+#senhaIn::placeholder{letter-spacing:normal;opacity:.45}
+/* Alvo de toque na trava. Medido no celular: os botões fantasma saíam
+   com 36 px de altura e os pequenos com 42, contra os 44 que o dedo
+   pede. São justamente "Esqueci a senha", "Voltar" e "Não lembro a
+   resposta" — os botões de quem está nervosa, trancada para fora do
+   próprio app, mirando com o polegar. A altura mínima vale só aqui
+   dentro, que é a parte que foi medida; o tamanho do texto não muda. */
+#trava .btn{min-height:44px}
+/* Senha errada treme. A frase de erro sozinha é fácil de não ver: ela
+   aparece onde já havia um espaço vazio reservado, e quem está com
+   pressa de entrar olha para o campo, não para a linha abaixo dele. */
+@keyframes travaNao{
+  10%,90%{transform:translateX(-3px)}
+  30%,70%{transform:translateX(5px)}
+  50%{transform:translateX(-5px)}}
+#trava .card.nao{animation:travaNao .42s cubic-bezier(.36,.07,.19,.97)}
+/* A tela da pergunta entra com um respiro em vez de trocar seco: ela
+   substitui a tela da senha no mesmo lugar, e sem isso parece que a
+   tela piscou em vez de ter virado outra coisa. */
+@keyframes pergEnt{from{opacity:0;transform:translateY(8px) scale(.985)}to{opacity:1;transform:none}}
+#trava .card.perg{animation:pergEnt .3s cubic-bezier(.2,.8,.25,1) both}
+@media (prefers-reduced-motion:reduce){#trava .card.nao,#trava .card.perg{animation:none}}
 
 /* ---------- botões ---------- */
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;background:var(--area);
@@ -365,7 +510,14 @@ button.tag:active{transform:scale(.96)}
 /* o rótulo do campo fica em caixa baixa de propósito: o título do grupo
    acima dele já é maiúsculo, e dois níveis de maiúscula apagam a hierarquia */
 label.fld{display:flex;flex-direction:column;gap:5px;font-size:12px;font-weight:600;color:var(--ink-2);min-width:0}
-input[type=text],input[type=number],input[type=date],input[type=time],select,textarea{
+/* password estava fora desta lista, e com isso TODO campo de senha do
+   app — o da trava e os tres da folha de por senha — saia com o
+   desenho cru do navegador: borda cinza de relevo, canto quadrado,
+   sem cor de foco e sem tema. No escuro era uma caixa branca no meio
+   da folha escura. Pior ainda: 'Mostrar o que eu digitei' troca o
+   type para text, e o campo mudava de forma no meio do uso. */
+input[type=text],input[type=password],input[type=number],input[type=date],
+input[type=time],select,textarea{
   background:var(--surface-2);border:1px solid var(--line);border-radius:var(--r-s);padding:11px 12px;
   font-size:14px;width:100%;font-family:var(--f-b);font-weight:500;color:var(--ink);
   transition:border-color .16s,background .16s,box-shadow .16s}
@@ -3535,6 +3687,7 @@ const DEF={
    lembretes:['09:00','11:00','14:00','16:30','19:00','21:00'],ocultar:[],alarmes:[],
    viuOcultar:false,disfarce:'',diaCheio:false,avisosOff:[],nivel:'zero',limites:[],higMin:[],
    corpoMeta:'',rampa:false,contador:'mes',hormAndro:'',pronome:'',identidade:'',senha:'',
+   pergunta:'',resposta:'',
    restricoes:[],alergias:[],semIng:[],ta:{}},
  dias:{},pesos:[],medidas:[],cargas:{},despensa:[],fotos:[],compras:[],recentes:[],favs:[],vozLog:[],
  salvos:[],trocas:{},ficha:{},externo:{ativo:false,fonte:'',treino:{},dieta:[]},th:{freq:14,hist:[]},
@@ -3692,6 +3845,15 @@ function normalizaTudo(){
  S.ui.dobras=Array.isArray(S.ui.dobras)?S.ui.dobras:[];
  S.exames=Array.isArray(S.exames)?S.exames.filter(x=>x&&x.id&&x.n&&x.v):[];
  if(typeof p.senha!=='string')p.senha='';
+ /* A pergunta de recuperação vem do mesmo lugar que todo o resto —
+    arquivo de backup, versão antiga, navegador — então chega conferida.
+    Uma sem a outra não serve para nada: pergunta sem resposta não abre,
+    resposta sem pergunta não tem o que ser perguntado. Então ou as duas
+    existem, ou nenhuma. */
+ if(typeof p.pergunta!=='string')p.pergunta='';
+ if(typeof p.resposta!=='string')p.resposta='';
+ p.pergunta=p.pergunta.trim().slice(0,90);
+ if(!p.pergunta||!p.resposta){p.pergunta='';p.resposta=''}
  /* Agenda e hábitos: formato conferido um a um, porque vêm de backup e
     de versão antiga, onde simplesmente não existiam. */
  S.agenda=(S.agenda&&typeof S.agenda==='object'&&!Array.isArray(S.agenda))?S.agenda:{};
@@ -4784,19 +4946,21 @@ function streak(){
 /* Cada disfarce é um app inteiro: nome, ícone, cor e uma tela que
    funciona de verdade. Trocar só o nome não disfarça nada — o ícone é a
    primeira coisa que alguém vê, e uma tela morta entrega na hora. */
+/* Nome, ícone, cor e descrição de cada disfarce vêm de NORTE_ID, a
+   tabela que está no topo da página. Ela mora lá porque precisa valer
+   ANTES desta parte do arquivo ser lida — até aqui, a aba dizia Norte
+   mesmo com disfarce ligado. Uma tabela só: as duas pontas não têm como
+   discordar. O que fica aqui é o que só esta tela usa. */
 const DISFARCES=[
- {id:'',n:'Norte, sem disfarce',app:'Norte',ic:'./icone-192.png',ic2:'./icone-512.png',gr:'512x512',
-  barra:'#123c53',fundo:'#0e0b16',d:'O app aparece como ele é.'},
- {id:'notas',n:'Bloco de notas',app:'Notas',ic:'./icone-notas-192.png',ic2:'./icone-notas-384.png',gr:'384x384',
-  barra:'#f2b42a',fundo:'#faf7ef',
-  d:'Abre num bloco de recados que escreve e guarda nota de verdade.'},
- {id:'calc',n:'Calculadora',app:'Calculadora',ic:'./icone-calc-192.png',ic2:'./icone-calc-384.png',gr:'384x384',
-  barra:'#2e3440',fundo:'#20242e',
+ Object.assign({id:'',n:'Norte, sem disfarce',
+  d:'O app aparece como ele é.'},NORTE_ID['']),
+ Object.assign({id:'notas',n:'Bloco de notas',
+  d:'Abre num bloco de recados que escreve e guarda nota de verdade.'},NORTE_ID.notas),
+ Object.assign({id:'calc',n:'Calculadora',
   d:'Abre numa calculadora que faz conta de verdade. Aqui a senha precisa ser só de números: é o que o teclado dela digita.',
-  soNumero:true},
- {id:'lista',n:'Lista de compras',app:'Lista',ic:'./icone-lista-192.png',ic2:'./icone-lista-384.png',gr:'384x384',
-  barra:'#20965c',fundo:'#f2faf6',
-  d:'Abre numa lista de compras que marca e guarda item de verdade.'}
+  soNumero:true},NORTE_ID.calc),
+ Object.assign({id:'lista',n:'Lista de compras',
+  d:'Abre numa lista de compras que marca e guarda item de verdade.'},NORTE_ID.lista)
 ];
 function disfarceDe(id){return DISFARCES.find(function(x){return x.id===(id||'')})||DISFARCES[0]}
 function disfarceAtual(){return disfarceDe(S.perfil.disfarce)}
@@ -8834,7 +8998,59 @@ function disfData(){
  return S.disf;
 }
 function senhaBate(t){return temSenha()&&hashSenha(String(t||'').trim())===S.perfil.senha}
-function sairDoDisfarce(){
+/* =====================================================================
+   PERGUNTA DE RECUPERAÇÃO
+   A pergunta é escrita pela pessoa — "qual o nome do seu primeiro
+   bicho?", "qual o filme que eu vejo quando estou mal?" — e a resposta
+   também. Ela não aparece no caminho normal: quem lembra a senha digita
+   a senha e pronto. Ela existe atrás do "Esqueci a senha", que até
+   agora era uma tela dizendo que não havia o que fazer.
+
+   O QUE ISSO CUSTA, e está escrito na tela onde a pessoa escolhe:
+   a partir do momento em que a pergunta existe, a tranca vale o que
+   valer a MAIS FRACA das duas portas. Quem souber a resposta entra sem
+   a senha. E pergunta pessoal é fraca justamente contra quem mora com
+   você — que costuma ser de quem este app precisa esconder. Por isso a
+   tela pede uma pergunta que só a pessoa saiba responder, e não uma que
+   a família inteira saiba.
+
+   A resposta é guardada embaralhada, como a senha. A pergunta fica em
+   texto puro, porque ela precisa aparecer na tela para ser respondida.
+   ===================================================================== */
+function temPergunta(){return !!(S.perfil.pergunta&&S.perfil.resposta)}
+/* Confere com folga: minúscula, sem acento, sem espaço sobrando.
+   "Bidu", "bidu " e "Bidú" têm de abrir igual — quem está tentando
+   lembrar não vai acertar a maiúscula de primeira, e errar por causa
+   disso seria perder tudo por um detalhe de digitação. Não passa pelo
+   nrm() de propósito: aquele guarda o que normaliza num cache de 4000
+   itens, e a resposta não tem por que ficar passeando por cache. */
+function normResposta(t){
+ return String(t||'').toLowerCase().normalize('NFD')
+  .replace(/[̀-ͯ]/g,'').replace(/\s+/g,' ').trim();
+}
+function respostaBate(t){
+ const v=normResposta(t);
+ return !!(v&&temPergunta()&&hashSenha(v)===S.perfil.resposta);
+}
+/* Entrar pela pergunta não devolve a senha: ela continua valendo e
+   continua esquecida. Quem sair daqui sem pôr outra bate na mesma porta
+   amanhã, e aí a pergunta vai parecer quebrada quando o quebrado era o
+   caminho. Por isso a folha vem junto — e dá para recusar, porque
+   obrigar alguém a escolher senha no momento em que acabou de se ver
+   trancada para fora é o pior momento possível. */
+function avisoSenhaNova(){
+ sheet('Você entrou pela pergunta',
+  '<p class="tiny muted" style="line-height:1.7">A senha antiga continua valendo, e continua '+
+  'esquecida. Ponha uma nova agora, senão amanhã você bate na mesma porta.</p>'+
+  '<p class="xtiny muted" style="line-height:1.65;margin-top:10px">A pergunta continua guardada '+
+  'do mesmo jeito. Dá para trocar as duas no Perfil, em Privacidade.</p>'+
+  '<button class="btn acc bl" style="margin-top:14px" data-a="senha-por">'+ic('check')+
+  ' Pôr uma senha nova</button>'+
+  '<button class="btn gh bl sm" style="margin-top:8px" data-a="close">Agora não</button>',
+  'Fica só neste aparelho');
+}
+/* porResposta: entrou respondendo a pergunta, e não com a senha. */
+function sairDoDisfarce(porResposta){
  destravado=true;
  const el=$('#disfarce');if(el){el.hidden=true;el.innerHTML=''}
  document.body.style.overflow='';
@@ -8844,6 +9060,7 @@ function sairDoDisfarce(){
  });
  aplicaIdentidade();
  render();
+ if(porResposta)avisoSenhaNova();
 }
 /* Volta a ser o outro app. Um toque, de qualquer lugar. */
 function entrarNoDisfarce(){
@@ -8862,7 +9079,17 @@ const DISF_CSS=
  'padding:16px 18px;font-size:21px;font-weight:700}'+
  '#disfarce .dcampo{width:100%;border:0;outline:0;font-size:16px;padding:14px;border-radius:12px}'+
  '#disfarce .dbt{border:0;cursor:pointer;font-size:16px;border-radius:12px;padding:14px}'+
- '#disfarce ul{list-style:none;margin:0;padding:0}';
+ '#disfarce ul{list-style:none;margin:0;padding:0}'+
+ /* A barra de rolagem também entrega. O app pinta '*' com a cor dele
+    (polegar roxo de --line-2, borda na cor --bg quase preta), e o '*'
+    alcança esta camada: a lista de notas, que é creme, aparecia com
+    barra roxa de borda preta. Cinza translúcido não é de app nenhum e
+    serve nos três, nos claros e no escuro. */
+ '#disfarce,#disfarce *{scrollbar-width:thin;scrollbar-color:rgba(130,130,140,.5) transparent}'+
+ '#disfarce::-webkit-scrollbar,#disfarce *::-webkit-scrollbar{width:9px;height:9px}'+
+ '#disfarce::-webkit-scrollbar-track,#disfarce *::-webkit-scrollbar-track{background:transparent}'+
+ '#disfarce::-webkit-scrollbar-thumb,#disfarce *::-webkit-scrollbar-thumb{'+
+  'background:rgba(130,130,140,.5);border-radius:999px;border:0}';
 
 function telaDisfarce(){
  const box=$('#disfarce');
@@ -8981,7 +9208,11 @@ function ligaDisfarce(id){
  const salvarNota=function(){
   const i=$('#dNotaIn');if(!i)return;
   const t=i.value.trim();if(!t)return;
+  /* O campo aceita a senha E a resposta da pergunta. Não dá para ter um
+     "esqueci a senha" aqui: o disfarce depende de não existir nada na
+     tela sugerindo que há senha. Então a porta de trás é a mesma porta. */
   if(senhaBate(t)){i.value='';return sairDoDisfarce()}
+  if(respostaBate(t)){i.value='';return sairDoDisfarce(true)}
   disfData().notas.unshift({t:t.slice(0,2000),d:new Date().toLocaleDateString('pt-BR')});
   i.value='';save('base');telaDisfarce();
  };
@@ -8989,6 +9220,7 @@ function ligaDisfarce(id){
   const i=$('#dListaIn');if(!i)return;
   const t=i.value.trim();if(!t)return;
   if(senhaBate(t)){i.value='';return sairDoDisfarce()}
+  if(respostaBate(t)){i.value='';return sairDoDisfarce(true)}
   disfData().lista.push({t:t.slice(0,120),ok:false});
   i.value='';save('base');telaDisfarce();
  };
@@ -9022,6 +9254,10 @@ function ligaDisfarce(id){
      /* É aqui que a senha entra: digitada no visor, confere antes de
         tentar virar conta. */
      if(senhaBate(txt)){txt='0';mostra();return sairDoDisfarce()}
+     /* A resposta da pergunta também abre aqui. Numa calculadora ela só
+        serve se for de números — e a tela que escolhe o disfarce já
+        avisa disso para a senha; vale igual para a resposta. */
+     if(respostaBate(txt)){txt='0';mostra();return sairDoDisfarce(true)}
      try{
       const conta=txt.replace(/÷/g,'/').replace(/×/g,'*').replace(/−/g,'-').replace(/%/g,'/100');
       if(!/^[0-9+\-*/.() ]+$/.test(conta))throw 0;
@@ -9094,12 +9330,30 @@ function aplicaIdentidade(){
  const apple=$('link[rel="apple-touch-icon"]'); if(apple)apple.href=d.ic;
  const mt=document.querySelector('meta[name="apple-mobile-web-app-title"]');
  if(mt)mt.content=nome;
+ /* A descrição conta junto com o nome. Ela é o que aparece na lista de
+    abas, no histórico, na prévia quando alguém manda o link e na caixa
+    de "adicionar à tela inicial" — adiantava pouco a aba dizer
+    Calculadora e a linha de baixo continuar contando o que o app é. */
+ const md=document.querySelector('meta[name="description"]');
+ if(md)md.content=d.desc;
  document.querySelectorAll('meta[name="theme-color"]').forEach(function(m){m.content=d.barra});
+ /* Com disfarce, o fundo da página também é o do outro app: puxar a
+    tela para baixo até ela esticar mostrava a cor do Norte na beirada. */
+ document.documentElement.style.background=d.id?d.fundo:'';
  try{
   const mf=$('link[rel="manifest"]');
   if(mf){
-   const j={name:nome,short_name:nome,lang:'pt-BR',start_url:'./index.html',scope:'./',
-    display:'standalone',orientation:'portrait',background_color:d.fundo,theme_color:d.barra,
+   /* A cor da tela de abertura do app instalado segue o tema quando não
+      há disfarce. Era fixa em escuro: quem usa no claro via um quadro
+      preto antes da primeira tela, toda vez. Com disfarce, é a cor do
+      outro app, que não tem tema. */
+   const escuro=window.matchMedia&&matchMedia('(prefers-color-scheme:dark)').matches;
+   const tm=S.ui.tema;
+   const fundoNorte=(tm==='dark'||(tm!=='light'&&escuro))?'#0e0b16':'#f6f3f8';
+   const j={name:nome,short_name:nome,description:d.desc,categories:d.cat,
+    lang:'pt-BR',dir:'ltr',start_url:'./index.html',scope:'./',
+    display:'standalone',orientation:'portrait',
+    background_color:d.id?d.fundo:fundoNorte,theme_color:d.barra,
     /* Sem 'maskable': o ícone é um objeto recortado sobre
        transparência, e maskable promete ao sistema que dá para cortar
        em qualquer formato sem estragar. Daria: os raios do sol sairiam
@@ -9108,6 +9362,19 @@ function aplicaIdentidade(){
        sobre o fundo dele, que é como ícone recortado deve ser usado. */
     icons:[{src:d.ic,sizes:'192x192',type:'image/png',purpose:'any'},
      {src:d.ic2,sizes:d.gr,type:'image/png',purpose:'any'}]};
+   /* Os atalhos do Norte só existem sem disfarce. Segurar o dedo no
+      ícone de uma calculadora e o celular oferecer "Treino de hoje" e
+      "Diário de comida" derruba o disfarce inteiro — e é o que o
+      arquivo de manifesto fixo oferece, porque ele não sabe de nada. */
+   if(!d.id)j.shortcuts=[
+    {name:'Treino de hoje',short_name:'Treino',url:'./index.html#treino'},
+    {name:'Diário de comida',short_name:'Comida',url:'./index.html#nutri'}];
+   /* Guardado para poder ser conferido. O manifesto vira uma URL blob,
+      e a politica de seguranca desta pagina nao deixa buscar blob —
+      entao, sem isto, nao existe jeito de ver o que o app esta
+      declarando sobre si mesmo. Numa funcao cujo trabalho e disfarcar,
+      poder conferir o que saiu importa. */
+   aplicaIdentidade._json=j;
    if(aplicaIdentidade._url)URL.revokeObjectURL(aplicaIdentidade._url);
    aplicaIdentidade._url=URL.createObjectURL(new Blob([JSON.stringify(j)],{type:'application/manifest+json'}));
    mf.href=aplicaIdentidade._url;
@@ -9143,23 +9410,269 @@ function telaSenha(){
   if(precisaDestravar()){el2.setAttribute('inert','');el2.setAttribute('aria-hidden','true')}
   else{el2.removeAttribute('inert');el2.removeAttribute('aria-hidden')}
  });
- if(!precisaDestravar()){document.body.style.overflow='';return}
+ if(!precisaDestravar()){
+  document.body.style.overflow='';
+  travaAltura();
+  return;
+ }
  document.body.style.overflow='hidden';
+ /* A tela é o ícone, o nome e um campo — a cara de um app abrindo, e
+    não a de um formulário. O que mudou e por quê:
+
+    O ícone entrou no lugar da bandeira. A faixa da bandeira tem o meio
+    branco, e em cima do cartão branco ela aparecia como duas barras
+    soltas com um buraco no meio; o contorno conserta isso em todo o
+    app, mas aqui o ícone diz melhor qual app está abrindo.
+
+    O "como fazer" era um botão no meio de uma frase de três linhas, e
+    quebrava a linha onde calhasse. Virou uma linha própria.
+
+    A caixa do erro tem altura fixa: sem isso o cartão pulava para baixo
+    quando a senha errava, bem na hora em que a pessoa vai digitar de
+    novo. */
  box.innerHTML=
-  '<div class="card" style="max-width:340px;width:100%">'+
-   '<div class="flagbar" style="margin-bottom:15px"></div>'+
-   chTtl('check',nomeDoApp())+
-   '<p class="tiny muted" style="line-height:1.65">Digite sua senha para abrir.</p>'+
-   '<input type="password" inputmode="numeric" id="senhaIn" placeholder="senha" '+
-    'autocomplete="off" style="margin-top:12px;text-align:center;font-size:19px;letter-spacing:.3em">'+
-   '<div id="senhaErro" class="tiny" style="color:var(--bad);margin-top:8px;min-height:18px"></div>'+
-   '<button class="btn acc bl" style="margin-top:4px" data-a="destravar">Abrir</button>'+
-   '<p class="xtiny muted" style="margin-top:13px;line-height:1.6">Esqueceu? Não dá para recuperar, '+
-   'porque não existe servidor para pedir. Dá para apagar tudo e começar de novo, '+
-   'e isso apaga mesmo — <button class="btn gh xs" data-a="senha-esqueci">como fazer</button></p>'+
+  '<div class="card" style="max-width:330px;width:100%;margin:auto;text-align:center">'+
+   '<img src="'+esc(disfarceAtual().ic)+'" alt="" width="66" height="66" '+
+    'style="display:block;margin:2px auto 11px">'+
+   '<h2 style="margin:0;font:800 21px/1.2 var(--f-d);letter-spacing:-.02em;color:var(--ink)">'+
+    esc(nomeDoApp())+'</h2>'+
+   '<p class="tiny muted" style="margin:7px 0 0;line-height:1.6">Digite sua senha para abrir.</p>'+
+   '<input type="password" inputmode="numeric" enterkeyhint="go" id="senhaIn" '+
+    'placeholder="senha" autocomplete="off" aria-label="Senha" aria-describedby="senhaErro" '+
+    'style="margin-top:15px;text-align:center;font-size:21px;letter-spacing:.34em;padding:14px 12px">'+
+   '<div id="senhaErro" class="xtiny" role="alert" '+
+    'style="color:var(--bad);margin-top:7px;min-height:17px;line-height:1.4"></div>'+
+   '<button class="btn acc bl" data-a="destravar">Abrir</button>'+
+   /* Os dois de baixo não ocupam a linha inteira. Três botões da mesma
+      largura empilhados leem como três caminhos de igual peso, e aqui
+      só existe um: abrir. Mesmo cuidado da folha de pôr senha — em
+      teclado de celular, campo cego erra muito —, mas em tamanho de
+      coadjuvante. Começa escondido, porque esta tela pode estar sendo
+      vista por outra pessoa, que é a razão de ela existir. */
+   '<button class="btn gh sm" id="travaVer" data-a="senha-ver-trava" '+
+    'style="margin-top:9px">'+ic('face')+' Mostrar o que eu digitei</button>'+
+   '<hr class="sep">'+
+   '<button class="btn gh xs" data-a="senha-esqueci">Esqueci a senha</button>'+
+   /* A frase de baixo tem de seguir a verdade do aparelho. Com pergunta
+      guardada, "não existe para onde pedir de volta" vira mentira dita
+      bem em cima do botão que leva ao caminho de volta. */
+   '<p class="xtiny muted" style="margin:9px 0 0;line-height:1.6">'+
+   (temPergunta()
+    ?'Você guardou uma pergunta para este caso.'
+    :'Não existe servidor para pedir de volta.')+'</p>'+
   '</div>';
+ travaAltura();
  const i=$('#senhaIn');
- if(i){i.focus();i.addEventListener('keydown',function(e){if(e.key==='Enter')tentarDestravar()});}
+ if(i){
+  i.focus();
+  i.addEventListener('keydown',function(e){if(e.key==='Enter')tentarDestravar()});
+  /* "Senha errada." ficava na tela enquanto a pessoa digitava a
+     próxima: ela corrigia e o app continuava dizendo que estava
+     errado. O aviso é da tentativa que passou, e sai na primeira
+     tecla da seguinte. */
+  i.addEventListener('input',function(){
+   const e2=$('#senhaErro');
+   if(e2&&e2.textContent)e2.textContent='';
+  });
+  /* O teclado sobe depois do foco, e só então dá para saber quanto
+     sobrou de tela. Um quadro depois, o campo volta para o meio do que
+     restou. */
+  i.addEventListener('focus',function(){setTimeout(function(){
+   travaAltura();
+   try{i.scrollIntoView({block:'center'})}catch(e2){}
+  },320)});
+ }
+}
+/* O teclado do celular não encolhe a página: ele sobe por cima dela. Com
+   a trava presa em inset:0, o cartão era centralizado na altura INTEIRA
+   — e num aparelho baixo o campo e o botão Abrir ficavam atrás do
+   teclado, com a pessoa digitando sem ver o que digitava e sem alcançar
+   o Abrir. Aqui a trava passa a ter a altura do que está mesmo visível. */
+function travaAltura(){
+ const box=$('#trava');
+ if(!box)return;
+ const vv=window.visualViewport;
+ if(box.hidden||!vv){
+  /* O repouso é 0px escrito, e não ''. O atributo da trava diz inset:0,
+     mas o navegador expande esse atalho em top/right/bottom/left assim
+     que qualquer uma delas é mexida — e aí limpar o top com '' APAGA o
+     top:0 em vez de devolvê-lo. A trava soltava do alto da página e
+     ficava do tamanho do conteúdo, no meio da tela. */
+  box.style.top='0px';box.style.height='';
+  return;
+ }
+ box.style.height=vv.height+'px';
+ box.style.top=vv.offsetTop+'px';
+}
+if(window.visualViewport){
+ visualViewport.addEventListener('resize',travaAltura);
+ visualViewport.addEventListener('scroll',travaAltura);
+}
+/* Apagar de verdade, e num lugar só: o Perfil e a trava chamam daqui.
+   Faltava jogar fora os caches do service worker. Entre eles está o
+   norte-midia, que guarda até 220 miniaturas do YouTube — ou seja, a
+   lista do que a pessoa andou olhando em maquiagem, voz e treino. A
+   tela de "Apagado" dizia que não sobrou nada deste app no aparelho, e
+   sobrava justamente isso. */
+function apagarTudoAgora(){
+ /* Gravar é adiado para o intervalo ocioso. Sem cancelar o que está
+    pendente, uma gravação atrasada escreveria o estado de volta logo
+    depois de apagar — e a tela diria "apagado" por cima de dados que
+    continuariam lá. */
+ lsPendente=false;clearTimeout(lsTimer);
+ try{localStorage.removeItem(LS);localStorage.removeItem('rotaforte.v2')}catch(e){}
+ try{if(window.indexedDB&&indexedDB.deleteDatabase)indexedDB.deleteDatabase(FOTO_DB)}catch(e){}
+ try{
+  if(window.caches&&caches.keys)caches.keys().then(function(ns){
+   ns.forEach(function(n){if(n.indexOf('norte-')===0)caches.delete(n)});
+  });
+ }catch(e){}
+ closeSheet();
+ document.body.innerHTML='<div style="padding:40px 22px;text-align:center;font-family:inherit">'+
+  '<h1 style="font-size:19px;margin-bottom:10px">Apagado</h1>'+
+  '<p style="font-size:14px;line-height:1.6;color:#666">Não sobrou nada deste app neste aparelho. '+
+  'Recarregue a página se quiser começar do zero.</p></div>';
+}
+/* Sem pergunta guardada, "Esqueci a senha" não tem o que recuperar — mas
+   tem o que oferecer: recomeçar. Antes isto era uma folha, e folha tem
+   z-index 60 contra os 90 da trava: ela abria ATRÁS da trava e ninguém
+   nunca viu. */
+function telaEsqueci(){
+ const box=$('#trava');
+ if(!box)return;
+ box.innerHTML=
+  '<div class="card perg" style="max-width:330px;width:100%;margin:auto">'+
+   '<div class="lbl">Esqueci a senha</div>'+
+   '<p class="tiny" style="line-height:1.7;margin:9px 0 0">Não existe recuperação, porque não '+
+   'existe servidor: nada seu sai deste aparelho, então não há para onde mandar um link.</p>'+
+   '<p class="tiny muted" style="line-height:1.7;margin-top:10px">O que dá para fazer é apagar '+
+   'tudo e começar de novo. Se você exportou seus dados algum dia, dá para importar de volta '+
+   'depois de recomeçar.</p>'+
+   '<p class="xtiny muted" style="line-height:1.65;margin-top:10px">Da próxima vez dá para '+
+   'guardar uma pergunta de recuperação, no Perfil, em Privacidade — e aí esquecer a senha '+
+   'deixa de custar tudo.</p>'+
+   '<button class="btn gh bl sm" style="margin-top:13px;color:var(--bad)" data-a="esqueci-apagar">'+
+   'Apagar tudo e começar de novo</button>'+
+   '<hr class="sep">'+
+   '<button class="btn gh bl xs" data-a="volta-senha">Voltar para a senha</button>'+
+  '</div>';
+ travaAltura();
+}
+/* A confirmação é digitada, e não um toque. Este é o único botão do app
+   que destrói tudo sem volta, e ele fica numa tela que qualquer pessoa
+   com o aparelho na mão alcança sem saber senha nenhuma. Escrever a
+   palavra não impede ninguém decidido — nada impede, já dava para
+   apagar pelas configurações do navegador — mas impede o toque errado
+   de quem só queria sair dali. */
+function telaApagar(){
+ const box=$('#trava');
+ if(!box)return;
+ box.innerHTML=
+  '<div class="card perg" style="max-width:330px;width:100%;margin:auto">'+
+   '<div class="lbl" style="color:var(--bad)">Apagar tudo</div>'+
+   '<p class="tiny" style="line-height:1.7;margin:9px 0 0">Isto apaga <b>tudo</b> que está neste '+
+   'aparelho: perfil, treinos, cargas, comida, peso, medidas, higiene, ciclo, voz, anotações, '+
+   'exames e as fotos de evolução.</p>'+
+   '<p class="tiny" style="line-height:1.7;margin-top:10px;color:var(--bad);font-weight:600">'+
+   'Não existe backup em lugar nenhum e não dá para desfazer. Depois disto o app abre vazio, '+
+   'como no primeiro dia.</p>'+
+   '<label class="fld" style="margin-top:13px">Escreva APAGAR para confirmar'+
+   '<input type="text" id="apIn" autocomplete="off" '+
+   'style="text-align:center;letter-spacing:.1em;text-transform:uppercase"></label>'+
+   '<button class="btn bl rm" id="apOk" data-a="apagar-trava" disabled '+
+   'style="margin-top:12px;background:var(--bad);color:#fff;opacity:.45">'+
+   'Apagar tudo agora, sem volta</button>'+
+   '<hr class="sep">'+
+   '<button class="btn gh bl xs" data-a="volta-senha">Voltar</button>'+
+  '</div>';
+ travaAltura();
+ const i=$('#apIn');
+ if(!i)return;
+ const afere=function(){
+  const ok=i.value.trim().toUpperCase()==='APAGAR';
+  const b=$('#apOk');
+  if(b){b.disabled=!ok;b.style.opacity=ok?'':'.45'}
+ };
+ i.addEventListener('input',afere);
+ i.addEventListener('keydown',function(e){
+  if(e.key!=='Enter')return;
+  e.preventDefault();
+  const b=$('#apOk');
+  if(b&&!b.disabled)b.click();
+ });
+ i.focus();
+}
+/* Quantas vezes a resposta já errou nesta sessão. Mora fora da função
+   porque a tela é redesenhada a cada volta e a conta não pode zerar
+   junto. */
+let errosResposta=0;
+/* A tela da pergunta mora na mesma camada da trava e é alcançada pelo
+   "Esqueci a senha" — que, sem pergunta guardada, leva à tela que
+   explica que não há o que recuperar. */
+function telaPergunta(){
+ const box=$('#trava');
+ if(!box||!temPergunta())return;
+ box.innerHTML=
+  '<div class="card perg" style="max-width:330px;width:100%;margin:auto;text-align:center">'+
+   '<div class="lbl">Esqueci a senha</div>'+
+   '<p style="margin:10px 0 0;font:700 18px/1.4 var(--f-d);color:var(--ink);overflow-wrap:break-word">'+
+    esc(S.perfil.pergunta)+'</p>'+
+   '<input type="text" id="respIn" enterkeyhint="go" autocomplete="off" '+
+    'aria-label="Resposta" aria-describedby="respErro" '+
+    'style="margin-top:14px;text-align:center;font-size:17px;padding:13px 12px">'+
+   '<div id="respErro" class="xtiny" role="alert" '+
+    'style="color:var(--bad);margin-top:7px;min-height:17px;line-height:1.4"></div>'+
+   '<button class="btn acc bl" data-a="resp-ok">Entrar</button>'+
+   '<p class="xtiny muted" style="margin:10px 0 0;line-height:1.6">Maiúscula e acento não '+
+   'importam.</p>'+
+   '<hr class="sep">'+
+   '<button class="btn gh xs" data-a="volta-senha">Voltar para a senha</button>'+
+   /* O apagar tudo não está aqui desde o primeiro quadro de propósito:
+      é o botão que destrói tudo sem volta, e oferecê-lo antes de a
+      pessoa ter tentado é convidar para ele. Aparece depois de duas
+      respostas erradas, que é quando "não lembro mesmo" começa a ser
+      verdade em vez de dedo trocado. */
+   '<div id="travaUltimo"'+(errosResposta>=2?'':' hidden')+' style="margin-top:9px">'+
+    '<button class="btn gh xs" data-a="esqueci-apagar" style="color:var(--bad)">'+
+    'Não lembro a resposta</button></div>'+
+  '</div>';
+ travaAltura();
+ const i=$('#respIn');
+ if(i){
+  i.focus();
+  i.addEventListener('keydown',function(e){if(e.key==='Enter')tentarResposta()});
+  /* Mesmo caso da senha: o aviso é da tentativa que passou. */
+  i.addEventListener('input',function(){
+   const e2=$('#respErro');
+   if(e2&&e2.textContent)e2.textContent='';
+  });
+ }
+}
+function tentarResposta(){
+ const i=$('#respIn');if(!i)return;
+ if(respostaBate(i.value)){
+  i.value='';
+  destravado=true;
+  telaSenha();
+  render();
+  avisoSenhaNova();
+ }else{
+  const e=$('#respErro');if(e)e.textContent='Não é essa resposta.';
+  const c=$('#trava .card');
+  if(c){c.classList.remove('nao');void c.offsetWidth;c.classList.add('nao')}
+  errosResposta++;
+  if(errosResposta>=2){
+   const u=$('#travaUltimo');
+   if(u&&u.hidden){
+    u.hidden=false;
+    /* Revelar embaixo de um cartão que já não cabe é o mesmo que não
+       revelar: num aparelho baixo, ou com o teclado aberto, a saída
+       nasce fora da tela e ninguém sabe que ela apareceu. */
+    try{u.scrollIntoView({block:'nearest'})}catch(e2){}
+   }
+  }
+  i.value='';i.focus();
+ }
 }
 function tentarDestravar(){
  const i=$('#senhaIn');if(!i)return;
@@ -9171,6 +9684,10 @@ function tentarDestravar(){
   destravado=true;i.value='';telaSenha();render();
  }else{
   const e=$('#senhaErro');if(e)e.textContent='Senha errada.';
+  /* Reinicia a animação: sem tirar e repor a classe, a segunda tentativa
+     errada não treme, porque a classe já está lá. */
+  const c=$('#trava .card');
+  if(c){c.classList.remove('nao');void c.offsetWidth;c.classList.add('nao')}
   i.value='';i.focus();
  }
 }
@@ -9195,14 +9712,118 @@ function cardSenha(){
   '<p class="tiny muted" style="line-height:1.7;margin-top:9px">Ela segura olhar por cima do ombro, '+
   'e não segura quem tem perícia: não é criptografia, e quem souber abrir o armazenamento do navegador passa por cima. '+
   'Para esse risco, o disfarce e o apagar tudo protegem mais.</p>'+
-  '<p class="xtiny muted" style="line-height:1.65;margin-top:9px">Não existe recuperação: sem servidor, '+
-  'não há para onde mandar um link. Esquecer esta senha custa tudo que está guardado.</p>'+
+  (temPergunta()
+   ?'<p class="xtiny muted" style="line-height:1.65;margin-top:9px">Não existe recuperação por '+
+    'fora: sem servidor, não há para onde mandar um link. O que existe é a pergunta que você '+
+    'guardou aqui embaixo, e ela mora neste aparelho como todo o resto.</p>'
+   :'<p class="xtiny muted" style="line-height:1.65;margin-top:9px">Não existe recuperação: sem servidor, '+
+    'não há para onde mandar um link. Esquecer esta senha custa tudo que está guardado.</p>')+
   (tem
    ?'<div class="row wrap" style="gap:7px;margin-top:12px">'+
     '<button class="btn gh sm grow" data-a="senha-mudar">Trocar a senha</button>'+
     '<button class="btn gh sm grow" data-a="senha-tirar">Tirar a senha</button></div>'
    :'<button class="btn acc bl sm" style="margin-top:12px" data-a="senha-por">'+ic('check')+' Pôr uma senha</button>')+
+  /* A pergunta é o caminho de volta quando a senha some da cabeça, então
+     só existe onde existe senha. Com a pergunta guardada mas sem senha,
+     o cartão diz isso em vez de sumir com ela em silêncio. */
+  (tem
+   ?'<hr class="sep">'+
+    '<div class="row" style="gap:8px;align-items:center">'+
+     '<div class="lbl grow">Se você esquecer a senha</div>'+
+     (temPergunta()?'<span class="tag o">tem pergunta</span>':'<span class="tag n">não tem</span>')+
+    '</div>'+
+    '<p class="tiny muted" style="line-height:1.7;margin-top:7px">Uma pergunta escrita por você, '+
+    'com a resposta que só você sabe. Ela não aparece no caminho normal: quem lembra a senha '+
+    'digita a senha. Ela fica atrás do “Esqueci a senha”, que sem isso é uma tela dizendo que '+
+    'não há o que fazer.</p>'+
+    (temPergunta()
+     ?'<p class="tiny" style="line-height:1.6;margin-top:9px;padding:10px 12px;'+
+      'background:var(--surface-2);border-radius:var(--r-s)">'+esc(S.perfil.pergunta)+'</p>'+
+      '<p class="xtiny" style="line-height:1.65;margin-top:8px;color:var(--warn)">A partir daqui '+
+      'a tranca vale o que valer a mais fraca das duas portas: quem souber a resposta entra sem '+
+      'a senha.</p>'+
+      '<div class="row wrap" style="gap:7px;margin-top:10px">'+
+      '<button class="btn gh sm grow" data-a="pergunta-por">Trocar a pergunta</button>'+
+      '<button class="btn gh sm grow" data-a="pergunta-tirar">Tirar a pergunta</button></div>'
+     :'<p class="xtiny muted" style="line-height:1.65;margin-top:8px">Hoje, esquecer a senha '+
+      'custa tudo que está guardado.</p>'+
+      '<button class="btn gh bl sm" style="margin-top:10px" data-a="pergunta-por">'+
+      ic('bell')+' Pôr uma pergunta</button>')
+   :(temPergunta()
+     ?'<p class="xtiny muted" style="line-height:1.65;margin-top:11px">Você tem uma pergunta de '+
+      'recuperação guardada. Sem senha não há o que recuperar, e ela volta a valer no dia em que '+
+      'você puser uma senha de novo.</p>'
+     :''))+
   '</div>';
+}
+/* Confere a cada tecla, como a folha da senha: o Guardar fica apagado
+   enquanto falta pergunta ou resposta, em vez de aceitar e não fazer.
+   A resposta aparece à vista, e não escondida em bolinhas: ela não é
+   senha, é uma palavra que a pessoa precisa conferir que escreveu
+   certo — e errar aqui, calada, é ficar sem o caminho de volta. */
+function perguntaAfere(){
+ const q=(($('#pqIn')||{}).value||'').trim();
+ const r=normResposta(($('#prIn')||{}).value||'');
+ const item=function(ok,txt){
+  return '<div class="xtiny" style="display:flex;gap:7px;align-items:flex-start;line-height:1.7;'+
+   'color:'+(ok?'var(--ok)':'var(--muted, #8b8b9a)')+'">'+
+   '<span aria-hidden="true" style="flex:none;width:12px">'+(ok?'✓':'·')+'</span>'+
+   '<span>'+txt+'</span></div>';
+ };
+ const reg=$('#pqRegras');
+ if(reg)reg.innerHTML=item(!!q,'a pergunta')+item(r.length>=2,'a resposta');
+ /* Resposta fácil de adivinhar: avisa, não bloqueia. Mesma regra da
+    senha óbvia — quem sabe do risco dela é ela. */
+ const av=$('#pqAviso');
+ if(av){
+  const curta=r.length>0&&r.length<4;
+  av.innerHTML=curta
+   ?'<div class="xtiny" style="color:var(--warn);line-height:1.6;margin-top:7px">'+
+    'Resposta de três letras ou menos é chute de quem tentar duas vezes.</div>':'';
+ }
+ const b=$('#pqOk');
+ if(b){b.disabled=!(q&&r.length>=2);b.style.opacity=b.disabled?'.45':''}
+}
+function sheetPergunta(){
+ const atual=S.perfil.pergunta||'';
+ sheet(atual?'Trocar a pergunta':'Pôr uma pergunta',
+  '<p class="tiny muted" style="line-height:1.65">Ela só aparece quando você tocar em “Esqueci a '+
+  'senha”. Acertando a resposta, o app abre e pede uma senha nova.</p>'+
+  '<p class="xtiny" style="line-height:1.65;margin-top:11px;color:var(--warn)">'+
+  '<b>Escolha uma que só você saiba responder.</b> Daqui em diante a tranca vale o que valer a '+
+  'mais fraca das duas portas, e quem mora com você costuma saber o nome do seu primeiro bicho, '+
+  'o nome da sua mãe e a escola onde você estudou. Pergunta boa aqui é a que nem quem te conhece '+
+  'há anos responde.</p>'+
+  '<label class="fld" style="margin-top:13px">A pergunta'+
+  '<input type="text" id="pqIn" maxlength="90" autocomplete="off" '+
+  'placeholder="qual era o apelido que só eu usava?"></label>'+
+  '<label class="fld" style="margin-top:10px">A resposta'+
+  '<input type="text" id="prIn" maxlength="60" autocomplete="off" '+
+  'placeholder="a resposta, do jeito que você vai lembrar"></label>'+
+  '<p class="xtiny muted" style="margin-top:7px;line-height:1.55">Maiúscula, acento e espaço '+
+  'sobrando não contam na hora de conferir.</p>'+
+  '<div id="pqRegras" style="margin-top:10px"></div>'+
+  '<div id="pqAviso"></div>'+
+  '<button class="btn acc bl" style="margin-top:14px" id="pqOk" data-a="pergunta-ok">Guardar</button>',
+  'Fica só neste aparelho');
+ const q=$('#pqIn');
+ if(q)q.value=atual;
+ /* A resposta de agora não volta preenchida: ela está guardada
+    embaralhada e o app não sabe qual é. Trocar a pergunta é escrever as
+    duas de novo, e a folha diz isso em vez de deixar um campo vazio
+    parecendo esquecimento. */
+ perguntaAfere();
+ ['pqIn','prIn'].forEach(function(id){
+  const el=$('#'+id);
+  if(!el)return;
+  el.addEventListener('input',perguntaAfere);
+  el.addEventListener('keydown',function(e){
+   if(e.key!=='Enter')return;
+   e.preventDefault();
+   const b=$('#pqOk');
+   if(b&&!b.disabled)b.click();
+  });
+ });
 }
 /* Senha óbvia: avisa, não bloqueia. Bloquear empurra a pessoa para uma
    senha que ela não lembra — e senha esquecida aqui custa TUDO, porque
@@ -9242,9 +9863,13 @@ function senhaAfere(){
 function sheetSenha(trocar){
  sheet(trocar?'Trocar a senha':'Pôr uma senha',
   '<p class="tiny muted" style="line-height:1.65;margin-bottom:5px">Quatro dígitos ou mais.</p>'+
-  '<p class="xtiny" style="line-height:1.65;margin-bottom:13px;color:var(--warn)">'+
-  'Não dá para recuperar depois. Sem servidor, não existe "esqueci minha senha": '+
-  'perder esta senha é perder treino, comida, fotos e exames.</p>'+
+  (temPergunta()
+   ?'<p class="xtiny" style="line-height:1.65;margin-bottom:13px;color:var(--ink-2)">'+
+    'Se você esquecer esta, a sua pergunta continua valendo: “'+esc(S.perfil.pergunta)+'”. '+
+    'É o único caminho de volta — não existe servidor para pedir.</p>'
+   :'<p class="xtiny" style="line-height:1.65;margin-bottom:13px;color:var(--warn)">'+
+    'Não dá para recuperar depois. Sem servidor, não existe "esqueci minha senha": '+
+    'perder esta senha é perder treino, comida, fotos e exames.</p>')+
   (trocar?'<label class="fld">Senha de agora<input type="password" inputmode="numeric" id="snAtual" autocomplete="off"></label>'+
    '<div id="snErroAtual" class="xtiny" style="color:var(--bad);line-height:1.6;min-height:2px"></div>':'')+
   '<label class="fld" style="margin-top:10px">Nova senha<input type="password" inputmode="numeric" id="snNova" autocomplete="off"></label>'+
@@ -13295,20 +13920,14 @@ document.addEventListener('click',ev=>{
     '<button class="btn gh bl sm" style="margin-top:8px" data-a="close">Cancelar</button>',
     'Leia antes de confirmar');
    break;
-  case 'apagar-confirma':
-   /* Gravar agora é adiado para o intervalo ocioso. Sem cancelar o que
-      está pendente, uma gravação atrasada escreveria o estado de volta
-      logo depois de apagar — e a tela diria "apagado" por cima de dados
-      que continuariam lá. */
-   lsPendente=false;clearTimeout(lsTimer);
-   try{localStorage.removeItem(LS);localStorage.removeItem('rotaforte.v2')}catch(e){}
-   try{if(window.indexedDB&&indexedDB.deleteDatabase)indexedDB.deleteDatabase(FOTO_DB)}catch(e){}
-   closeSheet();
-   document.body.innerHTML='<div style="padding:40px 22px;text-align:center;font-family:inherit">'+
-    '<h1 style="font-size:19px;margin-bottom:10px">Apagado</h1>'+
-    '<p style="font-size:14px;line-height:1.6;color:#666">Não sobrou nada deste app neste aparelho. '+
-    'Recarregue a página se quiser começar do zero.</p></div>';
-   break;
+  case 'apagar-confirma':apagarTudoAgora();break;
+  case 'apagar-trava':{
+   /* O mesmo apagar, chamado de dentro da trava. O botão só liga depois
+      de a palavra ser escrita, mas confere de novo aqui: quem chega por
+      outro caminho não passa pelo botão. */
+   const w=(($('#apIn')||{}).value||'').trim().toUpperCase();
+   if(w!=='APAGAR')return;
+   apagarTudoAgora();break}
   case 'aviso-off':{const A=S.perfil.avisosOff||[];
    if(A.indexOf(d.id)<0)A.push(d.id);
    S.perfil.avisosOff=A;save('base');render();
@@ -13534,13 +14153,41 @@ document.addEventListener('click',ev=>{
   /* trocar exercício */
   case 'porque-ex':sheetPorque(d.n);break;
   case 'destravar':tentarDestravar();break;
-  case 'senha-esqueci':sheet('Esqueci a senha',
-   '<p class="tiny muted" style="line-height:1.7">Não existe recuperação, porque não existe servidor: '+
-   'nada seu sai deste aparelho, então não há para onde mandar um link de recuperação.</p>'+
-   '<p class="tiny muted" style="line-height:1.7;margin-top:10px">O que dá para fazer é apagar os dados do app '+
-   'nas configurações do navegador, em "dados de sites", e começar de novo. Isso apaga tudo: treino, comida, fotos, exames.</p>'+
-   '<p class="xtiny muted" style="line-height:1.65;margin-top:10px">Se você exportou seus dados em algum momento, '+
-   'dá para importar de volta depois.</p>','Sem servidor, sem recuperação');break;
+  /* Com pergunta guardada, "Esqueci a senha" deixa de ser uma tela que
+     explica que não há o que fazer e passa a ser a tela que faz. */
+  case 'volta-senha':telaSenha();break;
+  case 'resp-ok':tentarResposta();break;
+  /* Tudo que a trava precisa é desenhado DENTRO dela. Uma folha aqui
+     tem z-index 60 contra os 90 da trava: o "Esqueci a senha" abria uma
+     folha atrás da própria trava e nunca apareceu para ninguém. */
+  case 'senha-esqueci':
+   if(temPergunta())telaPergunta(); else telaEsqueci();
+   break;
+  case 'esqueci-apagar':telaApagar();break;
+  /* Mostrar o que foi digitado, na tela de trava. Não reaproveita o
+     'senha-ver' da folha porque lá são três campos e aqui é um só, e o
+     espaçamento entre letras precisa afrouxar quando vira texto: com
+     .34em de espaço, senha à mostra fica ilegível. */
+  case 'senha-ver-trava':{
+   const c=$('#senhaIn'); if(!c)break;
+   const mostrar=c.type==='password';
+   c.type=mostrar?'text':'password';
+   c.style.letterSpacing=mostrar?'.14em':'.34em';
+   const bv=$('#travaVer');
+   if(bv)bv.innerHTML=ic('face')+' '+(mostrar?'Esconder de novo':'Mostrar o que eu digitei');
+   c.focus();
+   break}
+  case 'pergunta-por':sheetPergunta();break;
+  case 'pergunta-ok':{
+   const pq=(($('#pqIn')||{}).value||'').trim().slice(0,90);
+   const pr=normResposta(($('#prIn')||{}).value||'');
+   if(!pq)return toast('Escreva a pergunta');
+   if(pr.length<2)return toast('Escreva a resposta');
+   S.perfil.pergunta=pq;S.perfil.resposta=hashSenha(pr);
+   save('base');closeSheet();render();
+   toast('Guardada. Ela aparece em "Esqueci a senha".');break}
+  case 'pergunta-tirar':{S.perfil.pergunta='';S.perfil.resposta='';save('base');render();
+   toast('Pergunta tirada. Esquecer a senha volta a custar tudo.');break}
   case 'senha-por':sheetSenha(false);break;
   case 'senha-mudar':sheetSenha(true);break;
   case 'senha-ver':{
@@ -14103,6 +14750,16 @@ aplicaIdentidade();
 render();
 telaDisfarce();
 ligaCabecalhoMini();
+/* A abertura sai depois do primeiro desenho, e só depois dele: sumir
+   antes devolvia o branco que ela existe para evitar. */
+(function(){
+ const a=$('#abre');
+ if(!a)return;
+ requestAnimationFrame(function(){
+  a.classList.add('sai');
+  setTimeout(function(){if(a.parentNode)a.remove()},300);
+ });
+})();
 /* marca a área no corpo: é o que faz a cor da tela trocar */
 (function(){const r2=window.render;window.render=function(){
  r2.apply(null,arguments);

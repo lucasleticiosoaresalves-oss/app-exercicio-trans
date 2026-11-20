@@ -25,10 +25,11 @@
      passam direto para a rede: são coisas que a pessoa escolheu abrir
      naquele instante, e guardar isso seria guardar o que ela leu.
    ===================================================================== */
-/* Subiu para v2 porque os ícones mudaram. Sem subir, quem já abriu o app
-   uma vez continuaria vendo os antigos para sempre: arquivo do app é
-   servido do cache primeiro, e cache velho só sai quando o nome muda. */
-const VERSAO = 'norte-v2';
+/* Subiu para v3 porque o ícone do Norte mudou de novo: o sol perdeu o
+   fundo branco. Sem subir, quem já abriu o app uma vez continuaria
+   vendo o antigo para sempre — arquivo do app é servido do cache
+   primeiro, e cache velho só sai quando o nome muda. */
+const VERSAO = 'norte-v3';
 const CASCA = VERSAO + '-casca';
 /* As miniaturas NÃO levam a versão no nome, de propósito. Elas não têm
    nada a ver com a versão do app, e amarrar as duas jogaria fora até 220
