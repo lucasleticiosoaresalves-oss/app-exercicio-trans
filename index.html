@@ -3621,8 +3621,7 @@ function prTopicos(){
     ['Calcinha feita para mulheres trans','Existe peça específica, e ela evita machucar. É o caminho mais seguro.','R$30 a R$60']
    ])+
    prSem([
-    ['Justo embaixo, solto em cima','O contraste entre calça justa e blusa larga muda mais a silhueta que qualquer peça especial.'],
-    ['Nada disso te valida','Existe mulher cis sem peito, sem cintura e com voz grave. Corpo não assina documento nenhum.']
+    ['Justo embaixo, solto em cima','O contraste entre calça justa e blusa larga muda mais a silhueta que qualquer peça especial.']
    ]));
  }});
  /* Roupa, cabelo e maquiagem só existem onde há um lado para empurrar.
@@ -3633,7 +3632,7 @@ function prTopicos(){
   if(M)c+=prLista([
    ['Tons sóbrios e sobreposição','Escuro e neutro achata o contorno; camada sobre camada equilibra ombro e quadril.',''],
    ['Calça e bermuda largas','Larga embaixo tira a atenção do quadril. Justa embaixo faz o contrário.',''],
-   ['Sapato de sola alta','Bota, coturno ou tênis de sola grossa. Alguns centímetros mudam como você é lido de longe.',''],
+   ['Sapato de sola alta','Bota, coturno ou tênis de sola grossa. Alguns centímetros mudam como você é '+g('lid')+' de longe.',''],
    ['Acessório discreto','Corrente fina, armação retangular, relógio simples, touca ou boné de aba reta.','']
   ]);
   if(F)c+=(M?'<hr class="sep">':'')+prLista([
@@ -3696,10 +3695,17 @@ function prTopicos(){
    'O caminho é esse; pelos nomes exatos, procure por “nome social CPF” no gov.br.</p>');
  }});
  L.push({id:'pron',n:'Pronome',ic:'heart',html:function(){
-  return prCartao('heart','Ser lida como você é, sem precisar falar',
+  /* "Ser lida" cai em cima de quem lê, e por isso passa pelo g(). O
+     exemplo de correção também: dizer “é ele” para quem usa ela/dela é
+     o app errando o pronome na frase que ensina a corrigir pronome. */
+  const pz=S.perfil.pronome;
+  const exemplo=(pz==='ela'||pz==='ele'||pz==='elu')
+   ?'“é '+pz+'”'
+   :'o seu pronome, em duas palavras';
+  return prCartao('heart','Ser '+g('lid')+' como você é, sem precisar falar',
    prLista([
     ['Broche com a bandeira','Quem conhece, reconhece — e pergunta o pronome em vez de supor. Funciona bem na escola.','R$5 a R$15'],
-    ['Corrigir sem pedir desculpa','Uma frase curta, sem explicação: “é ele”. Quem respeita, ajusta. Quem não ajusta já respondeu outra coisa.','']
+    ['Corrigir sem pedir desculpa','Uma frase curta, sem explicação: '+exemplo+'. Quem respeita, ajusta. Quem não ajusta já respondeu outra coisa.','']
    ])+
    prSem([
     ['Broche dá para fazer','Botão, fita ou um desenho no caderno. O que importa é o sinal, não o acabamento.']
@@ -3723,6 +3729,17 @@ function stPratica(){
   '<p class="tiny" style="line-height:1.7">O que comprar, quanto custa por aqui, e — principalmente — '+
   'o que dá para fazer sem comprar nada. Os assuntos mudam com a sua trilha; você está em '+
   '<b>'+esc(trilha().n)+'</b>.</p>'+
+  /* Esta frase estava escondida no meio da lista de silhueta, e só na
+     trilha feminilizante. Ela é o enquadramento da tela inteira — vale
+     para quem acha que precisa de tudo isto e para quem não quer nada
+     disto —, então subiu para cá, onde é dita uma vez e todas as
+     trilhas leem. */
+  '<p class="tiny" style="line-height:1.7;margin-top:12px;padding:11px 13px;'+
+  'background:var(--ok-soft);border-radius:var(--r-s)"><b>Nada aqui é obrigatório.</b> '+
+  'Nenhuma dessas coisas te faz mais ou menos quem você é — isso não está em disputa. '+
+  'O que elas fazem é outra coisa, e é concreta: ajudam a passar, ou seja, a ser '+g('lid')+' na '+
+  'rua como você é, e com isso a disforia costuma pesar menos no dia. '+
+  'Use a que te serve, no dia em que servir.</p>'+
   '<p class="xtiny muted" style="line-height:1.65;margin-top:9px">Os preços são faixa de mercado e '+
   'envelhecem: estão aqui para dar ordem de grandeza, não para servir de orçamento.</p></div>';
  /* Índice. Com nove assuntos, a fileira inteira é um rolo longo demais
@@ -3738,10 +3755,9 @@ function stPratica(){
     'style="flex:none">'+ic(x.ic)+esc(x.n)+'</button>';
   }).join('')+'</div>';
  h+=mostra.map(function(x){return x.html()}).join('');
- h+='<div class="card"><p class="xtiny muted" style="line-height:1.7">Estas dicas vieram de material '+
-  'reunido por pessoas trans na internet e foram reescritas aqui, conferidas uma a uma contra o que o '+
-  'resto do app já diz. O que contrariava a evidência do app ficou de fora, e os desenhos são deste '+
-  'app, não dos prints.</p></div>';
+ h+='<div class="card"><p class="xtiny muted" style="line-height:1.7">Dicas de pessoas trans para '+
+  'pessoas trans, reescritas aqui e conferidas uma a uma contra o que o resto do app já diz. '+
+  'O que contrariava a evidência ficou de fora.</p></div>';
  $('#st-pratica').innerHTML=h;
 }
 
@@ -10001,7 +10017,7 @@ function telaPrimeira(){
   c='<div class="card">'+chTtl('user','Como o app fala com você')+
    '<p class="tiny muted" style="line-height:1.65">O nome e o pronome valem em todo texto do app. '+
    'Nada disto sai do aparelho.</p>'+
-   '<label class="fld" style="margin-top:13px">Como quer ser chamado'+
+   '<label class="fld" style="margin-top:13px">Como quer ser '+g('chamad')+
    '<input type="text" id="pv_nome" maxlength="40" autocomplete="off" value="'+esc(p.nome)+'" '+
    'placeholder="seu nome"></label>'+
    '<div class="lbl" style="margin:14px 0 7px">Seu pronome</div>'+
@@ -13136,7 +13152,7 @@ function camposPerfil(pref){
   '<p class="xtiny muted" style="margin-top:8px">Dá para trocar depois. A trilha muda o que aparece no app, '+
   'não tranca nada: o treino, a comida e a higiene funcionam igual nas três.</p>'+
   '<div class="lbl" style="margin:16px 0 7px">Sobre você</div><div class="g2">'+
-  '<label class="fld" style="grid-column:1/-1">Como quer ser chamado<input type="text" id="'+pref+'nome" value="'+esc(p.nome)+'" placeholder="Seu nome"></label>'+
+  '<label class="fld" style="grid-column:1/-1">Como quer ser '+g('chamad')+'<input type="text" id="'+pref+'nome" value="'+esc(p.nome)+'" placeholder="Seu nome"></label>'+
   '<label class="fld">Idade<input type="number" inputmode="numeric" id="'+pref+'idade" value="'+p.idade+'"></label>'+
   '<label class="fld">Altura (cm)<input type="number" inputmode="numeric" id="'+pref+'altura" value="'+p.altura+'"></label>'+
   '<label class="fld">Peso atual (kg)<input type="number" step="0.1" inputmode="decimal" id="'+pref+'peso" value="'+n1(pesoAtual())+'"></label>'+
