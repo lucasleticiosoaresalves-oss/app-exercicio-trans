@@ -3727,8 +3727,15 @@ function stPratica(){
  const mostra=sel?tops.filter(function(x){return x.id===sel}):tops;
  let h='<div class="card hero">'+chTtl('wand','Na prática')+
   '<p class="tiny" style="line-height:1.7">O que comprar, quanto custa por aqui, e — principalmente — '+
-  'o que dá para fazer sem comprar nada. Os assuntos mudam com a sua trilha; você está em '+
-  '<b>'+esc(trilha().n)+'</b>.</p>'+
+  'o que dá para fazer sem comprar nada.</p>'+
+  /* Quais assuntos aparecem depende da TRILHA, e não do pronome — e a
+     tela dizia isso numa frase que era fácil de ler sem ver. Agora é
+     uma linha própria, com o caminho para trocar ali mesmo. */
+  '<div class="row" style="gap:8px;align-items:center;margin-top:11px">'+
+  '<div class="tiny grow" style="line-height:1.6">Os assuntos seguem a sua trilha: '+
+  '<b>'+esc(trilha().n)+'</b>.</div>'+
+  '<button class="btn gh xs" style="flex:none" data-a="go-sub" data-tab="perfil" data-st="voce">'+
+  'Trocar</button></div>'+
   /* Esta frase estava escondida no meio da lista de silhueta, e só na
      trilha feminilizante. Ela é o enquadramento da tela inteira — vale
      para quem acha que precisa de tudo isto e para quem não quer nada
@@ -15579,6 +15586,20 @@ if('serviceWorker' in navigator){
    if(reg.waiting&&navigator.serviceWorker.controller)mostraAtualizacao(reg);
    avisaNova(reg.installing);
    reg.addEventListener('updatefound',function(){avisaNova(reg.installing)});
+   /* O navegador só procura versão nova quando há navegação. Um app
+      instalado fica dias aberto no celular sem nenhuma — e nesse tempo
+      continua rodando a versão com que abriu. Quem mexe numa opção e
+      não vê a tela mudar muitas vezes está olhando a versão de antes,
+      não um defeito. Então: toda vez que o app volta para a frente,
+      pergunta se existe versão nova. No máximo uma vez a cada cinco
+      minutos, para não bater no servidor a cada troca de aba. */
+   let olhouEm=0;
+   document.addEventListener('visibilitychange',function(){
+    if(document.hidden)return;
+    if(Date.now()-olhouEm<300000)return;
+    olhouEm=Date.now();
+    try{reg.update()}catch(e){}
+   });
   }).catch(function(){/* sem service worker o app funciona igual, só precisa de rede */});
 
   let recarregando=false;
