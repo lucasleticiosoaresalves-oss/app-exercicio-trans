@@ -941,6 +941,7 @@ button.cday:active{transform:scale(.94)}
    <div id="st-pele" class="stack" style="gap:14px" hidden></div>
    <div id="st-aparencia" class="stack" style="gap:14px" hidden></div>
    <div id="st-corpo" class="stack" style="gap:14px" hidden></div>
+   <div id="st-pratica" class="stack" style="gap:14px" hidden></div>
    <div id="st-higiene" class="stack" style="gap:14px" hidden></div>
    <div id="st-ciclo" class="stack" style="gap:14px" hidden></div>
    <div id="st-humor" class="stack" style="gap:14px" hidden></div>
@@ -3511,6 +3512,240 @@ const TRILHAS={
 function trilha(){return TRILHAS[S.perfil.trilha]||TRILHAS.masc}
 
 /* =====================================================================
+   NA PRÁTICA
+   O resto do app responde "o que é seguro" e "o que a evidência diz".
+   Esta tela responde outra pergunta, que é a que mais aparece em quem
+   está começando: o que eu compro, quanto custa, e o que eu faço
+   quando não posso comprar nem ser vista.
+
+   A última parte é a que mais importa e a que menos existe por aí.
+   Quase todo tutorial supõe dinheiro, casa que aceita e permissão para
+   sair de casa como se quer. Por isso cada assunto aqui tem o par: o
+   jeito com dinheiro, e o jeito sem.
+
+   Os preços são faixa de mercado brasileiro e envelhecem. Estão aqui
+   como ordem de grandeza — serve para saber se é dez ou setecentos —
+   e a tela diz isso.
+   ===================================================================== */
+/* Um cartão por assunto, e um índice em cima. A primeira versão era
+   uma fileira de dezoito cartões sem mapa nenhum — e na trilha de
+   androginia, que recebe os dois lados, saíam dois cartões chamados
+   "Cabelo" e dois chamados "Sem poder comprar nada", em ordens
+   diferentes. Agora cada assunto existe UMA vez, sabe a quais trilhas
+   pertence, e carrega dentro dele o par: o jeito com dinheiro e o jeito
+   sem. */
+function prLista(itens){
+ return '<div class="stack" style="gap:0;margin-top:2px">'+itens.map(function(x){
+  return '<div class="li" style="align-items:flex-start;gap:10px">'+
+   '<div class="grow" style="min-width:0"><div class="ttl">'+x[0]+'</div>'+
+   '<div class="sub" style="white-space:normal;line-height:1.6">'+x[1]+'</div></div>'+
+   (x[2]?'<span class="tag n" style="flex:none;align-self:flex-start">'+esc(x[2])+'</span>':'')+
+   '</div>';
+ }).join('')+'</div>';
+}
+/* O "sem poder comprar" não é um cartão à parte: ele é o rodapé do
+   assunto. Separado, virava uma ilha que a pessoa lia solta, sem saber
+   de quê. Colado no assunto, é a segunda resposta da mesma pergunta. */
+function prSem(itens){
+ return '<hr class="sep">'+
+  '<div class="row" style="gap:7px;align-items:center;margin-bottom:8px">'+
+  ic('heart','color:var(--ok);flex:none')+
+  '<div class="lbl" style="color:var(--ok)">Se não der para comprar</div></div>'+
+  '<div class="stack" style="gap:9px">'+itens.map(function(x){
+   return '<div><div style="font-size:13.5px;font-weight:650;color:var(--ink)">'+x[0]+'</div>'+
+    '<div class="xtiny muted" style="line-height:1.6;margin-top:2px">'+x[1]+'</div></div>';
+  }).join('')+'</div>';
+}
+function prCartao(ic0,titulo,corpo){
+ return '<div class="card">'+chTtl(ic0,titulo)+corpo+'</div>';
+}
+/* Cada assunto diz a quais trilhas pertence. É isto que faz androginia
+   receber os dois lados sem repetir título, e bem-estar receber só o
+   que vale para qualquer pessoa. */
+function prTopicos(){
+ const t=S.perfil.trilha, M=t==='masc'||t==='andro', F=t==='fem'||t==='andro';
+ const L=[];
+ if(M)L.push({id:'peito',n:'Peito',ic:'ruler',html:function(){
+  return prCartao('ruler','Achatar o peito',
+   '<p class="tiny muted" style="line-height:1.7">Quanto tempo por dia, o que o binder faz com a '+
+   'costela e quando tirar estão na tela de <b>Corpo</b>. Aqui é o que existe e quanto custa.</p>'+
+   prLista([
+    ['Binder regata ou colete','Cobre mais, segura mais e não sobe sozinho. É o que menos machuca quando o tamanho está certo.','R$35 a R$70'],
+    ['Binder faixa','Mais barato e mais fresco, mas sobe e desce com o movimento e aperta mais num ponto só.','R$20 a R$50'],
+    ['Top de compressão de academia','Não é binder: comprime menos. Também custa menos, respira melhor e dá para usar o dia inteiro.','R$30 a R$60'],
+    ['Fita adesiva própria','Para peito pequeno ou médio. Só a fita feita para pele — fita comum arranca pele.','R$20 a R$50']
+   ])+
+   '<hr class="sep">'+
+   '<div class="lbl" style="margin-bottom:7px">A direção certa da fita</div>'+
+   '<p class="tiny" style="line-height:1.7">Empurre cada lado <b>em direção à axila</b>. Para baixo '+
+   'cria volume na frente; para o meio junta e aumenta. Para a axila o peito some na lateral, que é '+
+   'onde a roupa esconde.</p>'+
+   '<div style="margin:13px 0 2px;color:var(--ink-2)">'+desenhoFita()+'</div>'+
+   '<p class="xtiny muted" style="line-height:1.65;margin-top:6px">Nunca com fita de embalagem, '+
+   'esparadrapo ou atadura. Se arder, apertar a respiração ou marcar a pele depois de tirar, estava '+
+   'apertado demais.</p>'+
+   prSem([
+    ['Duas camadas folgadas em vez de uma apertada','Regata ou camiseta justa por baixo e a blusa normal por cima. Esconde quase o mesmo sem comprimir.'],
+    ['Manga longa por baixo','Some com o contorno e passa por estilo. Funciona no frio e no ar-condicionado o ano inteiro.'],
+    ['Estampa escura e tecido grosso','Liso e claro marca tudo. Xadrez, listra larga, moletom e brim escondem sozinhos.'],
+    ['Camisa aberta por cima','Quebra a silhueta na vertical, e é a peça mais fácil de arrumar emprestada.']
+   ]));
+ }});
+ if(M)L.push({id:'volume',n:'Volume',ic:'info',html:function(){
+  return prCartao('info','Volume na frente',
+   prLista([
+    ['Packer de silicone','Formato e peso de verdade; alguns servem para urinar em pé. É o item mais caro desta tela.','R$400 a R$900'],
+    ['Cueca boxer escura','Tecido leve, sem estampa, cor escura. É o que mais muda a silhueta por menos dinheiro.','R$15 a R$40']
+   ])+
+   prSem([
+    ['Meia dentro de meia','Duas meias uma dentro da outra, enroladas, sobre a região coberta pela cueca. Custa zero e resolve o volume.']
+   ]));
+ }});
+ if(F)L.push({id:'pelo',n:'Pelo',ic:'drop',html:function(){
+  return prCartao('drop','Pelo',
+   prLista([
+    ['Esfoliar antes, sempre','Reduz pelo encravado e vermelhidão. É o passo que mais muda o resultado.',''],
+    ['Lâmina descartável','A mais barata e a que mais irrita. Nunca na pele seca: com creme ou espuma, e sem repetir no mesmo lugar.','R$8 a R$25'],
+    ['Pinça','Só para o rosto e área pequena. Para perna e braço é tempo demais para o resultado.','R$10 a R$25'],
+    ['Cera','Dura mais que a lâmina e dói mais. Para quem já sabe que a pele aguenta.','R$25 a R$60']
+   ])+
+   prSem([
+    ['Esfoliante de açúcar','Açúcar com um pouco de óleo ou mel. Mesmo efeito do esfoliante de loja, com o que já tem na cozinha.']
+   ]));
+ }});
+ if(F)L.push({id:'silhueta',n:'Silhueta',ic:'ruler',html:function(){
+  return prCartao('ruler','Silhueta',
+   prLista([
+    ['Sutiã com bojo no tamanho certo','Tamanho certo é o que modela. Grande demais fica artificial e aparece.','R$25 a R$60'],
+    ['Fita modeladora de cintura','Marca a cintura por baixo da roupa. Nunca apertada a ponto de mudar a respiração.','R$25 a R$70'],
+    ['Calcinha feita para mulheres trans','Existe peça específica, e ela evita machucar. É o caminho mais seguro.','R$30 a R$60']
+   ])+
+   prSem([
+    ['Justo embaixo, solto em cima','O contraste entre calça justa e blusa larga muda mais a silhueta que qualquer peça especial.'],
+    ['Nada disso te valida','Existe mulher cis sem peito, sem cintura e com voz grave. Corpo não assina documento nenhum.']
+   ]));
+ }});
+ /* Roupa, cabelo e maquiagem só existem onde há um lado para empurrar.
+    Na trilha de bem-estar os três nasciam vazios — sobrava o rodapé do
+    "se não der para comprar" sem nada em cima dele. */
+ if(M||F)L.push({id:'roupa',n:'Roupa',ic:'sparkle',html:function(){
+  let c='';
+  if(M)c+=prLista([
+   ['Tons sóbrios e sobreposição','Escuro e neutro achata o contorno; camada sobre camada equilibra ombro e quadril.',''],
+   ['Calça e bermuda largas','Larga embaixo tira a atenção do quadril. Justa embaixo faz o contrário.',''],
+   ['Sapato de sola alta','Bota, coturno ou tênis de sola grossa. Alguns centímetros mudam como você é lido de longe.',''],
+   ['Acessório discreto','Corrente fina, armação retangular, relógio simples, touca ou boné de aba reta.','']
+  ]);
+  if(F)c+=(M?'<hr class="sep">':'')+prLista([
+   ['Cor clara e tecido fluido','Pastel e caimento solto mudam a leitura sem comprar peça nova.',''],
+   ['Acessório pequeno','Colar fino, presilha, um anel. Detalhe pequeno entrega mais do que roupa inteira.',''],
+   ['Brinco de pressão','Para quem não pode furar a orelha. Sai quando precisar, e volta.','R$10 a R$30']
+  ]);
+  c+=prSem([
+   ['Gênero neutro é terreno seguro','Peça larga, cor neutra, tênis simples. Ninguém pergunta nada, e serve de ponte enquanto você decide o resto.']
+  ]);
+  return prCartao('sparkle','Roupa e acessório',c);
+ }});
+ if(M||F)L.push({id:'cabelo',n:'Cabelo',ic:'face',html:function(){
+  let c='';
+  if(M)c+=prLista([
+   ['Cortes que o barbeiro conhece pelo nome','Fade, taper, mullet, wolf cut, shag. Chegar com o nome evita a conversa difícil no balcão.',''],
+   ['Quando não dá para assumir em casa','Leve referência de corte curto feminino. Os mesmos centímetros, outro nome — e o resultado na sua cabeça é o mesmo.','']
+  ]);
+  if(F)c+=(M?'<hr class="sep">':'')+prLista([
+   ['Lavar dia sim, dia não','Lavar todo dia resseca. Massagear o couro na lavagem é o que de fato ajuda a crescer.',''],
+   ['Aplique ou peruca','Caminho rápido para comprimento enquanto o seu cresce.','R$30 a R$150'],
+   ['Unha arredondada','Formato arredondado e cor clara leem mais delicado que comprimento, e saem mais barato.','']
+  ]);
+  const sem=[];
+  if(M)sem.push(['Corte em casa','Máquina emprestada resolve um fade simples, e vídeo de barbeiro ensina o passo. O pior risco é o cabelo crescer de novo.']);
+  if(F)sem.push(['Hidratação de cozinha','Açúcar no condicionador esfolia o couro; café moído também. Custa o que já tem na cozinha.']);
+  c+=prSem(sem);
+  return prCartao('face','Cabelo',c);
+ }});
+ if(M||F)L.push({id:'maq',n:'Maquiagem',ic:'sparkle',html:function(){
+  let c='';
+  if(F)c+='<p class="tiny" style="line-height:1.7">Estreitar o alto do rosto e o canto do maxilar, '+
+   'levantar a maçã do rosto, iluminar o meio. O corretivo entra antes de tudo, porque é ele que cobre '+
+   'a sombra da barba.</p>'+
+   '<div style="margin:13px 0 2px;color:var(--ink-2)">'+desenhoContornoFem()+'</div>'+
+   legenda([['#b06a86','escurecer'],['#9c5a74','abaixo da maçã'],['#ffe9c9','iluminar'],['#5b4030','sobrancelha']]);
+  if(M)c+=(F?'<hr class="sep">':'')+
+   '<p class="tiny" style="line-height:1.7">'+(F?'No outro sentido: quadrar':'Quadrar')+' o alto da '+
+   'testa, alargar a linha do maxilar, sobrancelha mais cheia e mais reta. Uma sombra fosca '+
+   'marrom-acinzentada faz os três.</p>'+
+   '<div style="margin:13px 0 2px;color:var(--ink-2)">'+desenhoContornoMasc()+'</div>'+
+   legenda([['#c2763f','escurecer a borda'],['#8a5a33','lateral do nariz'],['#6f4a2e','buço e queixo'],['#3f2a1c','sobrancelha']])+
+   '<p class="xtiny muted" style="line-height:1.65;margin-top:10px">Sombra de barba se faz com traço '+
+   'curto e falha no meio, nunca com contorno fechado: contorno fechado lê como desenho, não como pelo.</p>';
+  c+=prSem([
+   ['O básico é três coisas','Corretivo, rímel e gloss. Sombra com várias cores substitui blush e contorno e economiza três produtos.'],
+   ['Dá para pedir emprestado','Maquiagem é o item mais fácil de testar na casa de alguém antes de gastar.']
+  ]);
+  return prCartao('sparkle','Maquiagem: onde escurece e onde ilumina',c);
+ }});
+ L.push({id:'doc',n:'Documento',ic:'book',html:function(){
+  return prCartao('book','Nome social no CPF',
+   prLista([
+    ['É de graça e não precisa dos pais','A partir dos 16 anos você mesma pede. Não é retificação de registro: é o nome social no cadastro da Receita.',''],
+    ['Onde se faz','No gov.br, no serviço de incluir ou alterar nome social no CPF. Precisa de conta gov.br e de um documento com foto.',''],
+    ['Quanto demora','Costuma sair em poucos dias úteis, e dá para acompanhar pelo próprio portal.',''],
+    ['O que muda','O nome passa a aparecer em serviço público, banco e cadastro que puxam da Receita. O registro de nascimento não muda.','']
+   ])+
+   '<p class="xtiny muted" style="line-height:1.65;margin-top:10px">Site de governo troca de botão. '+
+   'O caminho é esse; pelos nomes exatos, procure por “nome social CPF” no gov.br.</p>');
+ }});
+ L.push({id:'pron',n:'Pronome',ic:'heart',html:function(){
+  return prCartao('heart','Ser lida como você é, sem precisar falar',
+   prLista([
+    ['Broche com a bandeira','Quem conhece, reconhece — e pergunta o pronome em vez de supor. Funciona bem na escola.','R$5 a R$15'],
+    ['Corrigir sem pedir desculpa','Uma frase curta, sem explicação: “é ele”. Quem respeita, ajusta. Quem não ajusta já respondeu outra coisa.','']
+   ])+
+   prSem([
+    ['Broche dá para fazer','Botão, fita ou um desenho no caderno. O que importa é o sinal, não o acabamento.']
+   ]));
+ }});
+ if(trilha().voz!=='off')L.push({id:'voz',n:'Voz',ic:'mic',html:function(){
+  return '<div class="card" style="border-color:var(--warn)">'+chTtl('mic','Voz: o erro mais comum')+
+   '<p class="tiny" style="line-height:1.7">Forçar a voz — empurrar para o agudo ou para o grave com '+
+   'esforço na garganta — machuca a prega vocal, e o estrago se acumula. Som mais claro vem de '+
+   'ressonância, não de apertar. Som mais grave, com testosterona, vem sozinho com o tempo.</p>'+
+   '<button class="btn gh bl sm" style="margin-top:11px" data-a="cuid-ir" data-v="voz">'+
+   'Abrir o treino de voz</button></div>';
+ }});
+ return L;
+}
+function stPratica(){
+ const tops=prTopicos();
+ const sel=tops.some(function(x){return x.id===S.ui.prArea})?S.ui.prArea:'';
+ const mostra=sel?tops.filter(function(x){return x.id===sel}):tops;
+ let h='<div class="card hero">'+chTtl('wand','Na prática')+
+  '<p class="tiny" style="line-height:1.7">O que comprar, quanto custa por aqui, e — principalmente — '+
+  'o que dá para fazer sem comprar nada. Os assuntos mudam com a sua trilha; você está em '+
+  '<b>'+esc(trilha().n)+'</b>.</p>'+
+  '<p class="xtiny muted" style="line-height:1.65;margin-top:9px">Os preços são faixa de mercado e '+
+  'envelhecem: estão aqui para dar ordem de grandeza, não para servir de orçamento.</p></div>';
+ /* Índice. Com nove assuntos, a fileira inteira é um rolo longo demais
+    para achar qualquer coisa; o índice também diz, de relance, o que
+    esta tela cobre. */
+ /* Uma faixa que rola de lado, e não uma grade que quebra em quatro
+    linhas: onze assuntos empilhados empurravam o primeiro cartão para
+    fora da tela. É a mesma faixa que o resto do app usa nas sub-abas. */
+ h+='<div class="subtabs" style="gap:7px;margin:0 calc(var(--gl) * -1);padding:2px var(--gl)">'+
+  '<button class="chip xs'+(sel?'':' on')+'" data-a="pr-area" data-v="" style="flex:none">tudo</button>'+
+  tops.map(function(x){
+   return '<button class="chip xs'+(sel===x.id?' on':'')+'" data-a="pr-area" data-v="'+x.id+'" '+
+    'style="flex:none">'+ic(x.ic)+esc(x.n)+'</button>';
+  }).join('')+'</div>';
+ h+=mostra.map(function(x){return x.html()}).join('');
+ h+='<div class="card"><p class="xtiny muted" style="line-height:1.7">Estas dicas vieram de material '+
+  'reunido por pessoas trans na internet e foram reescritas aqui, conferidas uma a uma contra o que o '+
+  'resto do app já diz. O que contrariava a evidência do app ficou de fora, e os desenhos são deste '+
+  'app, não dos prints.</p></div>';
+ $('#st-pratica').innerHTML=h;
+}
+
+/* =====================================================================
    HIGIENE PESSOAL
    Construída para o dia ruim, não para o dia bom. Cada tarefa tem três
    níveis e QUALQUER um conta como feito — a literatura de ativação
@@ -3734,7 +3969,7 @@ const DEF={
  disf:{notas:[],lista:[],calc:''},
  ui:{tab:'inicio',sub:{treino:'hoje',nutri:'diario',prog:'peso',cuidados:'corpo',perfil:null},
    calMes:null,diaSel:null,tema:'auto',filtroRef:'todas',cardapio:null,skinTipo:null,
-   cienciaV:'fatos',fatoArea:'',calSaude:null,guiaAberto:'',dobras:[],refTudo:false}
+   cienciaV:'fatos',fatoArea:'',prArea:'',calSaude:null,guiaAberto:'',dobras:[],refTudo:false}
 };
 /* Medidas caseiras dos alimentos mais registrados, para não depender da balança.
    [rótulo, gramas equivalentes] */
@@ -9547,6 +9782,128 @@ if(window.visualViewport){
    não quer ver vem ANTES de o primeiro número aparecer, que é a regra
    que o app já tinha e que esta camada só passou a cumprir direito.
    ===================================================================== */
+/* =====================================================================
+   DESENHOS DAS DICAS
+   São SVG escritos aqui, e não imagens. Duas razões, nesta ordem:
+
+   1. O material que deu origem a estas dicas é de outras pessoas —
+      cada print tem a marca de quem fez. Conhecimento não tem dono,
+      desenho tem. O que entra no app é a instrução, redesenhada.
+   2. Desenho em SVG acompanha o tema, não pesa nada e continua nítido
+      em qualquer tela. Vinte e oito megabytes de print não fariam
+      nenhuma das três coisas.
+   ===================================================================== */
+/* O rosto, de frente, em traço simples. As zonas entram por cima. */
+function svgRosto(zonas,rotulo){
+ return '<svg viewBox="0 0 160 186" role="img" aria-label="'+esc(rotulo)+'" '+
+  'style="width:100%;max-width:230px;display:block;margin:0 auto">'+
+  '<g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" opacity=".55">'+
+   /* pescoço e ombro, para o rosto não flutuar */
+   '<path d="M62,140 L62,158 C44,163 34,170 30,180 M98,140 L98,158 C116,163 126,170 130,180"/>'+
+   '<path d="M40,74 C40,38 56,16 80,16 C104,16 120,38 120,74 C120,106 104,134 80,148 '+
+    'C56,134 40,106 40,74 Z"/>'+
+   '<path d="M55,64 C60,59 70,59 75,63 M105,64 C100,59 90,59 85,63"/>'+
+   '<path d="M80,78 L80,96 C80,99 77,100 74,100"/>'+
+   '<path d="M69,116 C74,113 86,113 91,116"/>'+
+  '</g>'+
+  '<g stroke="none">'+zonas+'</g>'+
+  '<g fill="none" stroke="currentColor" stroke-width="1.4" opacity=".45">'+
+   '<ellipse cx="63" cy="75" rx="7" ry="4"/><ellipse cx="97" cy="75" rx="7" ry="4"/>'+
+  '</g>'+
+  '</svg>';
+}
+function legenda(itens){
+ return '<div class="row wrap" style="gap:9px 14px;margin-top:10px;justify-content:center">'+
+  itens.map(function(x){
+   return '<span class="xtiny" style="display:inline-flex;align-items:center;gap:6px;color:var(--ink-2)">'+
+    '<span style="width:11px;height:11px;border-radius:3px;flex:none;background:'+x[0]+'"></span>'+
+    esc(x[1])+'</span>';
+  }).join('')+'</div>';
+}
+/* Contorno que puxa para o masculino: escurecer as bordas do rosto para
+   a testa parecer mais quadrada e o maxilar mais largo, e levantar a
+   sobrancelha com sombra em vez de lápis duro. */
+function desenhoContornoMasc(){
+ /* As faixas são TRAÇO e não preenchimento. Desenhadas como foice —
+    duas curvas quase coladas —, elas somem na tela: a área fica com
+    um ou dois pixels de altura e a cor não aparece. Traço grosso com
+    ponta redonda tem a espessura que eu pedir. */
+ const faixa=function(d,cor,w,op){
+  return '<path d="'+d+'" fill="none" stroke="'+cor+'" stroke-width="'+w+'" '+
+   'stroke-linecap="round" opacity="'+op+'"/>';
+ };
+ const z=
+  /* cantos da testa, para quadrar a linha do cabelo */
+  '<path d="M41,68 C41,42 50,24 64,19 C55,34 51,50 51,70 Z" fill="#c2763f" opacity=".5"/>'+
+  '<path d="M119,68 C119,42 110,24 96,19 C105,34 109,50 109,70 Z" fill="#c2763f" opacity=".5"/>'+
+  /* linha do maxilar, dos dois lados até o queixo */
+  faixa('M45,90 C50,114 62,133 79,144','#c2763f',9,'.5')+
+  faixa('M115,90 C110,114 98,133 81,144','#c2763f',9,'.5')+
+  /* laterais do nariz, para afinar o dorso */
+  faixa('M75,80 L75,97','#8a5a33',4,'.45')+
+  faixa('M85,80 L85,97','#8a5a33',4,'.45')+
+  /* sombra do buço e abaixo do lábio */
+  faixa('M70,107 C76,105 84,105 90,107','#6f4a2e',5,'.33')+
+  faixa('M74,125 C78,124 82,124 86,125','#6f4a2e',5,'.3')+
+  /* sobrancelha mais cheia e mais reta */
+  faixa('M54,64 C61,58 71,58 77,62','#3f2a1c',6,'.62')+
+  faixa('M106,64 C99,58 89,58 83,62','#3f2a1c',6,'.62');
+ return svgRosto(z,'Rosto de frente com as áreas de contorno masculinizante marcadas');
+}
+/* Contorno que puxa para o feminino: estreitar o alto e os cantos do
+   maxilar, levantar a maçã do rosto e iluminar o meio. */
+function desenhoContornoFem(){
+ const faixa=function(d,cor,w,op){
+  return '<path d="'+d+'" fill="none" stroke="'+cor+'" stroke-width="'+w+'" '+
+   'stroke-linecap="round" opacity="'+op+'"/>';
+ };
+ const z=
+  /* alto das têmporas, para estreitar a testa */
+  '<path d="M41,64 C41,40 50,23 64,18 C54,34 50,47 50,66 Z" fill="#b06a86" opacity=".4"/>'+
+  '<path d="M119,64 C119,40 110,23 96,18 C106,34 110,47 110,66 Z" fill="#b06a86" opacity=".4"/>'+
+  /* canto do maxilar, só o ângulo — o queixo fica de fora */
+  faixa('M45,88 C48,104 54,117 62,126','#b06a86',8,'.42')+
+  faixa('M115,88 C112,104 106,117 98,126','#b06a86',8,'.42')+
+  /* abaixo da maçã do rosto, puxando para cima */
+  faixa('M52,86 C60,93 66,96 71,99','#9c5a74',7,'.4')+
+  faixa('M108,86 C100,93 94,96 89,99','#9c5a74',7,'.4')+
+  /* iluminado: meio da testa, dorso do nariz, abaixo dos olhos, queixo */
+  '<ellipse cx="80" cy="38" rx="13" ry="12" fill="#ffe9c9" opacity=".7"/>'+
+  faixa('M80,66 L80,96','#ffe9c9',6,'.75')+
+  faixa('M57,84 C62,87 66,88 70,89','#ffe9c9',5,'.6')+
+  faixa('M103,84 C98,87 94,88 90,89','#ffe9c9',5,'.6')+
+  '<ellipse cx="80" cy="128" rx="8" ry="5" fill="#ffe9c9" opacity=".6"/>'+
+  /* sobrancelha mais fina e mais arqueada */
+  faixa('M55,65 C61,57 70,56 77,61','#5b4030',4,'.55')+
+  faixa('M105,65 C99,57 90,56 83,61','#5b4030',4,'.55');
+ return svgRosto(z,'Rosto de frente com as áreas de contorno feminilizante marcadas');
+}
+/* A direção da fita. É a informação que mais some nos tutoriais: o
+   sentido do empurrão muda o resultado e muda o risco. */
+function desenhoFita(){
+ return '<svg viewBox="0 0 200 150" role="img" '+
+  'aria-label="Tronco visto de frente, com setas apontando do centro do peito para cada axila" '+
+  'style="width:100%;max-width:260px;display:block;margin:0 auto">'+
+  '<g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" opacity=".55">'+
+   '<path d="M100,10 C112,10 118,16 118,24 L118,30 C136,34 156,42 162,52 '+
+    'C168,62 168,96 166,130 M100,10 C88,10 82,16 82,24 L82,30 C64,34 44,42 38,52 '+
+    'C32,62 32,96 34,130"/>'+
+   '<path d="M34,130 L166,130"/>'+
+   '<path d="M38,52 C44,64 46,76 46,88 M162,52 C156,64 154,76 154,88"/>'+
+  '</g>'+
+  '<g stroke="#5BCEFA" stroke-width="5" stroke-linecap="round" fill="none">'+
+   '<path d="M88,76 C74,74 64,68 56,60" marker-end="url(#pf)"/>'+
+   '<path d="M112,76 C126,74 136,68 144,60" marker-end="url(#pf)"/>'+
+  '</g>'+
+  '<defs><marker id="pf" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="5" markerHeight="5" '+
+   'orient="auto-start-reverse"><path d="M0,1 L9,5 L0,9 Z" fill="#5BCEFA"/></marker></defs>'+
+  '<g fill="currentColor" opacity=".5" font-size="9" text-anchor="middle" '+
+   'font-family="system-ui,sans-serif">'+
+   '<text x="46" y="50">axila</text><text x="154" y="50">axila</text>'+
+  '</g>'+
+  '</svg>';
+}
+
 /* A trilha reconfigura treino, voz, pele e objetivo. Mora numa função
    porque agora duas telas mexem nela: o Perfil e o primeiro uso.
 
@@ -11927,14 +12284,15 @@ const CU_BLOCOS=[
  ['voz',      'Voz',                 'mic',    'treino diário, medir a frequência e segurança vocal', ['voz']],
  ['pele',     'Pele e maquiagem',    'sparkle','rotina de pele, produtos, maquiagem e roupa',         ['pele','aparencia']],
  ['corpo',    'Corpo',               'ruler',  'binder, tucking e postura, com os limites de uso',    ['corpo']],
+ ['pratica',  'Na prática',          'wand',   'o que comprar, quanto custa e o que fazer sem poder comprar',['pratica']],
  ['higiene',  'Higiene',             'drop',   'a sua lista, editável, e a versão de dia ruim',       ['higiene']],
  ['ciclo',    'Ciclo e hormônios',   'cal',    'calendário, remédios e o que esperar de cada fase',   ['ciclo']],
  ['humor',    'Humor e cabeça',      'heart',  'ânimo, ansiedade e disforia, dia a dia',             ['humor']],
  ['servicos', 'Direitos e serviços', 'book',   'SUS, retificação, cirurgias e profissionais',         ['guias','profissionais']]
 ];
-const CU_SECOES_TODAS=['voz','pele','aparencia','corpo','higiene','ciclo','humor','guias','profissionais'];
+const CU_SECOES_TODAS=['voz','pele','aparencia','corpo','pratica','higiene','ciclo','humor','guias','profissionais'];
 const CU_RENDER={higiene:stHigiene,corpo:stCorpo,ciclo:stCiclo,voz:stVoz,aparencia:stAparencia,
-  pele:stPele,profissionais:stProfissionais,guias:stGuias,humor:stHumor};
+  pele:stPele,pratica:stPratica,profissionais:stProfissionais,guias:stGuias,humor:stHumor};
 
 /* Androginia e bem-estar nao tem binder nem treino de voz obrigatorio: o bloco
    simplesmente nao aparece, em vez de abrir vazio. */
@@ -14065,6 +14423,7 @@ document.addEventListener('click',ev=>{
   case 'go':S.ui.tab=d.tab;if(d.v)S.ui.cienciaV=d.v;window.scrollTo(0,0);render();break;
   case 'ciencia-v':S.ui.cienciaV=d.v;S.ui.fatoArea='';window.scrollTo(0,0);render();break;
   case 'fato-area':S.ui.fatoArea=d.v||'';render();break;
+  case 'pr-area':S.ui.prArea=d.v||'';window.scrollTo(0,0);render();break;
   case 'go-sub':{const tb=d.tab,st=d.st||(d.v||'').split('|')[1];
    S.ui.tab=tb;if(st)S.ui.sub[tb]=st;window.scrollTo(0,0);render();break}
   case 'close':case 'close-ovl':closeSheet();break;
