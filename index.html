@@ -882,11 +882,15 @@ button.cday:active{transform:scale(.94)}
 <header class="hdr">
  <div class="in">
   <div class="row top spread">
-   <div class="grow">
+   <!-- O cabeçalho é o caminho de volta. Era só texto, e de dentro de
+        uma tela funda a única saída era a barra de baixo. -->
+   <button class="grow" data-a="go" data-tab="inicio" aria-label="Voltar para o início"
+    style="background:none;border:0;padding:0;margin:0;text-align:left;color:inherit;
+    font:inherit;min-width:0;cursor:pointer">
     <div class="eyebrow">Norte</div>
     <h1 id="hdrTitle">Sua jornada</h1>
     <div class="sub" id="hdrSub">Carregando…</div>
-   </div>
+   </button>
    <div class="stack" style="gap:5px;align-items:flex-end">
     <span class="hpill" id="hdrDay">Dia <b>—</b></span>
     <span class="hpill" id="hdrStreak"><svg class="ic"><use href="#i-flame"/></svg><b>0</b></span>
@@ -3475,6 +3479,17 @@ const HABITS=[['higiene','Higiene: alguma coisa feita','sparkle'],
  ['pele','Skincare manhã e noite','sparkle'],['prot','Bater a meta de proteína','target'],
  ['agua','Bater a meta de água','drop'],['sono','Dormir 7 a 9 horas','moon'],
  ['passos','Caminhar 8 mil passos','steps'],['ultra','Zero ultraprocessado','leaf']];
+/* Para onde cada hábito leva. Os que não estão aqui não têm tela
+   própria — sono, passos e ultraprocessado se registram no próprio
+   cartão, e seta que não leva a lugar nenhum é pior que seta nenhuma. */
+const HAB_TELA={
+ higiene:['data-a="go-sub" data-tab="cuidados" data-st="higiene"','a higiene'],
+ treino:['data-a="go" data-tab="treino"','o treino'],
+ voz:['data-a="go-sub" data-tab="cuidados" data-st="voz"','o treino de voz'],
+ pele:['data-a="go-sub" data-tab="cuidados" data-st="pele"','a rotina de pele'],
+ prot:['data-a="go-sub" data-tab="nutri" data-st="diario"','o diário de comida'],
+ agua:['data-a="go-sub" data-tab="nutri" data-st="agua"','a água']
+};
 const LOCAIS=[['casa','Em casa','home'],['academia','Academia','dumb'],['cal','Calistenia','wave']];
 
 /* =====================================================================
@@ -5539,10 +5554,27 @@ function cardHabitos(){
  const x=dia(hoje()),LH=HABITS.filter(h=>h[0]!=='voz'||trilha().voz!=='off');
  const n=LH.filter(h=>x.hab[h[0]]).length;
  return '<div class="card">'+chTtl('check','Hábitos de hoje','<span class="tag '+(n===HABITS.length?'o':'n')+'">'+n+'/'+HABITS.length+'</span>')+
-  '<div class="stack" style="gap:0">'+LH.map(([k,t,i2])=>
-   '<button class="li" data-a="hab" data-k="'+k+'"><span class="chk '+(x.hab[k]?'on':'')+'">'+ic('check')+'</span>'+
-   ic(i2,'font-size:16px;color:var(--ink-3)')+
-   '<span class="grow" style="font-size:13.8px;font-weight:600;'+(x.hab[k]?'text-decoration:line-through;color:var(--ink-3)':'')+'">'+t+'</span></button>').join('')+'</div>'+
+  /* Cada hábito que tem tela atrás ganha uma seta que leva até ela. O
+     corpo da linha continua sendo o que marca feito — quem quer riscar
+     rico ainda toca na linha —, mas antes não havia caminho nenhum
+     daqui para a tela da coisa: clicar em "Treinar a voz" riscava o
+     item e deixava a pessoa no mesmo lugar.
+
+     A seta é um botão IRMÃO, e não um botão dentro do outro: botão
+     dentro de botão é HTML inválido, e o toque fica imprevisível. */
+  '<div class="stack" style="gap:0">'+LH.map(([k,t,i2])=>{
+   const onde=HAB_TELA[k];
+   const linha='<button class="li grow" data-a="hab" data-k="'+k+'">'+
+    '<span class="chk '+(x.hab[k]?'on':'')+'">'+ic('check')+'</span>'+
+    ic(i2,'font-size:16px;color:var(--ink-3)')+
+    '<span class="grow" style="font-size:13.8px;font-weight:600;'+
+    (x.hab[k]?'text-decoration:line-through;color:var(--ink-3)':'')+'">'+t+'</span></button>';
+   if(!onde)return linha;
+   return '<div class="row" style="gap:6px;align-items:stretch">'+linha+
+    '<button class="li" '+onde[0]+' aria-label="Abrir '+esc(onde[1])+'" '+
+    'style="width:auto;flex:none;padding-left:8px;padding-right:2px">'+
+    ic('right','color:var(--ink-3)')+'</button></div>';
+  }).join('')+'</div>'+
   /* Os hábitos que a própria pessoa criou entram aqui, no mesmo cartão
      dos do app, com a hora que o cálculo da semana achou. Em cartão
      separado seriam duas listas chamadas "hábitos" na mesma tela. */
@@ -14590,7 +14622,16 @@ document.addEventListener('click',ev=>{
  if(a==='close-ovl'&&ev.target!==el)return;
  switch(a){
   /* navegação */
-  case 'go':S.ui.tab=d.tab;if(d.v)S.ui.cienciaV=d.v;window.scrollTo(0,0);render();break;
+  case 'go':
+   S.ui.tab=d.tab;
+   /* Cuidados é um hub, e o botão da barra tem de cair nele. Como a
+      sub-aba fica guardada, tocar em Cuidados reabria o bloco da última
+      vez — a pessoa queria a lista e caía dentro de "Pele", sem ver que
+      existiam outros sete. Os atalhos de dentro do app usam 'go-sub',
+      que continua levando direto para o assunto. */
+   if(d.tab==='cuidados')S.ui.sub.cuidados=null;
+   if(d.v)S.ui.cienciaV=d.v;
+   window.scrollTo(0,0);render();break;
   case 'ciencia-v':S.ui.cienciaV=d.v;S.ui.fatoArea='';window.scrollTo(0,0);render();break;
   case 'fato-area':S.ui.fatoArea=d.v||'';render();break;
   case 'pr-area':S.ui.prArea=d.v||'';window.scrollTo(0,0);render();break;
@@ -15471,6 +15512,15 @@ document.addEventListener('click',ev=>{
 });
 document.addEventListener('click',ev=>{
  const b=ev.target.closest('#tabbar button[data-tab]');if(!b)return;
+ /* Cuidados é um hub, e o botão da barra tem de cair nele. Como a
+    sub-aba fica guardada, tocar em Cuidados reabria o bloco da última
+    vez: a pessoa queria a lista e caía dentro de "Pele", sem ver que
+    existiam outros sete. Os atalhos de dentro do app usam 'go-sub',
+    que continua levando direto para o assunto.
+
+    A barra é o caminho de voltar ao começo de cada aba — por isso
+    vale também quando ela já está aberta. */
+ if(b.dataset.tab==='cuidados')S.ui.sub.cuidados=null;
  S.ui.tab=b.dataset.tab;window.scrollTo(0,0);render();
 });
 document.addEventListener('keydown',ev=>{
