@@ -912,11 +912,13 @@ button.cday:active{transform:scale(.94)}
     <button class="subtab" data-st="agenda">Calendário</button>
     <button class="subtab" data-st="evolucao">Evolução</button>
     <button class="subtab" data-st="plano">Plano e movimentos</button>
+    <button class="subtab" data-st="exercicios">Todos os exercícios</button>
    </div>
    <div id="st-hoje" class="stack" style="gap:14px"></div>
    <div id="st-agenda" class="stack" style="gap:14px" hidden></div>
    <div id="st-evolucao" class="stack" style="gap:14px" hidden></div>
    <div id="st-plano" class="stack" style="gap:14px" hidden></div>
+   <div id="st-exercicios" class="stack" style="gap:14px" hidden></div>
   </div>
  </section>
 
@@ -3068,14 +3070,36 @@ RECIPES.push(
 
 /* ---- grupos musculares, inferidos pelo nome do exercício (para o gráfico de volume) ---- */
 const GRUPOS=[
- ['Cardio',['hiit','caminhada','corrida','bike','esteira','polichinelo','burpee','automassagem','mobilidade','alongamento','liberação','dormir','meta de','rolinho']],
- ['Core',['prancha','abdominal','canivete','superman','elevação de pernas','bicicleta','core','toque no ombro']],
- ['Costas',['puxada','remada','barra fixa','pullover','face pull','encolhimento','cavalinho','crucifixo invertido','dorsal']],
- ['Ombro',['desenvolvimento','elevação lateral','militar','pike','elevação frontal']],
+ /* A ordem é o desempate. A primeira linha que casa ganha, então tudo que
+    tem nome parecido com outro grupo vem antes das linhas gerais.
+
+    'coice' puxava para tríceps e 'flexão' para peito, e os dois são de
+    perna. 'bicicleta' do Core é o abdominal, não a bike. 'caminhada' do
+    Cardio não é monster walk (glúteo), caminhada do fazendeiro (carga) nem
+    caminhada do urso (core). 'abdução horizontal' é ombro, não quadril.
+    Alongamento, mobilidade e liberação saíram do Cardio e ganharam grupo
+    próprio: substituto de alongamento é outro alongamento, não corrida.
+
+    Isto decide com o que o app TROCA um exercício e qual etiqueta aparece
+    na ficha dele. O que decide limitação continua sendo o movimento, pelo
+    MOV_MAP. Sem estas linhas, 22 exercícios do plano caíam todos em
+    'Outros' e viravam substituto um do outro: o app oferecia chin-up para
+    quem não podia fazer pistol squat. */
+ ['Pernas',['coice de glúteo','flexão nórdica','flexão de joelho','curl de perna','caminhada lateral','caminhada na ponta','empurrar a parede com uma perna']],
+ ['Core',['caminhada do urso']],
+ ['Pernas',['salto lateral']],
+ ['Cardio',['bicicleta ergométrica','bicicleta na rua','caminhada do fazendeiro']],
+ ['Ombro',['abdução horizontal','abdução a 90']],
+ ['Peito',['empurrar a parede com força','pressão de palmas','squeeze','pseudo-planche']],
+ ['Mobilidade',['alongamento','mobilidade','liberação','rolinho','automassagem','postura do bebê','rotação de tronco deitada']],
+ ['Cardio',['hiit','caminhada','corrida','bike','esteira','polichinelo','burpee','dormir','meta de','elíptico','remo ergômetro','stepper','pular corda','joelho alto','chute no bumbum','skater','shadow boxing','dança','natação','hidroginástica','escada ou stepper','subir escada','subir e descer escada','circuito','tiros de']],
+ ['Core',['prancha','abdominal','canivete','superman','elevação de pernas','bicicleta','core','toque no ombro','hollow','mountain climber','escalador','bird dog','dead bug','pallof','rotação russa','rotação de tronco','ab wheel','sit-up','l-sit','elevação de joelhos','toque no calcanhar','elevação de tronco','respiração 360','marcha deitada','levantamento turco']],
+ ['Costas',['puxada','remada','barra fixa','pullover','face pull','encolhimento','cavalinho','crucifixo invertido','dorsal','dead hang','pendurar na barra','scapular pull','retração escapular','chin-up','front lever','extensão lombar','hiperextensão','extensão de tronco','rotação externa','rotação interna']],
+ ['Ombro',['desenvolvimento','elevação lateral','militar','pike','parada de mão','elevação frontal','push press','circundução de ombro','isometria de ombro','elevação em y','elevação em t','elevação em w','rotação de ombro']],
  ['Peito',['supino','flexão','crucifixo','peck','mergulho']],
  ['Bíceps',['rosca']],
  ['Tríceps',['tríceps','testa','francês','coice']],
- ['Pernas',['agachamento','leg press','afundo','stiff','extensora','flexora','panturrilha','pélvica','búlgaro','terra','sumô','cadeirinha','salto','glúteo','caminhando','ponte']]
+ ['Pernas',['agachamento','leg press','afundo','stiff','extensora','flexora','panturrilha','pélvica','búlgaro','terra','sumô','cadeirinha','salto','glúteo','caminhando','ponte','abdução','adução','adutora','nordic curl','pistol squat','bom dia','subida','hip thrust','swing com kettlebell','clean com kettlebell','passada','copenhagen','sissy squat','clamshell','frog pump','extensão de quadril','elevação de quadril','elevação de calcanhar','extensão de joelho','equilíbrio','posterior no trx','marcha','elevação de perna estendida']]
 ];
 function grupoDe(nome){
  const n=nrm(nome);
@@ -4007,7 +4031,7 @@ const DEF={
  disf:{notas:[],lista:[],calc:''},
  ui:{tab:'inicio',sub:{treino:'hoje',nutri:'diario',prog:'peso',cuidados:'corpo',perfil:null},
    calMes:null,diaSel:null,tema:'auto',filtroRef:'todas',cardapio:null,skinTipo:null,
-   cienciaV:'fatos',fatoArea:'',prArea:'',calSaude:null,guiaAberto:'',dobras:[],refTudo:false}
+   cienciaV:'fatos',fatoArea:'',prArea:'',exG:'',exEq:'',exQ:'',calSaude:null,guiaAberto:'',dobras:[],refTudo:false}
 };
 /* Medidas caseiras dos alimentos mais registrados, para não depender da balança.
    [rótulo, gramas equivalentes] */
@@ -6104,6 +6128,20 @@ const MOV={
 };
 const MOV_MAP=[
  ['__none__',['dormir','meta de','beber','liberação','automassagem','rolinho','hidrat']],
+ /* Desempate, e vem antes de tudo porque a lista é lida em ordem e a
+    primeira que bate ganha. Dois nomes caíam no movimento errado, e
+    errado aqui significa limitação errada:
+
+    "coice de glúteo" batia em 'coice', que é de tríceps — então quem
+    marcou dor no cotovelo perdia um exercício de glúteo, e quem marcou
+    joelho ou lombar continuava recebendo.
+
+    "flexão nórdica" batia em 'flexão' — então quem não pode apoiar
+    peso nas mãos perdia o exercício de posterior de coxa que mais
+    recruta a perna, e sem apoiar mão nenhuma. Esse já estava assim no
+    app: "Flexão nórdica assistida" é um dos exercícios do plano. */
+ ['ponte',['coice de glúteo']],
+ ['stiff',['flexão nórdica','flexão de joelho','curl de perna']],
  ['prancha',['prancha']],
  ['abdominal',['abdominal','canivete','hollow','bicicleta','elevação de pernas','superman','l-sit','core','toque no ombro']],
  ['mergulho',['mergulho','paralela','dips']],
@@ -6652,11 +6690,655 @@ function blocoHistorico(){
     (x.treino.nota?'<div class="xtiny muted" style="margin-top:2px">"'+esc(x.treino.nota)+'"</div>':'')+
     '</div>'+ic('right','color:var(--ink-3)')+'</button>';}).join('')+'</div></div>';
 }
+/* ---- catálogo de exercícios ----
+   504 exercícios: nome, grupo, onde dá para fazer, nível, para quem é
+   prioridade (m masculinizar, f feminilizar, a androginia, b bem-estar;
+   vazio = serve a todas por igual) e, quando vale a pena, uma linha de
+   execução.
+
+   NÃO tem campo de movimento: o movimento sai do próprio nome, pelo
+   MOV_MAP que o app já usa. É o que faz as limitações da pessoa valerem
+   aqui sem nenhuma tabela nova para manter em dia.
+
+   O grupo escrito aqui é o rótulo de quem procura — "Tríceps no banco"
+   fica em Tríceps, que é onde alguém vai olhar. O grupoDe() do app
+   chama o mesmo exercício de Peito, porque lá o grupo serve para achar
+   substituto do mesmo padrão de movimento. Os dois estão certos para o
+   que cada um faz, e o que decide limitação é o movimento, não isto. */
+const CATALOGO=[
+['Agachamento livre','Pernas','corpo',1,'','O básico de tudo. Desça em 3 segundos.'],
+['Agachamento livre com barra','Pernas','barra',2,'m','O que mais carrega perna por sessão.'],
+['Agachamento frontal com barra','Pernas','barra',3,'','Barra na frente: exige mais tronco ereto e pega mais quadríceps.'],
+['Agachamento goblet com halter','Pernas','halter',1,'','Halter junto ao peito. É o mais fácil de aprender a descer fundo.'],
+['Agachamento goblet com kettlebell','Pernas','kettle',1,''],
+['Agachamento sumô com halter','Pernas','halter',1,'f','Pés bem abertos: pega mais adutor e glúteo.'],
+['Agachamento sumô com kettlebell','Pernas','kettle',1,'f'],
+['Agachamento na cadeira','Pernas','corpo',1,'b','Senta e levanta. É agachamento, e conta igual.'],
+['Agachamento na parede (cadeirinha)','Pernas','corpo',1,'b','Isometria: segure o tempo em vez de contar repetição.'],
+['Agachamento com salto','Pernas','corpo',2,'','Explosivo. Sai do plano se você não pode dar impacto.'],
+['Agachamento búlgaro com halter','Pernas','halter',2,'f','Uma perna de cada vez, pé de trás apoiado.'],
+['Agachamento búlgaro só com o peso do corpo','Pernas','corpo',2,''],
+['Agachamento pistol apoiado','Pernas','corpo',3,'','Uma perna só, segurando num apoio.'],
+['Agachamento pistol completo','Pernas','corpo',3,'','O mais difícil da lista de perna sem equipamento.'],
+['Agachamento hack na máquina','Pernas','maquina',2,'m'],
+['Agachamento no Smith','Pernas','maquina',2,'','Trajetória guiada: bom para quem está aprendendo a carga.'],
+['Agachamento com elástico nos joelhos','Pernas','elastico',1,'','O elástico ensina a não deixar o joelho cair para dentro.'],
+['Agachamento isométrico com pausa no fundo','Pernas','corpo',2,'','Pare 3 segundos lá embaixo.'],
+['Agachamento 1 e 1/2','Pernas','corpo',2,'','Desce, sobe metade, desce de novo, sobe tudo.'],
+['Agachamento com peso na frente do corpo (zercher)','Pernas','barra',3,''],
+['Agachamento com salto alternando as pernas','Pernas','corpo',2,''],
+['Agachamento no banco com pausa','Pernas','banco',1,'b','Toca no banco, pausa, levanta.'],
+['Afundo parado','Pernas','corpo',1,''],
+['Afundo parado com halteres','Pernas','halter',2,''],
+['Afundo caminhando','Pernas','corpo',2,'f','Dá mais amplitude de glúteo que o afundo parado.'],
+['Afundo caminhando com halteres','Pernas','halter',2,'f'],
+['Afundo reverso','Pernas','corpo',1,'','Passo para trás: pesa menos no joelho da frente.'],
+['Afundo reverso com halteres','Pernas','halter',2,''],
+['Afundo lateral','Pernas','corpo',2,'f','Trabalha adutor junto.'],
+['Afundo apoiado no sofá','Pernas','corpo',2,'','Versão de casa do búlgaro.'],
+['Afundo no step','Pernas','corpo',2,''],
+['Passada com barra nas costas','Pernas','barra',3,'m'],
+['Afundo com elástico','Pernas','elastico',1,''],
+['Subida no banco (step-up)','Pernas','banco',1,'f','Suba empurrando com o calcanhar do pé de cima.'],
+['Subida no banco com halteres','Pernas','halter',2,'f'],
+['Subida lateral no banco','Pernas','banco',2,''],
+['Stiff com halteres','Pernas','halter',2,'f','Quadril para trás, joelho quase reto, costas retas.'],
+['Stiff com barra','Pernas','barra',2,'f'],
+['Stiff unilateral com halter','Pernas','halter',3,'','Uma perna só: equilíbrio e posterior juntos.'],
+['Levantamento terra convencional','Pernas','barra',3,'m','O que mais recruta corpo inteiro de uma vez.'],
+['Levantamento terra sumô','Pernas','barra',3,''],
+['Levantamento terra romeno','Pernas','barra',2,'f'],
+['Levantamento terra com kettlebell','Pernas','kettle',1,''],
+['Levantamento terra com elástico','Pernas','elastico',1,'b'],
+['Mesa flexora na máquina','Pernas','maquina',1,''],
+['Cadeira flexora na máquina','Pernas','maquina',1,''],
+['Flexora em pé na máquina','Pernas','maquina',2,''],
+['Nordic curl assistido','Pernas','corpo',3,'','O exercício de posterior mais intenso que existe sem peso.'],
+['Flexão nórdica inversa','Pernas','corpo',3,''],
+['Curl de perna com bola ou toalha','Pernas','corpo',2,'','Deitado, puxe os calcanhares com a bola.'],
+['Bom dia com barra','Pernas','barra',2,''],
+['Bom dia com elástico','Pernas','elastico',1,''],
+['Extensão de quadril na polia','Pernas','polia',2,'f'],
+['Stiff na polia baixa','Pernas','polia',2,'f'],
+['Elevação pélvica no chão','Pernas','corpo',1,'f','A ponte. Aperte o glúteo no topo por 2 segundos.'],
+['Elevação pélvica com barra','Pernas','barra',2,'f','O exercício que mais carrega glúteo por repetição.'],
+['Elevação pélvica apoiada no banco (hip thrust)','Pernas','banco',2,'f'],
+['Elevação pélvica unilateral','Pernas','corpo',2,'f'],
+['Ponte de glúteo com elástico nos joelhos','Pernas','elastico',1,'f'],
+['Coice de glúteo de quatro','Pernas','corpo',1,'f'],
+['Coice de glúteo na polia','Pernas','polia',2,'f'],
+['Coice de glúteo com elástico','Pernas','elastico',1,'f'],
+['Abdução de quadril na cadeira abdutora','Pernas','maquina',1,'f'],
+['Abdução deitado de lado','Pernas','corpo',1,'f','Glúteo médio, que é o que arredonda a lateral.'],
+['Abdução deitado com elástico','Pernas','elastico',1,'f'],
+['Abdução em pé na polia','Pernas','polia',2,'f'],
+['Caminhada lateral com elástico (monster walk)','Pernas','elastico',1,'f'],
+['Concha (clamshell) com elástico','Pernas','elastico',1,'f'],
+['Elevação pélvica com pausa de 3 segundos','Pernas','corpo',1,'f'],
+['Rã (frog pump)','Pernas','corpo',1,'f','Plantas dos pés juntas, joelhos abertos.'],
+['Extensão de quadril de quatro com perna estendida','Pernas','corpo',1,'f'],
+['Elevação pélvica com os pés no banco','Pernas','banco',2,'f'],
+['Agachamento búlgaro com pausa no fundo','Pernas','corpo',3,'f'],
+['Hip thrust unilateral no banco','Pernas','banco',3,'f'],
+['Cadeira extensora','Pernas','maquina',1,''],
+['Extensora unilateral','Pernas','maquina',2,''],
+['Leg press 45 graus','Pernas','maquina',1,'m'],
+['Leg press unilateral','Pernas','maquina',2,''],
+['Leg press com pés baixos','Pernas','maquina',2,'','Pé mais baixo na plataforma pega mais quadríceps.'],
+['Leg press com pés altos','Pernas','maquina',2,'f','Pé mais alto pega mais glúteo e posterior.'],
+['Sissy squat apoiado','Pernas','corpo',3,''],
+['Agachamento com peso no colo, sentada','Pernas','corpo',1,'b'],
+['Cadeira adutora','Pernas','maquina',1,'f'],
+['Adução deitado de lado','Pernas','corpo',1,'f'],
+['Adução com elástico em pé','Pernas','elastico',1,'f'],
+['Agachamento sumô com pausa','Pernas','corpo',2,'f'],
+['Copenhagen plank','Pernas','corpo',3,'','Adutor em isometria. É mais difícil do que parece.'],
+['Panturrilha em pé','Pernas','corpo',1,''],
+['Panturrilha em pé com halteres','Pernas','halter',1,''],
+['Panturrilha na máquina em pé','Pernas','maquina',1,''],
+['Panturrilha sentada na máquina','Pernas','maquina',1,'','Pega mais o sóleo, que é o músculo de baixo.'],
+['Panturrilha unilateral no degrau','Pernas','corpo',2,''],
+['Panturrilha no leg press','Pernas','maquina',2,''],
+['Panturrilha com pausa de 2 segundos no topo','Pernas','corpo',1,''],
+['Caminhada na ponta dos pés','Pernas','corpo',1,'b'],
+['Agachamento com uma perna no banco','Pernas','banco',3,''],
+['Elevação de quadril com uma perna e pé no banco','Pernas','banco',3,'f'],
+['Salto no caixote','Pernas','corpo',3,'m'],
+['Salto lateral (skater)','Pernas','corpo',2,''],
+['Afundo com salto','Pernas','corpo',3,''],
+['Agachamento com salto e giro','Pernas','corpo',3,''],
+['Marcha no lugar com joelho alto','Pernas','corpo',1,'b'],
+['Equilíbrio em uma perna','Pernas','corpo',1,'b','Trinta segundos de cada lado.'],
+['Equilíbrio em uma perna com os olhos fechados','Pernas','corpo',2,'b'],
+['Agachamento isométrico na parede com elevação de panturrilha','Pernas','corpo',2,''],
+['Swing com kettlebell','Pernas','kettle',2,'m','Quadril, não braço. O peso balança, você empurra o quadril.'],
+['Swing com kettlebell com uma mão','Pernas','kettle',3,''],
+['Agachamento com kettlebell no ombro (rack)','Pernas','kettle',2,''],
+['Levantamento turco','Pernas','kettle',3,'','Corpo inteiro, do chão até de pé.'],
+['Clean com kettlebell','Pernas','kettle',3,''],
+['Caminhada do fazendeiro com halteres','Pernas','halter',1,'m','Carregue peso e ande. Pega tudo.'],
+['Caminhada do fazendeiro com um lado só','Pernas','halter',2,'','O core segura o tronco reto.'],
+['Agachamento e levantar do chão (get-up simples)','Pernas','corpo',2,'b'],
+['Empurrar a parede com uma perna atrás','Pernas','corpo',1,'b'],
+['Subir escada','Pernas','corpo',1,'b','Conta como treino de perna e cardio.'],
+['Agachamento segurando no batente','Pernas','corpo',1,'b','Com apoio dá para descer mais fundo e com segurança.'],
+['Elevação de calcanhar segurando na parede','Pernas','corpo',1,'b'],
+['Ponte de glúteo com os pés na parede','Pernas','corpo',1,'b'],
+['Agachamento no ritmo da respiração','Pernas','corpo',1,'b'],
+['Afundo estático segurando na cadeira','Pernas','corpo',1,'b'],
+['Extensão de joelho sentada, sem peso','Pernas','corpo',1,'b'],
+['Flexão de joelho em pé, segurando no apoio','Pernas','corpo',1,'b'],
+['Abdução de quadril em pé, segurando na cadeira','Pernas','corpo',1,'b'],
+['Marcha sentada','Pernas','corpo',1,'b','Para dias em que levantar não dá.'],
+['Elevação de perna estendida sentada','Pernas','corpo',1,'b'],
+['Agachamento parcial com apoio nas duas mãos','Pernas','corpo',1,'b'],
+['Panturrilha sentada sem peso','Pernas','corpo',1,'b'],
+['Ponte de glúteo com elástico e pausa','Pernas','elastico',2,'f'],
+['Stiff com elástico','Pernas','elastico',1,'f'],
+['Agachamento com elástico sobre os ombros','Pernas','elastico',2,''],
+['Leg press na máquina horizontal','Pernas','maquina',1,'b'],
+['Agachamento no TRX ou fita de suspensão','Pernas','corpo',1,'b','A fita tira peso e deixa descer fundo.'],
+['Afundo no TRX','Pernas','corpo',2,''],
+['Posterior no TRX','Pernas','corpo',2,''],
+['Barra fixa pronada','Costas','corpo',3,'m','O exercício que mais abre a dorsal. Com elástico vale igual.'],
+['Barra fixa supinada (chin-up)','Costas','corpo',3,'','Pega mais bíceps junto.'],
+['Barra fixa com elástico de ajuda','Costas','elastico',2,'m'],
+['Barra fixa negativa','Costas','corpo',2,'m','Só a descida, em 5 segundos. É como se aprende a primeira.'],
+['Barra fixa neutra','Costas','corpo',3,''],
+['Pendurar na barra (dead hang)','Costas','corpo',1,'','Ombro e pegada, e alonga a coluna.'],
+['Puxada frontal na polia','Costas','polia',1,'m'],
+['Puxada frontal pegada aberta','Costas','polia',1,'m','Pegada aberta puxa a largura.'],
+['Puxada frontal pegada fechada','Costas','polia',1,''],
+['Puxada supinada na polia','Costas','polia',1,''],
+['Puxada neutra na polia','Costas','polia',1,''],
+['Puxada unilateral na polia','Costas','polia',2,''],
+['Puxada com corda na polia alta','Costas','polia',2,''],
+['Remada curvada com barra','Costas','barra',2,'m','Espessura das costas.'],
+['Remada curvada com halteres','Costas','halter',2,''],
+['Remada unilateral com halter (serrote)','Costas','halter',1,'m'],
+['Remada na máquina sentada','Costas','maquina',1,''],
+['Remada baixa na polia','Costas','polia',1,''],
+['Remada cavalinho','Costas','maquina',2,'m'],
+['Remada Pendlay','Costas','barra',3,''],
+['Remada com elástico sentada','Costas','elastico',1,'b'],
+['Remada com elástico em pé','Costas','elastico',1,'b'],
+['Remada invertida (australiana)','Costas','corpo',2,'','Debaixo de uma mesa firme também funciona.'],
+['Remada invertida com pés elevados','Costas','corpo',3,''],
+['Remada no TRX','Costas','corpo',1,'b'],
+['Remada alta com barra','Costas','barra',2,'m'],
+['Remada alta com halteres','Costas','halter',2,''],
+['Remada T com barra','Costas','barra',2,'m'],
+['Remada com kettlebell','Costas','kettle',2,''],
+['Remada deitada no banco com halteres','Costas','banco',2,''],
+['Pullover com halter','Costas','halter',2,'m','Abre a caixa torácica e pega a dorsal por outro ângulo.'],
+['Pullover na polia com braços estendidos','Costas','polia',2,'m'],
+['Face pull na polia','Costas','polia',1,'m','O melhor exercício para a postura do ombro.'],
+['Face pull com elástico','Costas','elastico',1,'b'],
+['Crucifixo invertido com halteres','Costas','halter',1,'m'],
+['Crucifixo invertido na máquina','Costas','maquina',1,''],
+['Crucifixo invertido no banco inclinado','Costas','banco',2,''],
+['Encolhimento com halteres','Costas','halter',1,'m','Trapézio superior.'],
+['Encolhimento com barra','Costas','barra',1,'m'],
+['Encolhimento na polia','Costas','polia',2,''],
+['Superman no chão','Costas','corpo',1,'','Lombar e glúteo, sem peso nenhum.'],
+['Superman alternado','Costas','corpo',1,'b'],
+['Extensão lombar no banco romano','Costas','banco',2,''],
+['Extensão lombar no chão com pausa','Costas','corpo',1,'b'],
+['Bird dog','Costas','corpo',1,'b','Braço e perna opostos. Estabiliza a lombar.'],
+['Retração escapular na barra','Costas','corpo',2,'','Só os ombros se movem. Ensina a puxada.'],
+['Retração escapular com elástico','Costas','elastico',1,'b'],
+['Puxada com elástico ajoelhada','Costas','elastico',1,'b'],
+['Remada em pronação na máquina','Costas','maquina',1,''],
+['Remada com pegada neutra na máquina','Costas','maquina',1,''],
+['Puxada atrás da nuca','Costas','polia',3,'','Só com ombro saudável e amplitude boa.'],
+['Barra fixa com pegada larga e pausa no topo','Costas','corpo',3,'m'],
+['Remada invertida com pausa','Costas','corpo',2,''],
+['Remada unilateral na polia baixa','Costas','polia',2,''],
+['Puxada com uma mão na polia','Costas','polia',2,''],
+['Remada curvada com elástico','Costas','elastico',1,''],
+['Rotação externa com elástico','Costas','elastico',1,'','Manguito rotador: pequeno, e é o que segura o ombro.'],
+['Rotação externa deitada de lado com halter','Costas','halter',1,''],
+['Rotação interna com elástico','Costas','elastico',1,''],
+['Puxada de braço estendido com elástico','Costas','elastico',1,''],
+['Remada sentada no chão com elástico','Costas','elastico',1,'b'],
+['Hiperextensão reversa','Costas','banco',3,''],
+['Puxada na barra com joelhos apoiados','Costas','corpo',2,''],
+['Remada com toalha na porta','Costas','corpo',1,'b','Sem equipamento nenhum: toalha presa na maçaneta.'],
+['Encolhimento com kettlebell','Costas','kettle',1,''],
+['Remada renegada','Costas','halter',3,'','Prancha e remada ao mesmo tempo.'],
+['Puxada frontal com pausa embaixo','Costas','polia',2,''],
+['Remada baixa com pausa de 2 segundos','Costas','polia',2,''],
+['Crucifixo invertido na polia alta','Costas','polia',2,'m'],
+['Barra fixa com peso','Costas','corpo',3,'m'],
+['Puxada com corda atrás da cabeça','Costas','polia',2,''],
+['Remada no banco a 45 graus','Costas','banco',2,''],
+['Puxada unilateral com elástico','Costas','elastico',1,''],
+['Extensão de tronco em pé com elástico','Costas','elastico',1,'b'],
+['Puxada escapular na polia','Costas','polia',1,''],
+['Flexão de braço','Peito','corpo',1,''],
+['Flexão com joelhos no chão','Peito','corpo',1,'b'],
+['Flexão na parede','Peito','corpo',1,'b','Quanto mais em pé, mais leve.'],
+['Flexão com as mãos no banco','Peito','banco',1,'b'],
+['Flexão com os pés elevados','Peito','corpo',2,'m','Pega mais a parte de cima do peito.'],
+['Flexão diamante','Peito','corpo',2,'','Mãos juntas: tríceps entra com força.'],
+['Flexão aberta','Peito','corpo',2,''],
+['Flexão explosiva','Peito','corpo',3,''],
+['Flexão com pausa embaixo','Peito','corpo',2,''],
+['Flexão arqueira','Peito','corpo',3,''],
+['Flexão hindu','Peito','corpo',2,''],
+['Flexão com elástico nas costas','Peito','elastico',2,''],
+['Flexão no TRX','Peito','corpo',2,''],
+['Flexão com rotação','Peito','corpo',2,''],
+['Pseudo-planche push-up','Peito','corpo',3,''],
+['Supino reto com barra','Peito','barra',2,'m'],
+['Supino reto com halteres','Peito','halter',2,'m'],
+['Supino inclinado com barra','Peito','barra',2,'m','Parte de cima do peito, que é a que mais muda a frente do tronco.'],
+['Supino inclinado com halteres','Peito','halter',2,'m'],
+['Supino declinado com barra','Peito','barra',2,''],
+['Supino declinado com halteres','Peito','halter',2,''],
+['Supino na máquina','Peito','maquina',1,''],
+['Supino no Smith','Peito','maquina',1,''],
+['Supino com pegada fechada','Peito','barra',2,'','Mais tríceps que peito.'],
+['Supino com halteres e pegada neutra','Peito','halter',2,''],
+['Supino com pausa no peito','Peito','barra',3,''],
+['Crucifixo reto com halteres','Peito','halter',1,''],
+['Crucifixo inclinado com halteres','Peito','halter',1,''],
+['Crucifixo na máquina (peck deck)','Peito','maquina',1,''],
+['Crucifixo na polia (cross-over)','Peito','polia',2,''],
+['Crucifixo na polia de baixo para cima','Peito','polia',2,''],
+['Crucifixo na polia de cima para baixo','Peito','polia',2,''],
+['Crucifixo com elástico','Peito','elastico',1,'b'],
+['Crucifixo no TRX','Peito','corpo',3,''],
+['Mergulho nas paralelas','Peito','corpo',3,'m'],
+['Mergulho no banco','Peito','banco',1,''],
+['Mergulho assistido na máquina','Peito','maquina',2,''],
+['Supino com elástico deitada','Peito','elastico',1,'b'],
+['Empurrar a parede com força (isometria de peito)','Peito','corpo',1,'b'],
+['Pressão de palmas (squeeze)','Peito','corpo',1,'b','Nenhum equipamento, e o peito contrai de verdade.'],
+['Flexão plus (protração escapular)','Peito','corpo',2,'','Serrátil, que é o músculo que estabiliza a escápula.'],
+['Supino com halteres no chão (floor press)','Peito','halter',2,'','Amplitude menor: bom para ombro sensível.'],
+['Supino unilateral com halter','Peito','halter',3,''],
+['Flexão com apoio em um braço só','Peito','corpo',3,''],
+['Crucifixo deitado no chão com halteres','Peito','halter',1,''],
+['Supino inclinado na máquina','Peito','maquina',1,''],
+['Flexão lenta de 5 segundos na descida','Peito','corpo',2,''],
+['Flexão com as mãos na escada ou degrau','Peito','corpo',1,'b'],
+['Supino reto com kettlebell','Peito','kettle',2,''],
+['Flexão com pés no TRX','Peito','corpo',3,''],
+['Supino guiado com pausa','Peito','maquina',1,'b'],
+['Crucifixo com pausa de 2 segundos na abertura','Peito','halter',2,''],
+['Flexão com apoio alternado na bola','Peito','corpo',3,''],
+['Supino com barra e pegada larga','Peito','barra',2,'m'],
+['Flexão espartana','Peito','corpo',3,''],
+['Desenvolvimento militar com barra','Ombro','barra',2,'m'],
+['Desenvolvimento com halteres sentada','Ombro','halter',2,'m'],
+['Desenvolvimento com halteres em pé','Ombro','halter',2,'m'],
+['Desenvolvimento Arnold','Ombro','halter',3,'m'],
+['Desenvolvimento na máquina','Ombro','maquina',1,''],
+['Desenvolvimento no Smith','Ombro','maquina',1,''],
+['Desenvolvimento com kettlebell','Ombro','kettle',2,''],
+['Desenvolvimento unilateral com halter','Ombro','halter',2,''],
+['Desenvolvimento com elástico','Ombro','elastico',1,'b'],
+['Desenvolvimento sentada com apoio nas costas','Ombro','banco',1,'b'],
+['Flexão pike','Ombro','corpo',2,'m','Desenvolvimento sem peso nenhum.'],
+['Flexão pike com pés elevados','Ombro','corpo',3,'m'],
+['Parada de mão na parede','Ombro','corpo',3,''],
+['Flexão na parada de mão','Ombro','corpo',3,'m'],
+['Elevação lateral com halteres','Ombro','halter',1,'m','O que mais alarga o ombro visto de frente.'],
+['Elevação lateral na polia','Ombro','polia',2,'m'],
+['Elevação lateral com elástico','Ombro','elastico',1,'m'],
+['Elevação lateral na máquina','Ombro','maquina',1,'m'],
+['Elevação lateral inclinada no banco','Ombro','banco',2,'m'],
+['Elevação lateral unilateral','Ombro','halter',2,'m'],
+['Elevação lateral com pausa no topo','Ombro','halter',2,'m'],
+['Elevação frontal com halteres','Ombro','halter',1,''],
+['Elevação frontal com barra','Ombro','barra',1,''],
+['Elevação frontal na polia','Ombro','polia',2,''],
+['Elevação frontal com anilha','Ombro','maquina',1,''],
+['Elevação frontal com elástico','Ombro','elastico',1,'b'],
+['Elevação lateral deitada de lado','Ombro','halter',2,''],
+['Desenvolvimento com pegada neutra','Ombro','halter',2,''],
+['Rotação externa a 90 graus com elástico','Ombro','elastico',2,''],
+['Circundução de ombro','Ombro','corpo',1,'b','Aquecimento: dez para frente, dez para trás.'],
+['Elevação em Y no banco inclinado','Ombro','banco',2,'m'],
+['Elevação em T no banco inclinado','Ombro','banco',2,'m'],
+['Elevação em W no banco inclinado','Ombro','banco',2,''],
+['Desenvolvimento com halteres e rotação','Ombro','halter',3,''],
+['Push press com barra','Ombro','barra',3,'m','Usa a perna para subir mais peso.'],
+['Push press com halteres','Ombro','halter',3,''],
+['Desenvolvimento por trás da nuca','Ombro','barra',3,'','Só com ombro saudável.'],
+['Elevação lateral com halter deitada no banco','Ombro','banco',2,''],
+['Encolhimento com elevação (high pull)','Ombro','barra',3,'m'],
+['Abdução horizontal com elástico','Ombro','elastico',1,''],
+['Isometria de ombro na parede','Ombro','corpo',1,'b'],
+['Elevação lateral sentada','Ombro','halter',1,'b'],
+['Elevação frontal alternada','Ombro','halter',1,''],
+['Desenvolvimento em pé com elástico sob os pés','Ombro','elastico',1,'b'],
+['Elevação lateral com garrafa de água','Ombro','corpo',1,'b','Sem halter em casa, garrafa cheia resolve.'],
+['Desenvolvimento com garrafas de água','Ombro','corpo',1,'b'],
+['Elevação lateral com pausa e descida lenta','Ombro','halter',2,'m'],
+['Rotação de ombro com bastão','Ombro','corpo',1,'b'],
+['Elevação lateral no cabo cruzado','Ombro','polia',3,'m'],
+['Desenvolvimento landmine','Ombro','barra',2,''],
+['Elevação frontal com corda na polia','Ombro','polia',2,''],
+['Prancha com toque no ombro','Ombro','corpo',2,'','Ombro estabilizando, core segurando.'],
+['Elevação lateral 21','Ombro','halter',3,'m'],
+['Desenvolvimento sentado na máquina com pegada neutra','Ombro','maquina',1,''],
+['Elevação lateral com elástico sentada','Ombro','elastico',1,'b'],
+['Rosca direta com barra','Bíceps','barra',1,'m'],
+['Rosca direta com barra W','Bíceps','barra',1,'','A barra W pesa menos no punho.'],
+['Rosca direta com halteres','Bíceps','halter',1,''],
+['Rosca alternada com halteres','Bíceps','halter',1,''],
+['Rosca martelo','Bíceps','halter',1,'m','Pega o braquial, que é o que engrossa o braço de lado.'],
+['Rosca martelo na corda','Bíceps','polia',2,''],
+['Rosca concentrada','Bíceps','halter',1,''],
+['Rosca Scott no banco','Bíceps','banco',2,''],
+['Rosca Scott na máquina','Bíceps','maquina',1,''],
+['Rosca inversa com barra','Bíceps','barra',2,'','Antebraço junto.'],
+['Rosca inversa com halteres','Bíceps','halter',2,''],
+['Rosca na polia baixa','Bíceps','polia',1,''],
+['Rosca na polia alta (duplo bíceps)','Bíceps','polia',2,''],
+['Rosca com elástico','Bíceps','elastico',1,'b'],
+['Rosca 21','Bíceps','barra',2,''],
+['Rosca spider','Bíceps','banco',2,''],
+['Rosca com pegada neutra na polia','Bíceps','polia',2,''],
+['Rosca com barra e pausa no topo','Bíceps','barra',2,''],
+['Rosca com halteres no banco inclinado','Bíceps','banco',2,'','Alonga o bíceps antes de contrair.'],
+['Rosca unilateral na polia','Bíceps','polia',2,''],
+['Rosca com kettlebell','Bíceps','kettle',1,''],
+['Rosca de punho com halteres','Bíceps','halter',1,''],
+['Rosca de punho inversa','Bíceps','halter',1,''],
+['Rosca com toalha ou mochila','Bíceps','corpo',1,'b','Qualquer peso que dê para segurar serve.'],
+['Rosca com garrafa de água','Bíceps','corpo',1,'b'],
+['Rosca com elástico sentada','Bíceps','elastico',1,'b'],
+['Barra fixa supinada com pausa','Bíceps','corpo',3,''],
+['Rosca drag com barra','Bíceps','barra',3,''],
+['Rosca com halteres e supinação no meio','Bíceps','halter',2,''],
+['Rosca martelo cruzada','Bíceps','halter',2,''],
+['Rosca com barra, descida de 4 segundos','Bíceps','barra',2,''],
+['Isometria de rosca a 90 graus','Bíceps','halter',2,''],
+['Rosca no TRX','Bíceps','corpo',2,''],
+['Rosca em pé com elástico sob os pés','Bíceps','elastico',1,'b'],
+['Rosca alternada sentada no banco','Bíceps','banco',1,''],
+['Tríceps na polia com barra','Tríceps','polia',1,''],
+['Tríceps na polia com corda','Tríceps','polia',1,''],
+['Tríceps na polia com pegada inversa','Tríceps','polia',2,''],
+['Tríceps testa com barra W','Tríceps','barra',2,''],
+['Tríceps testa com halteres','Tríceps','halter',2,''],
+['Tríceps francês com halter','Tríceps','halter',2,''],
+['Tríceps francês com barra','Tríceps','barra',2,''],
+['Tríceps francês unilateral','Tríceps','halter',2,''],
+['Tríceps coice com halter','Tríceps','halter',1,''],
+['Tríceps coice na polia','Tríceps','polia',2,''],
+['Tríceps coice com elástico','Tríceps','elastico',1,'b'],
+['Tríceps no banco (mergulho de banco)','Tríceps','banco',1,''],
+['Tríceps no banco com pés elevados','Tríceps','banco',2,''],
+['Mergulho nas paralelas com tronco reto','Tríceps','corpo',3,'','Tronco reto puxa mais tríceps que peito.'],
+['Flexão diamante com pausa','Tríceps','corpo',3,''],
+['Flexão fechada no banco','Tríceps','banco',1,'b'],
+['Tríceps na máquina','Tríceps','maquina',1,''],
+['Tríceps unilateral na polia','Tríceps','polia',2,''],
+['Tríceps com elástico sobre a cabeça','Tríceps','elastico',1,'b'],
+['Tríceps testa no chão com halteres','Tríceps','halter',2,''],
+['Supino fechado com halteres','Tríceps','halter',2,''],
+['Tríceps JM press','Tríceps','barra',3,''],
+['Extensão de tríceps deitada na polia','Tríceps','polia',2,''],
+['Tríceps com corda acima da cabeça','Tríceps','polia',2,''],
+['Flexão pseudo-diamante na parede','Tríceps','corpo',1,'b'],
+['Tríceps com garrafa de água','Tríceps','corpo',1,'b'],
+['Tríceps kickback duplo com elástico','Tríceps','elastico',1,''],
+['Tríceps no TRX','Tríceps','corpo',3,''],
+['Extensão de tríceps sentada com halter','Tríceps','halter',1,'b'],
+['Tríceps na barra com pegada fechada','Tríceps','barra',2,''],
+['Tríceps com pausa de 2 segundos na extensão','Tríceps','polia',2,''],
+['Tríceps testa com kettlebell','Tríceps','kettle',2,''],
+['Extensão de tríceps unilateral acima da cabeça','Tríceps','halter',2,''],
+['Tríceps na polia com descida lenta','Tríceps','polia',2,''],
+['Mergulho de banco com peso no colo','Tríceps','banco',2,''],
+['Flexão com mãos em diamante no joelho','Tríceps','corpo',1,'b'],
+['Tríceps na máquina sentada','Tríceps','maquina',1,'b'],
+['Extensão de tríceps com elástico na porta','Tríceps','elastico',1,'b'],
+['Tríceps francês deitada no banco','Tríceps','banco',2,''],
+['Tríceps com barra atrás do corpo','Tríceps','barra',3,''],
+['Prancha frontal','Core','corpo',1,'','Segure o tempo. Quadril na linha do ombro.'],
+['Prancha no antebraço','Core','corpo',1,''],
+['Prancha com os joelhos no chão','Core','corpo',1,'b'],
+['Prancha lateral','Core','corpo',2,''],
+['Prancha lateral com joelho apoiado','Core','corpo',1,'b'],
+['Prancha lateral com elevação de quadril','Core','corpo',3,''],
+['Prancha com toque alternado no ombro','Core','corpo',2,''],
+['Prancha com elevação de perna','Core','corpo',2,''],
+['Prancha com deslocamento lateral','Core','corpo',3,''],
+['Prancha na bola','Core','corpo',3,''],
+['Prancha com braço estendido','Core','corpo',2,''],
+['Prancha dinâmica (sobe e desce)','Core','corpo',2,''],
+['Prancha em pé contra a parede','Core','corpo',1,'b'],
+['Abdominal supra no solo','Core','corpo',1,''],
+['Abdominal infra no solo','Core','corpo',1,''],
+['Abdominal infra na paralela','Core','corpo',3,''],
+['Abdominal bicicleta','Core','corpo',1,''],
+['Abdominal canivete','Core','corpo',3,''],
+['Abdominal oblíquo no solo','Core','corpo',1,''],
+['Abdominal com pernas na parede','Core','corpo',1,'b'],
+['Abdominal na polia ajoelhada','Core','polia',2,''],
+['Abdominal na máquina','Core','maquina',1,''],
+['Abdominal com elástico','Core','elastico',1,'b'],
+['Elevação de pernas deitada','Core','corpo',2,''],
+['Elevação de pernas na barra','Core','corpo',3,''],
+['Elevação de joelhos na paralela','Core','corpo',2,''],
+['Elevação de pernas com pausa','Core','corpo',3,''],
+['Hollow hold','Core','corpo',3,''],
+['Hollow rock','Core','corpo',3,''],
+['Dead bug','Core','corpo',1,'b','O melhor primeiro exercício de core que existe.'],
+['Dead bug com elástico','Core','elastico',2,''],
+['Pallof press na polia','Core','polia',2,'','Anti-rotação: o core segura o tronco parado.'],
+['Pallof press com elástico','Core','elastico',1,''],
+['Rotação russa sentada','Core','corpo',2,''],
+['Rotação russa com peso','Core','halter',2,''],
+['Rotação de tronco na polia (wood chop)','Core','polia',2,''],
+['Rotação de tronco com elástico','Core','elastico',1,''],
+['Mountain climber','Core','corpo',2,''],
+['Mountain climber lento','Core','corpo',1,'b'],
+['Escalador cruzado','Core','corpo',2,''],
+['Ab wheel ajoelhada','Core','maquina',3,''],
+['Ab wheel em pé','Core','maquina',3,''],
+['Toque no calcanhar deitada','Core','corpo',1,'b'],
+['Canivete com uma perna','Core','corpo',2,''],
+['Abdominal V-up','Core','corpo',3,''],
+['L-sit no chão','Core','corpo',3,''],
+['L-sit na paralela','Core','corpo',3,''],
+['Prancha com peso nas costas','Core','corpo',3,''],
+['Abdominal com bola entre os joelhos','Core','corpo',1,'b'],
+['Respiração 360 graus deitada','Core','corpo',1,'b','Core começa pela respiração. Vale como exercício.'],
+['Vacuum abdominal','Core','corpo',2,''],
+['Prancha com os pés no TRX','Core','corpo',3,''],
+['Abdominal infra com elevação de quadril','Core','corpo',3,''],
+['Prancha frontal com pausa de 10 segundos a cada 30','Core','corpo',2,''],
+['Sit-up completo','Core','corpo',2,''],
+['Sit-up com peso no peito','Core','halter',3,''],
+['Caminhada do urso','Core','corpo',2,''],
+['Prancha invertida','Core','corpo',3,''],
+['Elevação de tronco com apoio no cotovelo','Core','corpo',1,'b'],
+['Marcha deitada (toe tap)','Core','corpo',1,'b'],
+['Caminhada leve','Cardio','corpo',1,'b','Vinte minutos contam. Não precisa suar.'],
+['Caminhada rápida','Cardio','corpo',1,'b'],
+['Caminhada em subida','Cardio','corpo',2,''],
+['Caminhada na esteira inclinada','Cardio','maquina',2,''],
+['Corrida leve','Cardio','corpo',2,''],
+['Corrida intervalada','Cardio','corpo',3,''],
+['Tiros de 30 segundos','Cardio','corpo',3,''],
+['Bicicleta ergométrica','Cardio','maquina',1,'b'],
+['Bicicleta na rua','Cardio','corpo',1,'b'],
+['Elíptico','Cardio','maquina',1,'b','Zero impacto no joelho.'],
+['Remo ergômetro','Cardio','maquina',2,''],
+['Escada ou stepper','Cardio','maquina',2,''],
+['Pular corda','Cardio','corpo',2,''],
+['Pular corda sem corda','Cardio','corpo',1,'b'],
+['Polichinelo','Cardio','corpo',1,''],
+['Polichinelo sem salto','Cardio','corpo',1,'b'],
+['Burpee','Cardio','corpo',3,''],
+['Burpee sem salto','Cardio','corpo',2,''],
+['Burpee na parede','Cardio','corpo',1,'b'],
+['Corrida estacionária','Cardio','corpo',1,'b'],
+['Joelho alto no lugar','Cardio','corpo',1,''],
+['Chute no bumbum','Cardio','corpo',1,''],
+['Skater lateral','Cardio','corpo',2,''],
+['Shadow boxing','Cardio','corpo',1,'b','Cardio sem impacto e sem equipamento.'],
+['Dança livre','Cardio','corpo',1,'b','Conta como cardio, e é o que mais gente consegue manter.'],
+['Natação','Cardio','corpo',2,'b'],
+['Hidroginástica','Cardio','corpo',1,'b'],
+['Subir e descer escada','Cardio','corpo',2,'b'],
+['Caminhada com peso na mochila','Cardio','corpo',2,''],
+['Circuito de corpo inteiro em casa','Cardio','corpo',2,''],
+['Alongamento de posterior de coxa sentada','Mobilidade','corpo',1,'b'],
+['Alongamento de quadríceps em pé','Mobilidade','corpo',1,'b'],
+['Alongamento de panturrilha na parede','Mobilidade','corpo',1,'b'],
+['Alongamento de peitoral no batente','Mobilidade','corpo',1,'b','Abre o peito de quem passa o dia curvada.'],
+['Alongamento de dorsal pendurada','Mobilidade','corpo',2,''],
+['Alongamento de flexor de quadril ajoelhada','Mobilidade','corpo',1,'b'],
+['Alongamento de glúteo deitada (figura 4)','Mobilidade','corpo',1,'b'],
+['Alongamento de pescoço lateral','Mobilidade','corpo',1,'b'],
+['Mobilidade de coluna gato e vaca','Mobilidade','corpo',1,'b'],
+['Mobilidade de quadril 90/90','Mobilidade','corpo',2,''],
+['Mobilidade de tornozelo na parede','Mobilidade','corpo',1,'b'],
+['Mobilidade de ombro com bastão','Mobilidade','corpo',1,'b'],
+['Mobilidade torácica deitada de lado','Mobilidade','corpo',1,'b'],
+['Rotação de tronco deitada','Mobilidade','corpo',1,'b'],
+['Postura do bebê (alongamento de lombar)','Mobilidade','corpo',1,'b'],
+['Alongamento de adutor sentada (borboleta)','Mobilidade','corpo',1,'b'],
+['Liberação de glúteo com bolinha','Mobilidade','corpo',1,'b'],
+['Liberação de planta do pé com bolinha','Mobilidade','corpo',1,'b'],
+['Liberação de quadríceps com rolinho','Mobilidade','corpo',1,'b'],
+['Liberação de dorsal com rolinho','Mobilidade','corpo',1,'b']
+];
+/* =====================================================================
+   TODOS OS EXERCÍCIOS
+   O plano do dia entrega o que fazer hoje. Esta tela é o contrário: a
+   lista inteira, para quem quer trocar, montar o próprio treino ou só
+   saber o que existe.
+
+   Três coisas já valem aqui sem nenhuma tabela nova:
+   - a LIMITAÇÃO que a pessoa marcou no Perfil, porque o movimento sai
+     do nome pelo MOV_MAP que o resto do app já usa;
+   - a TRILHA, que na androginia tira elevação lateral e glúteo isolado
+     — os dois que mais deslocam a proporção entre ombro e quadril;
+   - o LUGAR onde ela treina.
+
+   O que está fora não some: fica listado e marcado, com o motivo. Lista
+   que esconde sem dizer faz a pessoa procurar para sempre uma coisa que
+   o app tirou de propósito.
+   ===================================================================== */
+const EX_EQ={corpo:'sem equipamento',halter:'halter',barra:'barra',maquina:'máquina',
+ polia:'polia',elastico:'elástico',kettle:'kettlebell',banco:'banco ou sofá'};
+const EX_LUGAR=[['','qualquer'],['corpo','sem nada'],['casa','em casa'],['academia','academia']];
+const EX_CASA=['corpo','elastico','halter','banco','kettle'];
+function exCabe(eq,lugar){
+ if(!lugar)return true;
+ if(lugar==='corpo')return eq==='corpo';
+ if(lugar==='casa')return EX_CASA.indexOf(eq)>=0;
+ return true;
+}
+function stExercicios(){
+ const t=S.perfil.trilha;
+ const letra={masc:'m',fem:'f',andro:'a',bem:'b'}[t]||'';
+ const g=S.ui.exG||'', lugar=S.ui.exEq||'', q=nrm(S.ui.exQ||'');
+ const bloq=movsBloqueados(), foraTr=movsDaTrilha();
+ const grupos=[];
+ CATALOGO.forEach(function(x){if(grupos.indexOf(x[1])<0)grupos.push(x[1])});
+ /* Prioridade da trilha primeiro, e dentro disso a ordem em que foram
+    escritos — que é do mais básico para o mais difícil. */
+ const lista=CATALOGO.filter(function(x){
+  if(g&&x[1]!==g)return false;
+  if(!exCabe(x[2],lugar))return false;
+  if(q&&nrm(x[0]).indexOf(q)<0&&nrm(x[1]).indexOf(q)<0)return false;
+  return true;
+ }).map(function(x){
+  const m=movDe(x[0]);
+  return {n:x[0],g:x[1],eq:x[2],nv:x[3],pri:(letra&&x[4].indexOf(letra)>=0),o:x[5]||'',
+   trava:!!(m&&bloq[m.k]),fora:!!(m&&foraTr[m.k])};
+ });
+ /* Primeiro o que dá para fazer, depois a prioridade da trilha. A
+    ordem contrária jogava para o topo justamente o que a limitação
+    tirou: com dor no joelho, as quatro primeiras linhas de Pernas
+    eram riscadas. */
+ lista.sort(function(a,b){
+  const pa=(a.trava||a.fora)?1:0, pb=(b.trava||b.fora)?1:0;
+  if(pa!==pb)return pa-pb;
+  return (b.pri?1:0)-(a.pri?1:0);
+ });
+ const TETO=70;
+ const most=lista.slice(0,TETO);
+ const nvT=['','básico','intermediário','avançado'];
+ let h='<div class="card hero">'+chTtl('dumb','Todos os exercícios',
+   '<span class="tag n">'+CATALOGO.length+'</span>')+
+  '<p class="tiny" style="line-height:1.7">A lista inteira, para trocar um exercício do plano, '+
+  'montar o seu ou só saber o que existe. '+(letra==='a'
+   ?'Na sua trilha, elevação lateral e glúteo isolado ficam marcados como fora: são os dois que mais '+
+    'deslocam a proporção entre ombro e quadril.'
+   :'Os que são prioridade na sua trilha vêm primeiro.')+'</p>'+
+  ((S.perfil.limites||[]).length
+   ?'<p class="xtiny muted" style="line-height:1.65;margin-top:9px">O que esbarra na limitação que '+
+    'você marcou aparece riscado, com o motivo. Não some: some seria você procurar para sempre.</p>'
+   :'')+'</div>';
+ h+='<div class="card">'+
+  '<label class="fld">Procurar<input type="text" id="exQ" autocomplete="off" '+
+  'placeholder="agachamento, remada, prancha..." value="'+esc(S.ui.exQ||'')+'"></label>'+
+  '<div class="lbl" style="margin:13px 0 7px">Grupo</div>'+
+  '<div class="subtabs" style="gap:6px;margin:0 calc(var(--gl) * -1);padding:2px var(--gl)">'+
+  '<button class="chip xs'+(g?'':' on')+'" data-a="ex-g" data-v="" style="flex:none">todos</button>'+
+  grupos.map(function(x){
+   return '<button class="chip xs'+(g===x?' on':'')+'" data-a="ex-g" data-v="'+esc(x)+'" '+
+    'style="flex:none">'+esc(x)+'</button>';
+  }).join('')+'</div>'+
+  '<div class="lbl" style="margin:13px 0 7px">Onde você está</div>'+
+  '<div class="row wrap" style="gap:6px">'+EX_LUGAR.map(function(x){
+   return '<button class="chip xs'+(lugar===x[0]?' on':'')+'" data-a="ex-eq" data-v="'+x[0]+'">'+
+    x[1]+'</button>';
+  }).join('')+'</div></div>';
+ if(!lista.length){
+  h+='<div class="card"><p class="tiny muted" style="line-height:1.7">Nada com esse filtro. '+
+   'Tente outro grupo, ou limpe a busca.</p></div>';
+ }else{
+  h+='<div class="card"><div class="lbl" style="margin-bottom:6px">'+
+   (lista.length>TETO?'mostrando '+TETO+' de '+lista.length:lista.length+
+    (lista.length===1?' exercício':' exercícios'))+'</div>'+
+   '<div class="stack" style="gap:0">'+most.map(function(x){
+    const marca=x.trava?'<span class="tag w" style="flex:none">sua limitação tira</span>'
+     :x.fora?'<span class="tag n" style="flex:none">fora da sua trilha</span>'
+     :x.pri?'<span class="tag o" style="flex:none">prioridade</span>':'';
+    return '<div class="li" style="align-items:flex-start;gap:9px">'+
+     '<div class="grow" style="min-width:0">'+
+     '<div class="ttl"'+(x.trava?' style="text-decoration:line-through;color:var(--ink-3)"':'')+'>'+
+     esc(x.n)+'</div>'+
+     '<div class="sub">'+esc(x.g)+' · '+esc(nvT[x.nv])+' · '+esc(EX_EQ[x.eq]||x.eq)+
+     (x.o?'<br>'+esc(x.o):'')+'</div></div>'+marca+'</div>';
+   }).join('')+'</div>'+
+   (lista.length>TETO
+    ?'<p class="xtiny muted" style="margin-top:10px;line-height:1.6">Tem mais '+(lista.length-TETO)+
+     '. Use a busca ou escolha um grupo para chegar neles.</p>'
+    :'')+'</div>';
+ }
+ $('#st-exercicios').innerHTML=h;
+ const campo=$('#exQ');
+ if(campo){
+  /* O valor volta do estado a cada desenho, então o cursor precisa ser
+     reposto no fim — senão ele pula para o começo a cada letra. */
+  campo.addEventListener('input',function(){
+   S.ui.exQ=campo.value;
+   clearTimeout(stExercicios._t);
+   stExercicios._t=setTimeout(function(){
+    stExercicios();
+    const c2=$('#exQ');
+    if(c2){c2.focus();c2.setSelectionRange(c2.value.length,c2.value.length)}
+   },220);
+  });
+ }
+}
 function renderTreino(){
  const s=S.ui.sub.treino;
  $$('#treinoTabs .subtab').forEach(b=>b.classList.toggle('on',b.dataset.st===s));
- ['hoje','agenda','evolucao','plano'].forEach(k=>{const el=$('#st-'+k);if(el)el.hidden=(k!==s)});
- ({hoje:stHoje,agenda:stAgenda,evolucao:stEvolucao,plano:stPlano}[s]||stHoje)();
+ ['hoje','agenda','evolucao','plano','exercicios'].forEach(k=>{const el=$('#st-'+k);if(el)el.hidden=(k!==s)});
+ ({hoje:stHoje,agenda:stAgenda,evolucao:stEvolucao,plano:stPlano,exercicios:stExercicios}[s]||stHoje)();
 }
 /* =====================================================================
    NUTRIÇÃO
@@ -14635,6 +15317,8 @@ document.addEventListener('click',ev=>{
   case 'ciencia-v':S.ui.cienciaV=d.v;S.ui.fatoArea='';window.scrollTo(0,0);render();break;
   case 'fato-area':S.ui.fatoArea=d.v||'';render();break;
   case 'pr-area':S.ui.prArea=d.v||'';window.scrollTo(0,0);render();break;
+  case 'ex-g':S.ui.exG=d.v||'';render();break;
+  case 'ex-eq':S.ui.exEq=d.v||'';render();break;
   case 'go-sub':{const tb=d.tab,st=d.st||(d.v||'').split('|')[1];
    S.ui.tab=tb;if(st)S.ui.sub[tb]=st;window.scrollTo(0,0);render();break}
   case 'close':case 'close-ovl':closeSheet();break;
