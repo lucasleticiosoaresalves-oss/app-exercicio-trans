@@ -1,0 +1,12 @@
+# A pasta dicas/ tem imagens salvas de criadores, com marca d'água e
+# @ de quem fez. O conteúdo delas virou texto e desenho próprios dentro
+# do app; os arquivos em si não são meus nem seus para publicar, então
+# ficam fora do repositório de propósito.
+dicas/
+
+# Sobra de sistema e de editor
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+*~
